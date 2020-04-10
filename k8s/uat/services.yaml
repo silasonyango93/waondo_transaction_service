@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: waondo-transaction-service
+  namespace: uat
+  labels:
+    app: waondo-transaction-service
+    name: waondo-transaction-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      name: http
+      targetPort: 8080
+  selector:
+    app: waondo-transaction-service
+    name: waondo-transaction-service
