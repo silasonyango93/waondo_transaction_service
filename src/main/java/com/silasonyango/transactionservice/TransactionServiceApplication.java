@@ -29,6 +29,8 @@ public class TransactionServiceApplication {
 				registry.addMapping("/subpartitions/*").allowedOrigins(clientUrl);
 				registry.addMapping("/library_fields/*").allowedOrigins(clientUrl);
 				registry.addMapping("/resource_brands/*").allowedOrigins(clientUrl);
+				registry.addMapping("/user_roles/*").allowedOrigins(clientUrl);
+				registry.addMapping("/roles/*").allowedOrigins(clientUrl);
 			}
 		};
 	}
