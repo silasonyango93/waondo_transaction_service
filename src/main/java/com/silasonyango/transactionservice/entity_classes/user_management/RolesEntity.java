@@ -10,7 +10,7 @@ import javax.persistence.*;
 )
 
 @NamedNativeQueries({
-        @NamedNativeQuery(name="RolesEntity.getAllRoles",
+        @NamedNativeQuery(name="RolesEntity.getRoles",
                 query="SELECT * FROM users",
                 resultSetMapping = "roles" )
 })

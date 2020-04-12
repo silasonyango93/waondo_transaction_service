@@ -23,14 +23,10 @@ public class TransactionServiceApplication {
 			final String clientUrl = "*";
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/user/*").allowedOrigins(clientUrl);
-				registry.addMapping("/resource_types/*").allowedOrigins(clientUrl);
-				registry.addMapping("/library_partitions/*").allowedOrigins(clientUrl);
-				registry.addMapping("/subpartitions/*").allowedOrigins(clientUrl);
-				registry.addMapping("/library_fields/*").allowedOrigins(clientUrl);
-				registry.addMapping("/resource_brands/*").allowedOrigins(clientUrl);
 				registry.addMapping("/user_roles/*").allowedOrigins(clientUrl);
 				registry.addMapping("/roles/*").allowedOrigins(clientUrl);
+				registry.addMapping("/access_privileges/*").allowedOrigins(clientUrl);
+				registry.addMapping("/user_access_privileges/*").allowedOrigins(clientUrl);
 			}
 		};
 	}

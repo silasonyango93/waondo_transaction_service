@@ -17,13 +17,13 @@ public class RolesController {
     RolesRepository rolesRepository;
 
     @PostMapping("/create_role")
-    public RolesEntity createLibraryPartition(@Valid RolesEntity rolesEntity) {
+    public RolesEntity createARole(@Valid RolesEntity rolesEntity) {
 
         return rolesRepository.save(rolesEntity);
     }
 
     @PostMapping("/get_all_roles")
-    public List<RolesEntity> getAllLibraryPartitions() {
+    public List<RolesEntity> getAllRoles() {
         return rolesRepository.findAll();
     }
 }
