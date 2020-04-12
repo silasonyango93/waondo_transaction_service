@@ -1,8 +1,6 @@
 package com.silasonyango.transactionservice.controllers.user_management;
 
 import com.silasonyango.transactionservice.entity_classes.user_management.RolesEntity;
-import com.silasonyango.transactionservice.models.library_partitions.LibraryPartionsModel;
-import com.silasonyango.transactionservice.repository.library_partitions.LibraryPartionsRepository;
 import com.silasonyango.transactionservice.repository.user_management.RolesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
