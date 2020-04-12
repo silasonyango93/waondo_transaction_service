@@ -55,7 +55,7 @@ public class UserRolesController {
             UserRolesEntity userRolesEntity = new UserRolesEntity();
             userRolesEntity.setRoleId(rolesEntityList.get(i).getRoleId());
             userRolesEntity.setUserId(userIdDto.getUserId());
-            userRolesEntity.setConfirmationStatus("0");
+            userRolesEntity.setConfirmationStatus(0);
 
 
             dbUserRoles.add(userRolesRepository.save(userRolesEntity));
@@ -71,7 +71,7 @@ public class UserRolesController {
                 UserAccessPrivilegesEntity userAccessPrivilegesEntity = new UserAccessPrivilegesEntity();
                 userAccessPrivilegesEntity.setUserRoleId(dbUserRoles.get(j).getUserRoleId());
                 userAccessPrivilegesEntity.setAccessPrivilegeId(accessPrivilegesEntityList.get(k).getAccessPrivilegeId());
-                userAccessPrivilegesEntity.setPermissionStatus("0");
+                userAccessPrivilegesEntity.setPermissionStatus(0);
 
                 userAccessPrivilegesRepository.save(userAccessPrivilegesEntity);
             }

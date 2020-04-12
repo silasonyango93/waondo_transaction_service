@@ -21,13 +21,13 @@ public class UserRolesEntity implements java.io.Serializable{
     private int userRoleId;
 
     @Column(name = "UserId")
-    private String userId;
+    private int userId;
 
     @Column(name = "RoleId")
     private int roleId;
 
     @Column(name = "ConfirmationStatus")
-    private String confirmationStatus;
+    private int confirmationStatus;
 
     public int getUserRoleId() {
         return userRoleId;
@@ -37,11 +37,11 @@ public class UserRolesEntity implements java.io.Serializable{
         this.userRoleId = userRoleId;
     }
 
-    public String getUserId() {
+    public int getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(int userId) {
         this.userId = userId;
     }
 
@@ -53,11 +53,11 @@ public class UserRolesEntity implements java.io.Serializable{
         this.roleId = roleId;
     }
 
-    public String getConfirmationStatus() {
+    public int getConfirmationStatus() {
         return confirmationStatus;
     }
 
-    public void setConfirmationStatus(String confirmationStatus) {
+    public void setConfirmationStatus(int confirmationStatus) {
         this.confirmationStatus = confirmationStatus;
     }
 }

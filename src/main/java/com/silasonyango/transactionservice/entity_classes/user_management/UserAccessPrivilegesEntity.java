@@ -28,7 +28,7 @@ public class UserAccessPrivilegesEntity implements java.io.Serializable{
     private int accessPrivilegeId;
 
     @Column(name = "PermisionStatus")
-    private String permissionStatus;
+    private int permissionStatus;
 
     public int getUserAccessPrivilegeId() {
         return userAccessPrivilegeId;
@@ -54,11 +54,11 @@ public class UserAccessPrivilegesEntity implements java.io.Serializable{
         this.accessPrivilegeId = accessPrivilegeId;
     }
 
-    public String getPermissionStatus() {
+    public int getPermissionStatus() {
         return permissionStatus;
     }
 
-    public void setPermissionStatus(String permissionStatus) {
+    public void setPermissionStatus(int permissionStatus) {
         this.permissionStatus = permissionStatus;
     }
 }
