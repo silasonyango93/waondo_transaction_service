@@ -48,10 +48,6 @@ public class UserRolesController {
             userRolesRepository.save(userRolesEntity);
         }
 
-        SuccessFailureResponseDto successFailureResponseDto = new SuccessFailureResponseDto();
-        successFailureResponseDto.setSuccessStatus(true);
-        successFailureResponseDto.setResponseMessage("User successfully assigned roles");
-        successFailureResponseDto.setReturnValue("N/A");
-        return successFailureResponseDto;
+        return new SuccessFailureResponseDto(true, "User successfully assigned roles", "N/A");
     }
 }

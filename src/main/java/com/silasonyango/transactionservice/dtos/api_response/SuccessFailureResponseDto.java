@@ -5,6 +5,12 @@ public class SuccessFailureResponseDto {
     private String responseMessage;
     private String returnValue;
 
+    public SuccessFailureResponseDto(boolean successStatus, String responseMessage, String returnValue) {
+        this.successStatus = successStatus;
+        this.responseMessage = responseMessage;
+        this.returnValue = returnValue;
+    }
+
     public boolean isSuccessStatus() {
         return successStatus;
     }
