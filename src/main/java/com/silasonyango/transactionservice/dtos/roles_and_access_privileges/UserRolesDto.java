@@ -7,6 +7,8 @@ public class UserRolesDto {
     private int userId;
     private int roleId;
     private int confirmationStatus;
+    private String roleDescription;
+    private int roleCode;
     private List<UserAccessPrivilegesDto> userAccessPrivilegesDtoList;
 
 
@@ -48,5 +50,21 @@ public class UserRolesDto {
 
     public void setUserAccessPrivilegesDtoList(List<UserAccessPrivilegesDto> userAccessPrivilegesDtoList) {
         this.userAccessPrivilegesDtoList = userAccessPrivilegesDtoList;
+    }
+
+    public String getRoleDescription() {
+        return roleDescription;
+    }
+
+    public void setRoleDescription(String roleDescription) {
+        this.roleDescription = roleDescription;
+    }
+
+    public int getRoleCode() {
+        return roleCode;
+    }
+
+    public void setRoleCode(int roleCode) {
+        this.roleCode = roleCode;
     }
 }

@@ -26,7 +26,7 @@ public class RolesEntity implements java.io.Serializable{
     private String roleDescription;
 
     @Column(name = "RoleCode")
-    private String roleCode;
+    private int roleCode;
 
     public int getRoleId() {
         return roleId;
@@ -44,11 +44,11 @@ public class RolesEntity implements java.io.Serializable{
         this.roleDescription = roleDescription;
     }
 
-    public String getRoleCode() {
+    public int getRoleCode() {
         return roleCode;
     }
 
-    public void setRoleCode(String roleCode) {
+    public void setRoleCode(int roleCode) {
         this.roleCode = roleCode;
     }
 }

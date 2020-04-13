@@ -3,12 +3,8 @@ package com.silasonyango.transactionservice.controllers.user_management;
 import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.UserAccessPrivilegesDto;
 import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.UserDto;
 import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.UserRolesDto;
-import com.silasonyango.transactionservice.entity_classes.user_management.UserAccessPrivilegesEntity;
-import com.silasonyango.transactionservice.entity_classes.user_management.UserRolesEntity;
-import com.silasonyango.transactionservice.entity_classes.user_management.UsersEntity;
-import com.silasonyango.transactionservice.repository.user_management.UserAccessPrivilegesRepository;
-import com.silasonyango.transactionservice.repository.user_management.UserRolesRepository;
-import com.silasonyango.transactionservice.repository.user_management.UsersRepository;
+import com.silasonyango.transactionservice.entity_classes.user_management.*;
+import com.silasonyango.transactionservice.repository.user_management.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +25,12 @@ public class UsersController {
 
     @Autowired
     UserAccessPrivilegesRepository userAccessPrivilegesRepository;
+
+    @Autowired
+    RolesRepository rolesRepository;
+
+    @Autowired
+    AccessPrivilegesRepository accessPrivilegesRepository;
 
     @PostMapping("/create_a_user")
     public UsersEntity createAUser(@Valid UsersEntity usersEntity) {
@@ -64,6 +66,8 @@ public class UsersController {
                 userRolesDto.setRoleId(userRolesEntityList.get(k).getRoleId());
                 userRolesDto.setUserId(userRolesEntityList.get(k).getUserId());
                 userRolesDto.setConfirmationStatus(userRolesEntityList.get(k).getConfirmationStatus());
+                userRolesDto.setRoleDescription(getRoleDescription(userRolesEntityList.get(k).getRoleId()));
+                userRolesDto.setRoleCode(getRoleCode(userRolesEntityList.get(k).getRoleId()));
 
                 userRolesDtoList.add(userRolesDto);
             }
@@ -82,6 +86,8 @@ public class UsersController {
                     userAccessPrivilegesDto.setPermisionStatus(userAccessPrivilegesEntityList.get(r).getPermissionStatus());
                     userAccessPrivilegesDto.setUserAccessPrivilegeId(userAccessPrivilegesEntityList.get(r).getUserAccessPrivilegeId());
                     userAccessPrivilegesDto.setUserRoleId(userAccessPrivilegesEntityList.get(r).getUserRoleId());
+                    userAccessPrivilegesDto.setAccessPrivilegeDescription(getAccessPrivilegeDescription(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId()));
+                    userAccessPrivilegesDto.setAccessPrivilegeCode(getAccessPrivilegeCode(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId()));
 
                     userAccessPrivilegesDtoList.add(userAccessPrivilegesDto);
                 }
@@ -96,5 +102,29 @@ public class UsersController {
 
 
         return userDtoList;
+    }
+
+    public String getRoleDescription(int roleId) {
+        List<RolesEntity> rolesEntityList = rolesRepository.findByRoleId(roleId);
+
+        return rolesEntityList.get(0).getRoleDescription();
+    }
+
+    public int getRoleCode(int roleId) {
+        List<RolesEntity> rolesEntityList = rolesRepository.findByRoleId(roleId);
+
+        return rolesEntityList.get(0).getRoleCode();
+    }
+
+    public String getAccessPrivilegeDescription(int accessPrivilegeId) {
+        List<AccessPrivilegesEntity> accessPrivilegesEntityList = accessPrivilegesRepository.findByAccessPrivilegeId(accessPrivilegeId);
+
+        return accessPrivilegesEntityList.get(0).getAccessPrivilegeDescription();
+    }
+
+    public int getAccessPrivilegeCode(int accessPrivilegeId) {
+        List<AccessPrivilegesEntity> accessPrivilegesEntityList = accessPrivilegesRepository.findByAccessPrivilegeId(accessPrivilegeId);
+
+        return accessPrivilegesEntityList.get(0).getAccessPrivilegeCode();
     }
 }

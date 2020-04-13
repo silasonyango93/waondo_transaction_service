@@ -5,6 +5,8 @@ public class UserAccessPrivilegesDto {
     private int userRoleId;
     private int accessPrivilegeId;
     private int permissionStatus;
+    private String accessPrivilegeDescription;
+    private int accessPrivilegeCode;
 
     public int getUserAccessPrivilegeId() {
         return userAccessPrivilegeId;
@@ -36,5 +38,21 @@ public class UserAccessPrivilegesDto {
 
     public void setPermisionStatus(int permisionStatus) {
         this.permissionStatus = permisionStatus;
+    }
+
+    public String getAccessPrivilegeDescription() {
+        return accessPrivilegeDescription;
+    }
+
+    public void setAccessPrivilegeDescription(String accessPrivilegeDescription) {
+        this.accessPrivilegeDescription = accessPrivilegeDescription;
+    }
+
+    public int getAccessPrivilegeCode() {
+        return accessPrivilegeCode;
+    }
+
+    public void setAccessPrivilegeCode(int accessPrivilegeCode) {
+        this.accessPrivilegeCode = accessPrivilegeCode;
     }
 }

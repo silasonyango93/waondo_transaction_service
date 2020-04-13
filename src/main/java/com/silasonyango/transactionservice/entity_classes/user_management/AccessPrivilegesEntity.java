@@ -24,7 +24,7 @@ public class AccessPrivilegesEntity implements java.io.Serializable{
     private String accessPrivilegeDescription;
 
     @Column(name = "AccessPrivilegeCode")
-    private String accessPrivilegeCode;
+    private int accessPrivilegeCode;
 
     public int getAccessPrivilegeId() {
         return accessPrivilegeId;
@@ -42,11 +42,11 @@ public class AccessPrivilegesEntity implements java.io.Serializable{
         this.accessPrivilegeDescription = accessPrivilegeDescription;
     }
 
-    public String getAccessPrivilegeCode() {
+    public int getAccessPrivilegeCode() {
         return accessPrivilegeCode;
     }
 
-    public void setAccessPrivilegeCode(String accessPrivilegeCode) {
+    public void setAccessPrivilegeCode(int accessPrivilegeCode) {
         this.accessPrivilegeCode = accessPrivilegeCode;
     }
 }
