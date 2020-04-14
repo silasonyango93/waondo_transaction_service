@@ -5,6 +5,7 @@ import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.User
 import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.UserRolesDto;
 import com.silasonyango.transactionservice.entity_classes.user_management.*;
 import com.silasonyango.transactionservice.repository.user_management.*;
+import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UsersController {
+
     @Autowired
     UsersRepository usersRepository;
 
@@ -40,7 +42,6 @@ public class UsersController {
 
     @PostMapping("/get_users_roles_and_access_privileges")
     public List<UserDto> getUsersRolesAndAccessPrivileges() {
-
         List<UserDto> userDtoList = new ArrayList<UserDto>();
         List<UsersEntity> usersEntityList = usersRepository.findAll();
 
