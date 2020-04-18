@@ -6,7 +6,7 @@ public class UserDto {
     private int userId;
     private String name;
     private String email;
-    private String genderId;
+    private int genderId;
     private String registeredDate;
     private List<UserRolesDto> userRolesDtoList;
 
@@ -34,11 +34,11 @@ public class UserDto {
         this.email = email;
     }
 
-    public String getGenderId() {
+    public int getGenderId() {
         return genderId;
     }
 
-    public void setGenderId(String genderId) {
+    public void setGenderId(int genderId) {
         this.genderId = genderId;
     }
 

@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface RolesRepository extends JpaRepository<RolesEntity, Long> {
     public List<RolesEntity> findByRoleId(@Param("RoleId") int roleId);
+    public List<RolesEntity> findByRoleCode(@Param("RoleCode") int roleCode);
 }

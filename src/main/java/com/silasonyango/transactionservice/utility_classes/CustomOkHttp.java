@@ -44,29 +44,22 @@ public class CustomOkHttp {
 
     }
 
-    public void okHttpPostPassingParams() throws Exception {
+    public String okHttpPostPassingParams(String apiUrl,RequestBody requestBody) throws Exception {
 
-        // form parameters
-        RequestBody formBody = new FormBody.Builder()
-                .add("username", "abc")
-                .add("password", "123")
-                .add("custom", "secret")
-                .build();
-
+        String responseString;
         Request request = new Request.Builder()
-                .url("https://httpbin.org/post")
-                .addHeader("User-Agent", "OkHttp Bot")
-                .post(formBody)
+                .url(apiUrl)
+                .post(requestBody)
                 .build();
 
         try (Response response = httpClient.newCall(request).execute()) {
 
             if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
 
-            // Get response body
-            System.out.println(response.body().string());
+            responseString = response.body().string();
         }
 
+        return responseString;
     }
 
 

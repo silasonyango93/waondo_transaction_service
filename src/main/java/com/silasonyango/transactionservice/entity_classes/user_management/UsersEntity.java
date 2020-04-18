@@ -28,7 +28,7 @@ public class UsersEntity implements java.io.Serializable{
     private String email;
 
     @Column(name = "GenderId")
-    private String genderId;
+    private int genderId;
 
     @Column(name = "EncryptedPassword")
     private String encryptedPassword;
@@ -60,11 +60,11 @@ public class UsersEntity implements java.io.Serializable{
         this.email = email;
     }
 
-    public String getGenderId() {
+    public int getGenderId() {
         return genderId;
     }
 
-    public void setGenderId(String genderId) {
+    public void setGenderId(int genderId) {
         this.genderId = genderId;
     }
 

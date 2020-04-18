@@ -1,18 +1,23 @@
 package com.silasonyango.transactionservice.controllers.user_management;
 
+import com.silasonyango.transactionservice.common.config.EndPoints;
 import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureResponseDto;
 import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.UserAccessPrivilegesDto;
 import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.UserDto;
 import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.UserRolesDto;
+import com.silasonyango.transactionservice.dtos.user_management.AuthenticationRequestDto;
+import com.silasonyango.transactionservice.dtos.user_management.AuthenticationResponseDto;
 import com.silasonyango.transactionservice.dtos.user_management.UserIdDto;
 import com.silasonyango.transactionservice.entity_classes.user_management.*;
 import com.silasonyango.transactionservice.repository.user_management.*;
 import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
-import net.minidev.json.JSONObject;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -111,6 +116,111 @@ public class UsersController {
 
         return userDto;
     }
+
+
+
+    @PostMapping("/authenticate")
+    public AuthenticationResponseDto authenticate(@Valid AuthenticationRequestDto authenticationRequestDto) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        List<UsersEntity> usersEntityList = usersRepository.findByEmail(authenticationRequestDto.getAttemptedEmail());
+        UsersEntity user = usersEntityList.get(0);
+
+        AuthenticationResponseDto authenticationResponseDto = new AuthenticationResponseDto();
+        if(passwordEncoder.matches(authenticationRequestDto.getAttemptedPassword(),user.getEncryptedPassword())){
+
+            CustomOkHttp customOkHttp = new CustomOkHttp();
+
+            RequestBody formBody = new FormBody.Builder()
+                    .add("userId", String.valueOf(user.getUserId()))
+                    .add("roleCode", String.valueOf(authenticationRequestDto.getAttemtedRoleCode()))
+                    .build();
+
+            try {
+                String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/user_has_certain_role",formBody);
+
+                JSONObject object = new JSONObject(responseString);
+                JSONArray jsonArray = object.getJSONArray("results");
+
+                if(jsonArray.length() == 0) {
+                    authenticationResponseDto.setLoginSuccessful(false);
+                    authenticationResponseDto.setAuthenticationEventMessage("Current user not assigned this role");
+                } else if(jsonArray.length() > 0) {
+
+                    JSONObject obj = null;
+                    obj = jsonArray.getJSONObject(0);
+
+                    if(isUserAllowedLoginWithThisRole(obj.getInt("UserRoleId"))) {
+                        authenticationResponseDto.setLoginSuccessful(true);
+                        authenticationResponseDto.setAuthenticationEventMessage("Login successful");
+                        authenticationResponseDto.setUserId(user.getUserId());
+                        authenticationResponseDto.setName(user.getName());
+                        authenticationResponseDto.setEmail(user.getEmail());
+                        authenticationResponseDto.setGenderId(user.getGenderId());
+                        authenticationResponseDto.setUserRegistrationDate(user.getRegisteredDate());
+
+
+
+                        List<UserRolesEntity> userRolesEntityList = userRolesRepository.findByUserId(user.getUserId());
+                        List<UserRolesDto> userRolesDtoList = new ArrayList<UserRolesDto>();
+
+                        for(int k = 0;k<userRolesEntityList.size();k++) {
+                            UserRolesDto userRolesDto = new UserRolesDto();
+                            userRolesDto.setUserRoleId(userRolesEntityList.get(k).getUserRoleId());
+                            userRolesDto.setRoleId(userRolesEntityList.get(k).getRoleId());
+                            userRolesDto.setUserId(userRolesEntityList.get(k).getUserId());
+                            userRolesDto.setConfirmationStatus(userRolesEntityList.get(k).getConfirmationStatus());
+                            userRolesDto.setRoleDescription(getRoleDescription(userRolesEntityList.get(k).getRoleId()));
+                            userRolesDto.setRoleCode(getRoleCode(userRolesEntityList.get(k).getRoleId()));
+
+                            userRolesDtoList.add(userRolesDto);
+                        }
+
+
+                        for(int j = 0;j<userRolesDtoList.size();j++) {
+
+                            List<UserAccessPrivilegesEntity> userAccessPrivilegesEntityList = userAccessPrivilegesRepository.findByUserRoleId(userRolesDtoList.get(j).getUserRoleId());
+                            List<UserAccessPrivilegesDto> userAccessPrivilegesDtoList = new ArrayList<UserAccessPrivilegesDto>();
+
+                            for(int r = 0;r<userAccessPrivilegesEntityList.size();r++) {
+                                UserAccessPrivilegesDto userAccessPrivilegesDto = new UserAccessPrivilegesDto();
+                                userAccessPrivilegesDto.setAccessPrivilegeId(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId());
+                                userAccessPrivilegesDto.setPermisionStatus(userAccessPrivilegesEntityList.get(r).getPermissionStatus());
+                                userAccessPrivilegesDto.setUserAccessPrivilegeId(userAccessPrivilegesEntityList.get(r).getUserAccessPrivilegeId());
+                                userAccessPrivilegesDto.setUserRoleId(userAccessPrivilegesEntityList.get(r).getUserRoleId());
+                                userAccessPrivilegesDto.setAccessPrivilegeDescription(getAccessPrivilegeDescription(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId()));
+                                userAccessPrivilegesDto.setAccessPrivilegeCode(getAccessPrivilegeCode(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId()));
+
+                                userAccessPrivilegesDtoList.add(userAccessPrivilegesDto);
+                            }
+
+                            userRolesDtoList.get(j).setUserAccessPrivilegesDtoList(userAccessPrivilegesDtoList);
+
+                        }
+
+                        authenticationResponseDto.setUserRolesDtoList(userRolesDtoList);
+                    }
+
+
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                authenticationResponseDto.setLoginSuccessful(false);
+                authenticationResponseDto.setAuthenticationEventMessage("Error determining user access rights: " + e.toString());
+            }
+
+
+
+        }else {
+
+            authenticationResponseDto.setLoginSuccessful(false);
+            authenticationResponseDto.setAuthenticationEventMessage("Wrong email or password");
+
+        }
+
+        return authenticationResponseDto;
+    }
+
 
     @PostMapping("/get_users_roles_and_access_privileges")
     public List<UserDto> getUsersRolesAndAccessPrivileges() {
@@ -233,5 +343,34 @@ public class UsersController {
         }
 
         return new SuccessFailureResponseDto(true, "User successfully assigned roles", "N/A");
+    }
+
+    public int getRoleIdFromRoleCode(int roleCode) {
+        List<RolesEntity> rolesEntityList = rolesRepository.findByRoleCode(roleCode);
+
+        return rolesEntityList.get(0).getRoleId();
+    }
+
+
+
+
+    public boolean isUserAllowedLoginWithThisRole(int userRoleId) {
+        boolean isUserAllowedLogin = false;
+        CustomOkHttp customOkHttp = new CustomOkHttp();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("userRoleId", String.valueOf(userRoleId))
+                .build();
+
+        try {
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/user_allowed_login_with_certain_role",formBody);
+            JSONObject object = new JSONObject(responseString);
+            JSONArray jsonArray = object.getJSONArray("results");
+            isUserAllowedLogin = jsonArray.length() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return isUserAllowedLogin;
     }
 }
