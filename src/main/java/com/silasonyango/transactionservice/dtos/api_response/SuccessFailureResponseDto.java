@@ -11,7 +11,7 @@ public class SuccessFailureResponseDto {
         this.returnValue = returnValue;
     }
 
-    public boolean isSuccessStatus() {
+    public boolean getSuccessStatus() {
         return successStatus;
     }
 

@@ -33,9 +33,6 @@ public class UsersEntity implements java.io.Serializable{
     @Column(name = "EncryptedPassword")
     private String encryptedPassword;
 
-    @Column(name = "Salt")
-    private String salt;
-
     @Column(name = "RegisteredDate")
     private String registeredDate;
 
@@ -77,14 +74,6 @@ public class UsersEntity implements java.io.Serializable{
 
     public void setEncryptedPassword(String encryptedPassword) {
         this.encryptedPassword = encryptedPassword;
-    }
-
-    public String getSalt() {
-        return salt;
-    }
-
-    public void setSalt(String salt) {
-        this.salt = salt;
     }
 
     public String getRegisteredDate() {
