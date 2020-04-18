@@ -122,101 +122,113 @@ public class UsersController {
     @PostMapping("/authenticate")
     public AuthenticationResponseDto authenticate(@Valid AuthenticationRequestDto authenticationRequestDto) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        List<UsersEntity> usersEntityList = usersRepository.findByEmail(authenticationRequestDto.getAttemptedEmail());
-        UsersEntity user = usersEntityList.get(0);
-
         AuthenticationResponseDto authenticationResponseDto = new AuthenticationResponseDto();
-        if(passwordEncoder.matches(authenticationRequestDto.getAttemptedPassword(),user.getEncryptedPassword())){
+        List<UsersEntity> usersEntityList = usersRepository.findByEmail(authenticationRequestDto.getAttemptedEmail());
 
-            CustomOkHttp customOkHttp = new CustomOkHttp();
-
-            RequestBody formBody = new FormBody.Builder()
-                    .add("userId", String.valueOf(user.getUserId()))
-                    .add("roleCode", String.valueOf(authenticationRequestDto.getAttemtedRoleCode()))
-                    .build();
-
-            try {
-                String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/user_has_certain_role",formBody);
-
-                JSONObject object = new JSONObject(responseString);
-                JSONArray jsonArray = object.getJSONArray("results");
-
-                if(jsonArray.length() == 0) {
-                    authenticationResponseDto.setLoginSuccessful(false);
-                    authenticationResponseDto.setAuthenticationEventMessage("Current user not assigned this role");
-                } else if(jsonArray.length() > 0) {
-
-                    JSONObject obj = null;
-                    obj = jsonArray.getJSONObject(0);
-
-                    if(isUserAllowedLoginWithThisRole(obj.getInt("UserRoleId"))) {
-                        authenticationResponseDto.setLoginSuccessful(true);
-                        authenticationResponseDto.setAuthenticationEventMessage("Login successful");
-                        authenticationResponseDto.setUserId(user.getUserId());
-                        authenticationResponseDto.setName(user.getName());
-                        authenticationResponseDto.setEmail(user.getEmail());
-                        authenticationResponseDto.setGenderId(user.getGenderId());
-                        authenticationResponseDto.setUserRegistrationDate(user.getRegisteredDate());
+        if(usersEntityList.size() == 0) {
+            authenticationResponseDto.setLoginSuccessful(false);
+            authenticationResponseDto.setAuthenticationEventMessage("No user exists by this email");
+        } else if(usersEntityList.size() == 1) {
+            UsersEntity user = usersEntityList.get(0);
 
 
+            if(passwordEncoder.matches(authenticationRequestDto.getAttemptedPassword(),user.getEncryptedPassword())){
 
-                        List<UserRolesEntity> userRolesEntityList = userRolesRepository.findByUserId(user.getUserId());
-                        List<UserRolesDto> userRolesDtoList = new ArrayList<UserRolesDto>();
+                CustomOkHttp customOkHttp = new CustomOkHttp();
 
-                        for(int k = 0;k<userRolesEntityList.size();k++) {
-                            UserRolesDto userRolesDto = new UserRolesDto();
-                            userRolesDto.setUserRoleId(userRolesEntityList.get(k).getUserRoleId());
-                            userRolesDto.setRoleId(userRolesEntityList.get(k).getRoleId());
-                            userRolesDto.setUserId(userRolesEntityList.get(k).getUserId());
-                            userRolesDto.setConfirmationStatus(userRolesEntityList.get(k).getConfirmationStatus());
-                            userRolesDto.setRoleDescription(getRoleDescription(userRolesEntityList.get(k).getRoleId()));
-                            userRolesDto.setRoleCode(getRoleCode(userRolesEntityList.get(k).getRoleId()));
+                RequestBody formBody = new FormBody.Builder()
+                        .add("userId", String.valueOf(user.getUserId()))
+                        .add("roleCode", String.valueOf(authenticationRequestDto.getAttemtedRoleCode()))
+                        .build();
 
-                            userRolesDtoList.add(userRolesDto);
-                        }
+                try {
+                    String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/user_has_certain_role",formBody);
+
+                    JSONObject object = new JSONObject(responseString);
+                    JSONArray jsonArray = object.getJSONArray("results");
+
+                    if(jsonArray.length() == 0) {
+                        authenticationResponseDto.setLoginSuccessful(false);
+                        authenticationResponseDto.setAuthenticationEventMessage("Current user not assigned this role");
+                    } else if(jsonArray.length() > 0) {
+
+                        JSONObject obj = null;
+                        obj = jsonArray.getJSONObject(0);
+
+                        if(isUserAllowedLoginWithThisRole(obj.getInt("UserRoleId"))) {
+                            authenticationResponseDto.setLoginSuccessful(true);
+                            authenticationResponseDto.setAuthenticationEventMessage("Login successful");
+                            authenticationResponseDto.setUserId(user.getUserId());
+                            authenticationResponseDto.setName(user.getName());
+                            authenticationResponseDto.setEmail(user.getEmail());
+                            authenticationResponseDto.setGenderId(user.getGenderId());
+                            authenticationResponseDto.setUserRegistrationDate(user.getRegisteredDate());
 
 
-                        for(int j = 0;j<userRolesDtoList.size();j++) {
 
-                            List<UserAccessPrivilegesEntity> userAccessPrivilegesEntityList = userAccessPrivilegesRepository.findByUserRoleId(userRolesDtoList.get(j).getUserRoleId());
-                            List<UserAccessPrivilegesDto> userAccessPrivilegesDtoList = new ArrayList<UserAccessPrivilegesDto>();
+                            List<UserRolesEntity> userRolesEntityList = userRolesRepository.findByUserId(user.getUserId());
+                            List<UserRolesDto> userRolesDtoList = new ArrayList<UserRolesDto>();
 
-                            for(int r = 0;r<userAccessPrivilegesEntityList.size();r++) {
-                                UserAccessPrivilegesDto userAccessPrivilegesDto = new UserAccessPrivilegesDto();
-                                userAccessPrivilegesDto.setAccessPrivilegeId(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId());
-                                userAccessPrivilegesDto.setPermisionStatus(userAccessPrivilegesEntityList.get(r).getPermissionStatus());
-                                userAccessPrivilegesDto.setUserAccessPrivilegeId(userAccessPrivilegesEntityList.get(r).getUserAccessPrivilegeId());
-                                userAccessPrivilegesDto.setUserRoleId(userAccessPrivilegesEntityList.get(r).getUserRoleId());
-                                userAccessPrivilegesDto.setAccessPrivilegeDescription(getAccessPrivilegeDescription(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId()));
-                                userAccessPrivilegesDto.setAccessPrivilegeCode(getAccessPrivilegeCode(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId()));
+                            for(int k = 0;k<userRolesEntityList.size();k++) {
+                                UserRolesDto userRolesDto = new UserRolesDto();
+                                userRolesDto.setUserRoleId(userRolesEntityList.get(k).getUserRoleId());
+                                userRolesDto.setRoleId(userRolesEntityList.get(k).getRoleId());
+                                userRolesDto.setUserId(userRolesEntityList.get(k).getUserId());
+                                userRolesDto.setConfirmationStatus(userRolesEntityList.get(k).getConfirmationStatus());
+                                userRolesDto.setRoleDescription(getRoleDescription(userRolesEntityList.get(k).getRoleId()));
+                                userRolesDto.setRoleCode(getRoleCode(userRolesEntityList.get(k).getRoleId()));
 
-                                userAccessPrivilegesDtoList.add(userAccessPrivilegesDto);
+                                userRolesDtoList.add(userRolesDto);
                             }
 
-                            userRolesDtoList.get(j).setUserAccessPrivilegesDtoList(userAccessPrivilegesDtoList);
 
+                            for(int j = 0;j<userRolesDtoList.size();j++) {
+
+                                List<UserAccessPrivilegesEntity> userAccessPrivilegesEntityList = userAccessPrivilegesRepository.findByUserRoleId(userRolesDtoList.get(j).getUserRoleId());
+                                List<UserAccessPrivilegesDto> userAccessPrivilegesDtoList = new ArrayList<UserAccessPrivilegesDto>();
+
+                                for(int r = 0;r<userAccessPrivilegesEntityList.size();r++) {
+                                    UserAccessPrivilegesDto userAccessPrivilegesDto = new UserAccessPrivilegesDto();
+                                    userAccessPrivilegesDto.setAccessPrivilegeId(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId());
+                                    userAccessPrivilegesDto.setPermisionStatus(userAccessPrivilegesEntityList.get(r).getPermissionStatus());
+                                    userAccessPrivilegesDto.setUserAccessPrivilegeId(userAccessPrivilegesEntityList.get(r).getUserAccessPrivilegeId());
+                                    userAccessPrivilegesDto.setUserRoleId(userAccessPrivilegesEntityList.get(r).getUserRoleId());
+                                    userAccessPrivilegesDto.setAccessPrivilegeDescription(getAccessPrivilegeDescription(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId()));
+                                    userAccessPrivilegesDto.setAccessPrivilegeCode(getAccessPrivilegeCode(userAccessPrivilegesEntityList.get(r).getAccessPrivilegeId()));
+
+                                    userAccessPrivilegesDtoList.add(userAccessPrivilegesDto);
+                                }
+
+                                userRolesDtoList.get(j).setUserAccessPrivilegesDtoList(userAccessPrivilegesDtoList);
+
+                            }
+
+                            authenticationResponseDto.setUserRolesDtoList(userRolesDtoList);
+                        } else {
+                            authenticationResponseDto.setLoginSuccessful(false);
+                            authenticationResponseDto.setAuthenticationEventMessage("Access rights not currently granted");
                         }
 
-                        authenticationResponseDto.setUserRolesDtoList(userRolesDtoList);
+
                     }
 
-
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    authenticationResponseDto.setLoginSuccessful(false);
+                    authenticationResponseDto.setAuthenticationEventMessage("Error determining user access rights: " + e.toString());
                 }
 
-            } catch (Exception e) {
-                e.printStackTrace();
+
+
+            }else {
+
                 authenticationResponseDto.setLoginSuccessful(false);
-                authenticationResponseDto.setAuthenticationEventMessage("Error determining user access rights: " + e.toString());
+                authenticationResponseDto.setAuthenticationEventMessage("Wrong email or password");
+
             }
-
-
-
-        }else {
-
-            authenticationResponseDto.setLoginSuccessful(false);
-            authenticationResponseDto.setAuthenticationEventMessage("Wrong email or password");
-
         }
+
+
 
         return authenticationResponseDto;
     }
