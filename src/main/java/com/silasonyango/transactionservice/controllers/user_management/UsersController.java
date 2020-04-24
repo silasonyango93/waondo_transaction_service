@@ -112,6 +112,7 @@ public class UsersController {
             }
 
             userDto.setUserRolesDtoList(userRolesDtoList);
+            userDto.setUserSuccessfullyCreated(true);
         }
 
         return userDto;

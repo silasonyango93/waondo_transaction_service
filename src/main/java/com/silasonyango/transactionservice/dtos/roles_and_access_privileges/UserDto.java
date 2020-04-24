@@ -3,6 +3,7 @@ package com.silasonyango.transactionservice.dtos.roles_and_access_privileges;
 import java.util.List;
 
 public class UserDto {
+    private boolean userSuccessfullyCreated;
     private int userId;
     private String name;
     private String email;
@@ -56,5 +57,13 @@ public class UserDto {
 
     public void setUserRolesDtoList(List<UserRolesDto> userRolesDtoList) {
         this.userRolesDtoList = userRolesDtoList;
+    }
+
+    public boolean isUserSuccessfullyCreated() {
+        return userSuccessfullyCreated;
+    }
+
+    public void setUserSuccessfullyCreated(boolean userSuccessfullyCreated) {
+        this.userSuccessfullyCreated = userSuccessfullyCreated;
     }
 }
