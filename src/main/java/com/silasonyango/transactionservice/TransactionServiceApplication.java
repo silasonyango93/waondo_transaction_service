@@ -28,6 +28,8 @@ public class TransactionServiceApplication {
 				registry.addMapping("/access_privileges/*").allowedOrigins(clientUrl);
 				registry.addMapping("/user_access_privileges/*").allowedOrigins(clientUrl);
 				registry.addMapping("/users/*").allowedOrigins(clientUrl);
+				registry.addMapping("/students/*").allowedOrigins(clientUrl);
+				registry.addMapping("/statements/*").allowedOrigins(clientUrl);
 			}
 		};
 	}
