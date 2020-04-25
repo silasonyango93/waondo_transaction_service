@@ -1,6 +1,7 @@
 package com.silasonyango.transactionservice.controllers.user_management;
 
 import com.silasonyango.transactionservice.common.config.EndPoints;
+import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
 import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureResponseDto;
 import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.UserAccessPrivilegesDto;
 import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.UserDto;
@@ -8,7 +9,11 @@ import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.User
 import com.silasonyango.transactionservice.dtos.user_management.AuthenticationRequestDto;
 import com.silasonyango.transactionservice.dtos.user_management.AuthenticationResponseDto;
 import com.silasonyango.transactionservice.dtos.user_management.UserIdDto;
+import com.silasonyango.transactionservice.entity_classes.session_management.SessionLogsEntity;
+import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.*;
+import com.silasonyango.transactionservice.repository.session_management.SessionLogsRepository;
+import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.user_management.*;
 import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
 import okhttp3.FormBody;
@@ -46,6 +51,12 @@ public class UsersController {
 
     @Autowired
     AccessPrivilegesRepository accessPrivilegesRepository;
+
+    @Autowired
+    SessionLogsRepository sessionLogsRepository;
+
+    @Autowired
+    UserSessionActivitiesRepository userSessionActivitiesRepository;
 
     @PostMapping("/create_user")
     public UserDto createUser(@Valid UsersEntity user) {
@@ -165,7 +176,12 @@ public class UsersController {
                             authenticationResponseDto.setGenderId(user.getGenderId());
                             authenticationResponseDto.setUserRegistrationDate(user.getRegisteredDate());
 
+                            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                            LocalDateTime now = LocalDateTime.now();
+                            SessionLogsEntity returnedSession = sessionLogsRepository.save(new SessionLogsEntity(user.getUserId(),dtf.format(now)));
+                            authenticationResponseDto.setSessionLogsEntity(returnedSession);
 
+                            userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(returnedSession.getSessionLogId(), SessionActivitiesConfig.LOGIN_SESSION_ACTIVITY, dtf.format(now)));
 
                             List<UserRolesEntity> userRolesEntityList = userRolesRepository.findByUserId(user.getUserId());
                             List<UserRolesDto> userRolesDtoList = new ArrayList<UserRolesDto>();

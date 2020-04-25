@@ -30,6 +30,9 @@ public class TransactionServiceApplication {
 				registry.addMapping("/users/*").allowedOrigins(clientUrl);
 				registry.addMapping("/students/*").allowedOrigins(clientUrl);
 				registry.addMapping("/statements/*").allowedOrigins(clientUrl);
+				registry.addMapping("/usersessionactivities/*").allowedOrigins(clientUrl);
+				registry.addMapping("/sessionlogs/*").allowedOrigins(clientUrl);
+				registry.addMapping("/sessionactivities/*").allowedOrigins(clientUrl);
 			}
 		};
 	}

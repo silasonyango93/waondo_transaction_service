@@ -1,6 +1,7 @@
 package com.silasonyango.transactionservice.dtos.user_management;
 
 import com.silasonyango.transactionservice.dtos.roles_and_access_privileges.UserRolesDto;
+import com.silasonyango.transactionservice.entity_classes.session_management.SessionLogsEntity;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ public class AuthenticationResponseDto {
     private int genderId;
     private String userRegistrationDate;
     private List<UserRolesDto> userRolesDtoList;
+    private SessionLogsEntity sessionLogsEntity;
 
     public boolean isLoginSuccessful() {
         return isLoginSuccessful;
@@ -76,5 +78,13 @@ public class AuthenticationResponseDto {
 
     public void setUserRolesDtoList(List<UserRolesDto> userRolesDtoList) {
         this.userRolesDtoList = userRolesDtoList;
+    }
+
+    public SessionLogsEntity getSessionLogsEntity() {
+        return sessionLogsEntity;
+    }
+
+    public void setSessionLogsEntity(SessionLogsEntity sessionLogsEntity) {
+        this.sessionLogsEntity = sessionLogsEntity;
     }
 }
