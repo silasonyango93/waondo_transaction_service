@@ -6,7 +6,7 @@ import javax.persistence.*;
 public class StudentEntity implements java.io.Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "StudentsId")
+    @Column(name = "StudentId")
     private int studentId;
 
     @Column(name = "AdmissionNo")

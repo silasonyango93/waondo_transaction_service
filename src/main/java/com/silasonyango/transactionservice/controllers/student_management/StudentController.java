@@ -57,7 +57,7 @@ public class StudentController {
 
             StudentEntity dbSavedStudent = studentRepository.save(student);
 
-            createAFeeStatement(dbSavedStudent.getAdmissionNo());
+            createAFeeStatement(dbSavedStudent.getStudentId());
 
             userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(studentRegistrationDto.getRegistrationSessionId(), SessionActivitiesConfig.REGISTER_A_STUDENT_SESSION_ACTIVITY, dtf.format(now)));
 
@@ -71,9 +71,9 @@ public class StudentController {
         return successFailureResponseDto;
     }
 
-    public FeeStatementEntity createAFeeStatement(String admissionNumber) {
+    public FeeStatementEntity createAFeeStatement(int studentId) {
 
-        return feeStatementRepository.save(new FeeStatementEntity(admissionNumber,0,0,0,0,0,0,0,0,0,0));
+        return feeStatementRepository.save(new FeeStatementEntity(studentId,0,0,0,0,0));
 
     }
 }

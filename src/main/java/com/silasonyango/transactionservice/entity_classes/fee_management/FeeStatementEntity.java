@@ -9,32 +9,14 @@ public class FeeStatementEntity implements java.io.Serializable{
     @Column(name = "FeeStatementId")
     private int feeStatementId;
 
-    @Column(name = "AdmissionNo")
-    private String admissionNo;
-
-    @Column(name = "LunchScheme")
-    private int lunchScheme;
-
-    @Column(name = "PE")
-    private int PE;
-
-    @Column(name = "EW")
-    private int EW;
-
-    @Column(name = "LT")
-    private int LT;
-
-    @Column(name = "RMI")
-    private int RMI;
-
-    @Column(name = "Administration")
-    private int administration;
-
-    @Column(name = "Activity")
-    private int activity;
+    @Column(name = "StudentId")
+    private int studentId;
 
     @Column(name = "CurrentYearTotal")
     private int currentYearTotal;
+
+    @Column(name = "AlternateTotal")
+    private int alternateTotal;
 
     @Column(name = "CurrentTermBalance")
     private int currentTermBalance;
@@ -42,22 +24,20 @@ public class FeeStatementEntity implements java.io.Serializable{
     @Column(name = "AnnualBalance")
     private int annualBalance;
 
+    @Column(name = "StudentWorth")
+    private int studentWorth;
+
     public FeeStatementEntity() {
 
     }
 
-    public FeeStatementEntity(String admissionNo,int lunchScheme,int PE,int EW,int LT,int RMI,int administration,int activity,int currentYearTotal,int currentTermBalance,int annualBalance) {
-        this.admissionNo = admissionNo;
-        this.lunchScheme = lunchScheme;
-        this.PE = PE;
-        this.EW = EW;
-        this.LT = LT;
-        this.RMI = RMI;
-        this.administration = administration;
-        this.activity = activity;
+    public FeeStatementEntity(int studentId,int currentYearTotal,int alternateTotal,int currentTermBalance,int annualBalance,int studentWorth) {
+        this.studentId = studentId;
         this.currentYearTotal = currentYearTotal;
         this.currentTermBalance = currentTermBalance;
         this.annualBalance = annualBalance;
+        this.studentWorth = studentWorth;
+        this.alternateTotal = alternateTotal;
 
     }
 
@@ -67,70 +47,6 @@ public class FeeStatementEntity implements java.io.Serializable{
 
     public void setFeeStatementId(int feeStatementId) {
         this.feeStatementId = feeStatementId;
-    }
-
-    public String getAdmissionNo() {
-        return admissionNo;
-    }
-
-    public void setAdmissionNo(String admissionNo) {
-        this.admissionNo = admissionNo;
-    }
-
-    public int getLunchScheme() {
-        return lunchScheme;
-    }
-
-    public void setLunchScheme(int lunchScheme) {
-        this.lunchScheme = lunchScheme;
-    }
-
-    public int getPE() {
-        return PE;
-    }
-
-    public void setPE(int PE) {
-        this.PE = PE;
-    }
-
-    public int getEW() {
-        return EW;
-    }
-
-    public void setEW(int EW) {
-        this.EW = EW;
-    }
-
-    public int getLT() {
-        return LT;
-    }
-
-    public void setLT(int LT) {
-        this.LT = LT;
-    }
-
-    public int getRMI() {
-        return RMI;
-    }
-
-    public void setRMI(int RMI) {
-        this.RMI = RMI;
-    }
-
-    public int getAdministration() {
-        return administration;
-    }
-
-    public void setAdministration(int administration) {
-        this.administration = administration;
-    }
-
-    public int getActivity() {
-        return activity;
-    }
-
-    public void setActivity(int activity) {
-        this.activity = activity;
     }
 
     public int getCurrentYearTotal() {
@@ -155,5 +71,29 @@ public class FeeStatementEntity implements java.io.Serializable{
 
     public void setAnnualBalance(int annualBalance) {
         this.annualBalance = annualBalance;
+    }
+
+    public int getStudentWorth() {
+        return studentWorth;
+    }
+
+    public void setStudentWorth(int studentWorth) {
+        this.studentWorth = studentWorth;
+    }
+
+    public int getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(int studentId) {
+        this.studentId = studentId;
+    }
+
+    public int getAlternateTotal() {
+        return alternateTotal;
+    }
+
+    public void setAlternateTotal(int alternateTotal) {
+        this.alternateTotal = alternateTotal;
     }
 }
