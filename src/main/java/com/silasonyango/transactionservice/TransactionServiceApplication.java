@@ -33,6 +33,7 @@ public class TransactionServiceApplication {
 				registry.addMapping("/usersessionactivities/*").allowedOrigins(clientUrl);
 				registry.addMapping("/sessionlogs/*").allowedOrigins(clientUrl);
 				registry.addMapping("/sessionactivities/*").allowedOrigins(clientUrl);
+				registry.addMapping("/class-fee-structure-component/*").allowedOrigins(clientUrl);
 			}
 		};
 	}
