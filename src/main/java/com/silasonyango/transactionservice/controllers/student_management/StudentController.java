@@ -3,10 +3,14 @@ package com.silasonyango.transactionservice.controllers.student_management;
 import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
 import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureResponseDto;
 import com.silasonyango.transactionservice.dtos.student_management.StudentRegistrationDto;
+import com.silasonyango.transactionservice.entity_classes.fee_management.ClassFeeStructureComponentEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.StudentFeeComponentEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
+import com.silasonyango.transactionservice.repository.fee_management.ClassFeeStructureComponentRepository;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
+import com.silasonyango.transactionservice.repository.fee_management.StudentFeeComponentRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +34,12 @@ public class StudentController {
 
     @Autowired
     UserSessionActivitiesRepository userSessionActivitiesRepository;
+
+    @Autowired
+    ClassFeeStructureComponentRepository classFeeStructureComponentRepository;
+
+    @Autowired
+    StudentFeeComponentRepository studentFeeComponentRepository;
 
     @PostMapping("/create_student")
     public SuccessFailureResponseDto createAStudent(@Valid StudentRegistrationDto studentRegistrationDto) {
@@ -59,6 +69,8 @@ public class StudentController {
 
             createAFeeStatement(dbSavedStudent.getStudentId());
 
+            prepareStudentFeeComponent(dbSavedStudent.getStudentId());
+
             userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(studentRegistrationDto.getRegistrationSessionId(), SessionActivitiesConfig.REGISTER_A_STUDENT_SESSION_ACTIVITY, dtf.format(now)));
 
             successFailureResponseDto.setSuccessStatus(true);
@@ -75,5 +87,12 @@ public class StudentController {
 
         return feeStatementRepository.save(new FeeStatementEntity(studentId,0,0,0,0,0));
 
+    }
+
+    public void prepareStudentFeeComponent(int studentId) {
+        List<ClassFeeStructureComponentEntity> classFeeComponentList = classFeeStructureComponentRepository.findAll();
+        for(int i=0;i<classFeeComponentList.size();i++) {
+            studentFeeComponentRepository.save(new StudentFeeComponentEntity(studentId,classFeeComponentList.get(i).getClassFeeStructureComponentId(),0));
+        }
     }
 }
