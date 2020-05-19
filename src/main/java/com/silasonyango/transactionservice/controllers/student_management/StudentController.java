@@ -92,12 +92,13 @@ public class StudentController {
 
     public FeeStatementEntity createAFeeStatement(int studentId) {
 
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime now = LocalDateTime.now();
 
-        int currentTermFeeAmount = getCurrentTermFeeAmount(UtilityClass.getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId"), UtilityClass.getAStudentClassDetails(studentId).getInt("AcademicClassLevelId"));
+        int currentTermTermBalance = getCurrentFeeStructureCurrentTermFee(UtilityClass.getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId"), UtilityClass.getAStudentClassDetails(studentId).getInt("AcademicClassLevelId"));
+        int annualBalance = UtilityClass.getAStudentAnnualBalanceFromTermBalance(studentId,currentTermTermBalance);
 
-        return feeStatementRepository.save(new FeeStatementEntity(studentId,0,0,currentTermFeeAmount,0,0));
+        return feeStatementRepository.save(new FeeStatementEntity(studentId,0,0,currentTermTermBalance,annualBalance,0));
 
     }
 
@@ -108,7 +109,7 @@ public class StudentController {
         }
     }
 
-    public int getCurrentTermFeeAmount(int termIterationId, int academicClassLevelId) {
+    public int getCurrentFeeStructureCurrentTermFee(int termIterationId, int academicClassLevelId) {
 
         int feeAmount = 0;
         CustomOkHttp customOkHttp = new CustomOkHttp();
