@@ -1,5 +1,6 @@
 package com.silasonyango.transactionservice.controllers.student_management;
 
+import com.silasonyango.transactionservice.common.config.EndPoints;
 import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
 import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureResponseDto;
 import com.silasonyango.transactionservice.dtos.student_management.StudentRegistrationDto;
@@ -13,6 +14,12 @@ import com.silasonyango.transactionservice.repository.fee_management.FeeStatemen
 import com.silasonyango.transactionservice.repository.fee_management.StudentFeeComponentRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
+import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
+import com.silasonyango.transactionservice.utility_classes.UtilityClass;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,7 +92,12 @@ public class StudentController {
 
     public FeeStatementEntity createAFeeStatement(int studentId) {
 
-        return feeStatementRepository.save(new FeeStatementEntity(studentId,0,0,0,0,0));
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+
+        int currentTermFeeAmount = getCurrentTermFeeAmount(UtilityClass.getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId"), UtilityClass.getAStudentClassDetails(studentId).getInt("AcademicClassLevelId"));
+
+        return feeStatementRepository.save(new FeeStatementEntity(studentId,0,0,currentTermFeeAmount,0,0));
 
     }
 
@@ -94,5 +106,28 @@ public class StudentController {
         for(int i=0;i<classFeeComponentList.size();i++) {
             studentFeeComponentRepository.save(new StudentFeeComponentEntity(studentId,classFeeComponentList.get(i).getClassFeeStructureComponentId(),0));
         }
+    }
+
+    public int getCurrentTermFeeAmount(int termIterationId, int academicClassLevelId) {
+
+        int feeAmount = 0;
+        CustomOkHttp customOkHttp = new CustomOkHttp();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("termIterationId", String.valueOf(termIterationId))
+                .add("academicClassLevelId", String.valueOf(academicClassLevelId))
+                .build();
+
+        try {
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_fee_structure_for_particular_student_for_particular_term",formBody);
+            JSONObject object = new JSONObject(responseString);
+            JSONArray jsonArray = object.getJSONArray("results");
+            JSONObject dataObject = jsonArray.getJSONObject(0);
+            feeAmount = dataObject.getInt("FeeAmount");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return feeAmount;
     }
 }
