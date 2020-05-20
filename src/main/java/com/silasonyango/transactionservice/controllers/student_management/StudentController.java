@@ -9,10 +9,12 @@ import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStat
 import com.silasonyango.transactionservice.entity_classes.fee_management.StudentFeeComponentEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
+import com.silasonyango.transactionservice.entity_classes.student_management.StudentRegistrationEntity;
 import com.silasonyango.transactionservice.repository.fee_management.ClassFeeStructureComponentRepository;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.fee_management.StudentFeeComponentRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
+import com.silasonyango.transactionservice.repository.student_management.StudentRegistrationRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
@@ -48,6 +50,9 @@ public class StudentController {
     @Autowired
     StudentFeeComponentRepository studentFeeComponentRepository;
 
+    @Autowired
+    StudentRegistrationRepository studentRegistrationRepository;
+
     @PostMapping("/create_student")
     public SuccessFailureResponseDto createAStudent(@Valid StudentRegistrationDto studentRegistrationDto) {
         SuccessFailureResponseDto successFailureResponseDto = new SuccessFailureResponseDto();
@@ -78,7 +83,8 @@ public class StudentController {
 
             prepareStudentFeeComponent(dbSavedStudent.getStudentId());
 
-            userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(studentRegistrationDto.getRegistrationSessionId(), SessionActivitiesConfig.REGISTER_A_STUDENT_SESSION_ACTIVITY, dtf.format(now)));
+            UserSessionActivitiesEntity userSessionActivity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(studentRegistrationDto.getRegistrationSessionId(), SessionActivitiesConfig.REGISTER_A_STUDENT_SESSION_ACTIVITY, dtf.format(now)));
+            studentRegistrationRepository.save(new StudentRegistrationEntity(studentRegistrationDto.getRegistrationSessionId(),userSessionActivity.getUserSessionActivityId(),dbSavedStudent.getStudentId(),dtf.format(now)));
 
             successFailureResponseDto.setSuccessStatus(true);
             successFailureResponseDto.setResponseMessage("Student successfully registered");
