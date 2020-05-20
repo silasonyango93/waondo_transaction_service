@@ -6,7 +6,7 @@ public class StudentRegistrationDto {
     private String studentName;
     private int genderId;
     private String studentDob;
-    private int studentTypeId;
+    private int studentResidenceId;
     private int classId;
     private String admissionDate;
     private String profPicName;
@@ -52,12 +52,12 @@ public class StudentRegistrationDto {
         this.studentDob = studentDob;
     }
 
-    public int getStudentTypeId() {
-        return studentTypeId;
+    public int getStudentResidenceId() {
+        return studentResidenceId;
     }
 
-    public void setStudentTypeId(int studentTypeId) {
-        this.studentTypeId = studentTypeId;
+    public void setStudentResidenceId(int studentResidenceId) {
+        this.studentResidenceId = studentResidenceId;
     }
 
     public int getClassId() {

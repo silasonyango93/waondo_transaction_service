@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Apr 29, 2020 at 09:44 AM
+-- Generation Time: May 20, 2020 at 05:12 PM
 -- Server version: 5.7.26
 -- PHP Version: 7.3.6
 
@@ -89,7 +89,8 @@ INSERT INTO `actual_terms` (`TermId`, `TermIterationId`, `TermStartDate`, `TermE
 (5, 3, '2018-08-01', '2018-11-30', 2018),
 (6, 1, '2019-01-01', '2019-03-31', 2019),
 (7, 2, '2019-05-01', '2019-07-31', 2019),
-(8, 3, '2019-09-01', '2019-11-30', 2019);
+(8, 3, '2019-09-01', '2019-11-30', 2019),
+(9, 2, '2020-04-01', '2020-07-31', 2020);
 
 -- --------------------------------------------------------
 
@@ -115,12 +116,12 @@ INSERT INTO `actual_weeks` (`ActualWeekId`, `TermId`, `WeekIterationId`, `WeekSt
 -- --------------------------------------------------------
 
 --
--- Table structure for table `carryforward`
+-- Table structure for table `carry_forwards`
 --
 
-CREATE TABLE `carryforward` (
+CREATE TABLE `carry_forwards` (
   `CarryFowardId` int(11) NOT NULL,
-  `AdmissionNo` varchar(200) NOT NULL,
+  `StudentId` int(11) NOT NULL,
   `CarryForwardAmount` int(11) NOT NULL,
   `DateCarriedForward` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -157,6 +158,13 @@ CREATE TABLE `class_fee_structures` (
   `AcademicClassLevelId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `class_fee_structures`
+--
+
+INSERT INTO `class_fee_structures` (`ClassFeeStructureId`, `FeeStructureId`, `AcademicClassLevelId`) VALUES
+(1, 1, 1);
+
 -- --------------------------------------------------------
 
 --
@@ -166,9 +174,22 @@ CREATE TABLE `class_fee_structures` (
 CREATE TABLE `class_fee_structure_breakdown` (
   `ClassFeeStructureBreakDownId` int(11) NOT NULL,
   `ClassFeeStructureId` int(11) NOT NULL,
+  `StudentResidenceId` int(11) NOT NULL,
   `TermIterationId` int(11) NOT NULL,
   `FeeAmount` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `class_fee_structure_breakdown`
+--
+
+INSERT INTO `class_fee_structure_breakdown` (`ClassFeeStructureBreakDownId`, `ClassFeeStructureId`, `StudentResidenceId`, `TermIterationId`, `FeeAmount`) VALUES
+(4, 1, 2, 2, 30000),
+(5, 1, 1, 2, 20000),
+(6, 1, 1, 1, 20000),
+(7, 1, 1, 3, 5000),
+(8, 1, 2, 1, 5000),
+(9, 1, 2, 3, 15000);
 
 -- --------------------------------------------------------
 
@@ -179,9 +200,18 @@ CREATE TABLE `class_fee_structure_breakdown` (
 CREATE TABLE `class_fee_structure_components` (
   `ClassFeeStructureComponentId` int(11) NOT NULL,
   `ClassFeeStructureId` int(11) NOT NULL,
-  `FeeComponentName` int(11) NOT NULL,
-  `FeeComponentRatio` int(11) NOT NULL
+  `FeeComponentId` int(11) NOT NULL,
+  `FeeComponentRatio` double NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `class_fee_structure_components`
+--
+
+INSERT INTO `class_fee_structure_components` (`ClassFeeStructureComponentId`, `ClassFeeStructureId`, `FeeComponentId`, `FeeComponentRatio`) VALUES
+(1, 1, 1, 30),
+(2, 1, 2, 20),
+(3, 1, 3, 20);
 
 -- --------------------------------------------------------
 
@@ -223,6 +253,16 @@ CREATE TABLE `fee_components` (
   `FeeComponentDescription` varchar(500) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Dumping data for table `fee_components`
+--
+
+INSERT INTO `fee_components` (`FeeComponentId`, `FeeComponentDescription`) VALUES
+(1, 'Administration'),
+(2, 'PE'),
+(3, 'Lunch Scheme'),
+(4, 'RMI');
+
 -- --------------------------------------------------------
 
 --
@@ -233,8 +273,8 @@ CREATE TABLE `fee_corrections` (
   `FeeCorrectionId` int(11) NOT NULL,
   `SessionLogId` int(11) NOT NULL,
   `ActualSessionActivityId` int(11) NOT NULL,
-  `AdmissionNo` varchar(200) NOT NULL,
   `CorrectionDescriptionId` int(11) NOT NULL,
+  `StudentId` int(11) NOT NULL,
   `PreviousTermBalance` int(11) NOT NULL,
   `PreviousAnnualBalance` int(11) NOT NULL,
   `PreviousTotal` int(11) NOT NULL,
@@ -252,19 +292,21 @@ CREATE TABLE `fee_corrections` (
 
 CREATE TABLE `fee_statements` (
   `FeeStatementId` int(11) NOT NULL,
-  `AdmissionNo` varchar(200) NOT NULL,
-  `LunchScheme` int(11) DEFAULT '0',
-  `PE` int(11) DEFAULT '0',
-  `EW` int(11) DEFAULT '0',
-  `LT` int(11) DEFAULT '0',
-  `RMI` int(11) DEFAULT '0',
-  `Administration` int(11) DEFAULT '0',
-  `Activity` int(11) DEFAULT '0',
+  `StudentId` int(11) NOT NULL,
   `CurrentYearTotal` int(11) DEFAULT '0',
+  `AlternateTotal` int(11) NOT NULL,
   `CurrentTermBalance` int(11) DEFAULT '0',
   `AnnualBalance` int(11) DEFAULT '0',
   `StudentWorth` int(11) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `fee_statements`
+--
+
+INSERT INTO `fee_statements` (`FeeStatementId`, `StudentId`, `CurrentYearTotal`, `AlternateTotal`, `CurrentTermBalance`, `AnnualBalance`, `StudentWorth`) VALUES
+(7, 20, 0, 0, 20000, 25000, 0),
+(8, 21, 0, 0, 30000, 45000, 0);
 
 -- --------------------------------------------------------
 
@@ -275,10 +317,20 @@ CREATE TABLE `fee_statements` (
 CREATE TABLE `fee_structures` (
   `FeeStructureId` int(11) NOT NULL,
   `UserId` int(11) NOT NULL,
+  `FeeStructureDescription` varchar(200) NOT NULL,
   `DateCreated` datetime NOT NULL,
   `IsCurrentFeeStructure` int(11) NOT NULL,
   `IsProspect` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `fee_structures`
+--
+
+INSERT INTO `fee_structures` (`FeeStructureId`, `UserId`, `FeeStructureDescription`, `DateCreated`, `IsCurrentFeeStructure`, `IsProspect`) VALUES
+(1, 14, '2018 Fee Structure', '2020-05-05 20:32:17', 1, 0),
+(2, 14, '2019 Fee Structure', '2020-05-05 20:41:41', 0, 0),
+(3, 14, '2020 Fee Structure', '2020-05-05 20:41:57', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -307,7 +359,7 @@ INSERT INTO `gender` (`GenderId`, `GenderDescription`) VALUES
 
 CREATE TABLE `installments` (
   `InstallmentId` int(11) NOT NULL,
-  `AdmissionNo` varchar(200) NOT NULL,
+  `StudentId` int(11) NOT NULL,
   `InstallmentAmount` int(11) NOT NULL,
   `InstallmentDate` datetime NOT NULL,
   `IsCarryForward` int(11) NOT NULL,
@@ -433,57 +485,12 @@ CREATE TABLE `session_logs` (
 --
 
 INSERT INTO `session_logs` (`SessionLogId`, `UserId`, `SessionStartDate`, `SessionEndDate`) VALUES
-(1, 14, '2020-04-25 14:28:08', NULL),
-(2, 14, '2020-04-25 15:03:07', NULL),
-(3, 14, '2020-04-25 15:04:32', NULL),
-(4, 14, '2020-04-26 11:40:07', NULL),
-(5, 14, '2020-04-26 11:55:55', NULL),
-(6, 14, '2020-04-26 11:56:54', NULL),
-(7, 14, '2020-04-26 11:58:22', NULL),
-(8, 14, '2020-04-26 11:59:37', NULL),
-(9, 14, '2020-04-26 12:00:01', NULL),
-(10, 14, '2020-04-26 12:05:34', NULL),
-(11, 14, '2020-04-26 12:05:43', NULL),
-(12, 14, '2020-04-26 12:09:48', NULL),
-(13, 14, '2020-04-26 12:10:14', NULL),
-(14, 14, '2020-04-26 12:24:17', '2020-04-26 12:30:56'),
-(15, 14, '2020-04-26 12:27:23', NULL),
-(16, 14, '2020-04-26 12:27:56', NULL),
-(17, 14, '2020-04-26 12:31:02', '2020-04-26 12:32:44'),
-(18, 14, '2020-04-26 12:32:35', '2020-04-26 12:32:44'),
-(19, 14, '2020-04-26 13:42:44', '2020-04-26 14:04:53'),
-(20, 14, '2020-04-26 14:14:55', '2020-04-26 14:15:30'),
-(21, 14, '2020-04-26 14:16:37', '2020-04-26 14:22:28'),
-(22, 14, '2020-04-26 14:54:12', '2020-04-26 14:54:40'),
-(23, 14, '2020-04-26 14:56:14', '2020-04-26 15:02:16'),
-(24, 14, '2020-04-26 14:59:04', '2020-04-26 15:02:16'),
-(25, 14, '2020-04-26 15:03:07', '2020-04-26 15:03:48'),
-(26, 14, '2020-04-26 15:09:20', '2020-04-26 15:10:04'),
-(27, 14, '2020-04-26 15:22:42', '2020-04-26 15:28:54'),
-(28, 14, '2020-04-26 15:30:20', '2020-04-26 16:12:31'),
-(29, 14, '2020-04-26 15:31:42', '2020-04-26 16:12:31'),
-(30, 14, '2020-04-26 16:15:15', '2020-04-27 11:39:04'),
-(31, 14, '2020-04-27 11:39:34', '2020-04-27 11:41:05'),
-(32, 14, '2020-04-27 11:43:29', '2020-04-27 11:44:42'),
-(33, 14, '2020-04-27 11:44:46', '2020-04-27 11:44:55'),
-(34, 14, '2020-04-27 11:44:57', '2020-04-27 11:45:07'),
-(35, 14, '2020-04-27 11:45:10', '2020-04-27 11:48:40'),
-(36, 14, '2020-04-27 11:48:55', '2020-04-27 11:50:12'),
-(37, 14, '2020-04-27 11:50:17', '2020-04-27 11:53:16'),
-(38, 14, '2020-04-27 11:51:58', '2020-04-27 11:53:16'),
-(39, 14, '2020-04-27 11:53:19', '2020-04-27 11:53:32'),
-(40, 14, '2020-04-27 11:53:36', '2020-04-27 12:18:01'),
-(41, 14, '2020-04-27 12:18:53', '2020-04-27 12:19:00'),
-(42, 14, '2020-04-27 12:19:04', '2020-04-27 12:19:12'),
-(43, 14, '2020-04-27 12:19:16', '2020-04-27 12:19:23'),
-(44, 14, '2020-04-27 12:19:27', '2020-04-27 12:19:36'),
-(45, 14, '2020-04-27 12:19:44', '2020-04-27 12:32:39'),
-(46, 14, '2020-04-27 12:24:55', '2020-04-27 12:32:39'),
-(47, 14, '2020-04-27 12:38:18', '2020-04-27 14:34:02'),
-(48, 14, '2020-04-27 14:34:08', '2020-04-28 17:19:05'),
-(49, 14, '2020-04-28 17:16:52', '2020-04-28 17:19:05'),
-(50, 14, '2020-04-28 17:21:02', '2020-04-29 09:28:33'),
-(51, 14, '2020-04-29 09:28:29', '2020-04-29 09:28:33');
+(156, 14, '2020-05-20 19:26:39', '2020-05-20 19:28:32'),
+(157, 14, '2020-05-20 19:28:36', '2020-05-20 19:58:19'),
+(158, 14, '2020-05-20 19:59:22', '2020-05-20 20:02:39'),
+(159, 14, '2020-05-20 20:02:42', '2020-05-20 20:06:35'),
+(160, 14, '2020-05-20 20:06:38', '2020-05-20 20:08:11'),
+(161, 14, '2020-05-20 20:10:04', '2020-05-20 20:11:30');
 
 -- --------------------------------------------------------
 
@@ -492,16 +499,26 @@ INSERT INTO `session_logs` (`SessionLogId`, `UserId`, `SessionStartDate`, `Sessi
 --
 
 CREATE TABLE `students` (
-  `StudentsId` int(11) NOT NULL,
+  `StudentId` int(11) NOT NULL,
   `AdmissionNo` varchar(200) NOT NULL,
   `StudentName` varchar(200) DEFAULT NULL,
   `GenderId` int(11) NOT NULL,
   `StudentDOB` date NOT NULL,
-  `StudentTypeId` int(11) NOT NULL,
+  `StudentResidenceId` int(11) NOT NULL,
   `ClassId` int(11) DEFAULT NULL,
   `AdmissionDate` datetime NOT NULL,
   `ProfPicName` varchar(900) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `students`
+--
+
+INSERT INTO `students` (`StudentId`, `AdmissionNo`, `StudentName`, `GenderId`, `StudentDOB`, `StudentResidenceId`, `ClassId`, `AdmissionDate`, `ProfPicName`) VALUES
+(18, '8032', 'Silas Onyango', 1, '2020-05-07', 1, 1, '2020-05-20 19:59:58', 'male_student.png'),
+(19, '630', 'Silas Onyango', 1, '2020-05-20', 1, 1, '2020-05-20 20:03:21', 'male_student.png'),
+(20, '8033', 'Silas Onyango', 1, '2020-05-20', 1, 1, '2020-05-20 20:07:03', 'male_student.png'),
+(21, '8034', 'Zain Konyango', 1, '2020-05-30', 2, 1, '2020-05-20 20:10:27', 'male_student.png');
 
 -- --------------------------------------------------------
 
@@ -511,10 +528,22 @@ CREATE TABLE `students` (
 
 CREATE TABLE `student_fee_components` (
   `StudentFeeComponentId` int(11) NOT NULL,
-  `AdmissionNo` int(11) NOT NULL,
+  `StudentId` int(11) NOT NULL,
   `ClassFeeStructureComponentId` int(11) NOT NULL,
   `ComponentFeeAmount` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `student_fee_components`
+--
+
+INSERT INTO `student_fee_components` (`StudentFeeComponentId`, `StudentId`, `ClassFeeStructureComponentId`, `ComponentFeeAmount`) VALUES
+(19, 20, 1, 0),
+(20, 20, 2, 0),
+(21, 20, 3, 0),
+(22, 21, 1, 0),
+(23, 21, 2, 0),
+(24, 21, 3, 0);
 
 -- --------------------------------------------------------
 
@@ -525,27 +554,35 @@ CREATE TABLE `student_fee_components` (
 CREATE TABLE `student_registration` (
   `StudentRegistrationId` int(11) NOT NULL,
   `SessionLogId` int(11) NOT NULL,
-  `ActualSessionActivityId` int(11) NOT NULL,
-  `AdmissionNo` varchar(200) NOT NULL,
-  `StudentRegistrationDate` int(11) NOT NULL
+  `UserSessionActivityId` int(11) NOT NULL,
+  `StudentId` int(11) NOT NULL,
+  `StudentRegistrationDate` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `student_registration`
+--
+
+INSERT INTO `student_registration` (`StudentRegistrationId`, `SessionLogId`, `UserSessionActivityId`, `StudentId`, `StudentRegistrationDate`) VALUES
+(2, 160, 166, 20, '2020-05-20 20:07:03'),
+(3, 161, 168, 21, '2020-05-20 20:10:27');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `student_types`
+-- Table structure for table `student_residence`
 --
 
-CREATE TABLE `student_types` (
-  `StudentTypeId` int(11) NOT NULL,
-  `StudentTypeDescription` varchar(100) NOT NULL
+CREATE TABLE `student_residence` (
+  `StudentResidenceId` int(11) NOT NULL,
+  `StudentResidenceDescription` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `student_types`
+-- Dumping data for table `student_residence`
 --
 
-INSERT INTO `student_types` (`StudentTypeId`, `StudentTypeDescription`) VALUES
+INSERT INTO `student_residence` (`StudentResidenceId`, `StudentResidenceDescription`) VALUES
 (1, 'Boarder'),
 (2, 'Day Scholar');
 
@@ -579,8 +616,8 @@ CREATE TABLE `transactions` (
   `TransactionId` int(11) NOT NULL,
   `SessionLogId` int(11) NOT NULL,
   `ActualSessionActivityId` int(11) NOT NULL,
-  `AdmissionNo` varchar(200) NOT NULL,
   `TransactionDescriptionId` int(11) NOT NULL,
+  `StudentId` int(11) NOT NULL,
   `InstallmentId` int(11) DEFAULT NULL,
   `CarryFowardId` int(11) DEFAULT NULL,
   `FeeCorrectionId` int(11) DEFAULT NULL,
@@ -726,56 +763,14 @@ CREATE TABLE `user_session_activities` (
 --
 
 INSERT INTO `user_session_activities` (`UserSessionActivityId`, `SessionLogId`, `SessionActivityId`, `SessionActivityDate`) VALUES
-(1, 3, 1, '2020-04-25 15:04:32'),
-(2, 4, 1, '2020-04-26 11:40:07'),
-(3, 5, 1, '2020-04-26 11:55:55'),
-(4, 6, 1, '2020-04-26 11:56:54'),
-(5, 7, 1, '2020-04-26 11:58:22'),
-(6, 8, 1, '2020-04-26 11:59:37'),
-(7, 9, 1, '2020-04-26 12:00:01'),
-(8, 10, 1, '2020-04-26 12:05:34'),
-(9, 11, 1, '2020-04-26 12:05:43'),
-(10, 12, 1, '2020-04-26 12:09:48'),
-(11, 13, 1, '2020-04-26 12:10:14'),
-(12, 14, 1, '2020-04-26 12:24:17'),
-(13, 15, 1, '2020-04-26 12:27:23'),
-(14, 16, 1, '2020-04-26 12:27:56'),
-(15, 17, 1, '2020-04-26 12:31:02'),
-(16, 18, 1, '2020-04-26 12:32:35'),
-(17, 19, 1, '2020-04-26 13:42:44'),
-(18, 20, 1, '2020-04-26 14:14:55'),
-(19, 21, 1, '2020-04-26 14:16:37'),
-(20, 22, 1, '2020-04-26 14:54:12'),
-(21, 23, 1, '2020-04-26 14:56:14'),
-(22, 24, 1, '2020-04-26 14:59:04'),
-(23, 25, 1, '2020-04-26 15:03:07'),
-(24, 26, 1, '2020-04-26 15:09:20'),
-(25, 27, 1, '2020-04-26 15:22:42'),
-(26, 28, 1, '2020-04-26 15:30:20'),
-(27, 29, 1, '2020-04-26 15:31:42'),
-(28, 30, 1, '2020-04-26 16:15:15'),
-(29, 31, 1, '2020-04-27 11:39:34'),
-(30, 32, 1, '2020-04-27 11:43:29'),
-(31, 33, 1, '2020-04-27 11:44:46'),
-(32, 34, 1, '2020-04-27 11:44:57'),
-(33, 35, 1, '2020-04-27 11:45:10'),
-(34, 36, 1, '2020-04-27 11:48:55'),
-(35, 37, 1, '2020-04-27 11:50:17'),
-(36, 38, 1, '2020-04-27 11:51:58'),
-(37, 39, 1, '2020-04-27 11:53:19'),
-(38, 40, 1, '2020-04-27 11:53:36'),
-(39, 41, 1, '2020-04-27 12:18:53'),
-(40, 42, 1, '2020-04-27 12:19:04'),
-(41, 43, 1, '2020-04-27 12:19:16'),
-(42, 44, 1, '2020-04-27 12:19:27'),
-(43, 45, 1, '2020-04-27 12:19:44'),
-(44, 46, 1, '2020-04-27 12:24:55'),
-(45, 47, 1, '2020-04-27 12:38:18'),
-(46, 48, 1, '2020-04-27 14:34:08'),
-(47, 48, 2, '2020-04-27 14:34:28'),
-(48, 49, 1, '2020-04-28 17:16:52'),
-(49, 50, 1, '2020-04-28 17:21:02'),
-(50, 51, 1, '2020-04-29 09:28:29');
+(161, 156, 1, '2020-05-20 19:26:39'),
+(162, 157, 1, '2020-05-20 19:28:36'),
+(163, 158, 1, '2020-05-20 19:59:22'),
+(164, 159, 1, '2020-05-20 20:02:42'),
+(165, 160, 1, '2020-05-20 20:06:38'),
+(166, 160, 2, '2020-05-20 20:07:03'),
+(167, 161, 1, '2020-05-20 20:10:04'),
+(168, 161, 2, '2020-05-20 20:10:27');
 
 -- --------------------------------------------------------
 
@@ -840,11 +835,11 @@ ALTER TABLE `actual_weeks`
   ADD KEY `WeekIterationId` (`WeekIterationId`);
 
 --
--- Indexes for table `carryforward`
+-- Indexes for table `carry_forwards`
 --
-ALTER TABLE `carryforward`
+ALTER TABLE `carry_forwards`
   ADD PRIMARY KEY (`CarryFowardId`),
-  ADD KEY `AdmissionNo` (`AdmissionNo`);
+  ADD KEY `StudentId` (`StudentId`);
 
 --
 -- Indexes for table `classes`
@@ -868,14 +863,16 @@ ALTER TABLE `class_fee_structures`
 ALTER TABLE `class_fee_structure_breakdown`
   ADD PRIMARY KEY (`ClassFeeStructureBreakDownId`),
   ADD KEY `ClassFeeStructureId` (`ClassFeeStructureId`),
-  ADD KEY `TermIterationId` (`TermIterationId`);
+  ADD KEY `TermIterationId` (`TermIterationId`),
+  ADD KEY `StudentResidenceId` (`StudentResidenceId`);
 
 --
 -- Indexes for table `class_fee_structure_components`
 --
 ALTER TABLE `class_fee_structure_components`
   ADD PRIMARY KEY (`ClassFeeStructureComponentId`),
-  ADD KEY `ClassFeeStructureId` (`ClassFeeStructureId`);
+  ADD KEY `ClassFeeStructureId` (`ClassFeeStructureId`),
+  ADD KEY `FeeComponentId` (`FeeComponentId`);
 
 --
 -- Indexes for table `class_streams`
@@ -903,14 +900,14 @@ ALTER TABLE `fee_corrections`
   ADD KEY `CorrectionDescriptionId` (`CorrectionDescriptionId`),
   ADD KEY `SessionLogId` (`SessionLogId`),
   ADD KEY `ActualSessionActivityId` (`ActualSessionActivityId`),
-  ADD KEY `AdmissionNo` (`AdmissionNo`);
+  ADD KEY `StudentId` (`StudentId`);
 
 --
 -- Indexes for table `fee_statements`
 --
 ALTER TABLE `fee_statements`
   ADD PRIMARY KEY (`FeeStatementId`),
-  ADD KEY `AdmissionNo` (`AdmissionNo`);
+  ADD KEY `StudentId` (`StudentId`);
 
 --
 -- Indexes for table `fee_structures`
@@ -930,9 +927,9 @@ ALTER TABLE `gender`
 --
 ALTER TABLE `installments`
   ADD PRIMARY KEY (`InstallmentId`),
-  ADD KEY `AdmissionNo` (`AdmissionNo`),
   ADD KEY `SessionLogId` (`SessionLogId`),
-  ADD KEY `ActualSessionActivityId` (`ActualSessionActivityId`);
+  ADD KEY `ActualSessionActivityId` (`ActualSessionActivityId`),
+  ADD KEY `StudentId` (`StudentId`);
 
 --
 -- Indexes for table `lots`
@@ -977,17 +974,18 @@ ALTER TABLE `session_logs`
 -- Indexes for table `students`
 --
 ALTER TABLE `students`
-  ADD PRIMARY KEY (`StudentsId`),
+  ADD PRIMARY KEY (`StudentId`),
   ADD UNIQUE KEY `AdmissionNo` (`AdmissionNo`),
   ADD KEY `ClassId` (`ClassId`),
-  ADD KEY `StudentTypeId` (`StudentTypeId`),
+  ADD KEY `StudentTypeId` (`StudentResidenceId`),
   ADD KEY `GenderId` (`GenderId`);
 
 --
 -- Indexes for table `student_fee_components`
 --
 ALTER TABLE `student_fee_components`
-  ADD PRIMARY KEY (`StudentFeeComponentId`);
+  ADD PRIMARY KEY (`StudentFeeComponentId`),
+  ADD KEY `StudentId` (`StudentId`);
 
 --
 -- Indexes for table `student_registration`
@@ -995,14 +993,14 @@ ALTER TABLE `student_fee_components`
 ALTER TABLE `student_registration`
   ADD PRIMARY KEY (`StudentRegistrationId`),
   ADD KEY `SessionLogId` (`SessionLogId`),
-  ADD KEY `ActualSessionActivityId` (`ActualSessionActivityId`),
-  ADD KEY `AdmissionNo` (`AdmissionNo`);
+  ADD KEY `ActualSessionActivityId` (`UserSessionActivityId`),
+  ADD KEY `StudentId` (`StudentId`);
 
 --
--- Indexes for table `student_types`
+-- Indexes for table `student_residence`
 --
-ALTER TABLE `student_types`
-  ADD PRIMARY KEY (`StudentTypeId`);
+ALTER TABLE `student_residence`
+  ADD PRIMARY KEY (`StudentResidenceId`);
 
 --
 -- Indexes for table `term_iterations`
@@ -1017,11 +1015,11 @@ ALTER TABLE `transactions`
   ADD PRIMARY KEY (`TransactionId`),
   ADD KEY `SessionLogId` (`SessionLogId`),
   ADD KEY `ActualSessionActivityId` (`ActualSessionActivityId`),
-  ADD KEY `AdmissionNo` (`AdmissionNo`),
   ADD KEY `TransactionDescriptionId` (`TransactionDescriptionId`),
   ADD KEY `InstallmentId` (`InstallmentId`),
   ADD KEY `FeeCorrectionId` (`FeeCorrectionId`),
-  ADD KEY `CarryFowardId` (`CarryFowardId`);
+  ADD KEY `CarryFowardId` (`CarryFowardId`),
+  ADD KEY `StudentId` (`StudentId`);
 
 --
 -- Indexes for table `transaction_descriptions`
@@ -1087,7 +1085,7 @@ ALTER TABLE `access_privileges`
 -- AUTO_INCREMENT for table `actual_terms`
 --
 ALTER TABLE `actual_terms`
-  MODIFY `TermId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `TermId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `actual_weeks`
@@ -1096,9 +1094,9 @@ ALTER TABLE `actual_weeks`
   MODIFY `ActualWeekId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `carryforward`
+-- AUTO_INCREMENT for table `carry_forwards`
 --
-ALTER TABLE `carryforward`
+ALTER TABLE `carry_forwards`
   MODIFY `CarryFowardId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -1111,19 +1109,19 @@ ALTER TABLE `classes`
 -- AUTO_INCREMENT for table `class_fee_structures`
 --
 ALTER TABLE `class_fee_structures`
-  MODIFY `ClassFeeStructureId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ClassFeeStructureId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `class_fee_structure_breakdown`
 --
 ALTER TABLE `class_fee_structure_breakdown`
-  MODIFY `ClassFeeStructureBreakDownId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ClassFeeStructureBreakDownId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `class_fee_structure_components`
 --
 ALTER TABLE `class_fee_structure_components`
-  MODIFY `ClassFeeStructureComponentId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ClassFeeStructureComponentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `class_streams`
@@ -1141,7 +1139,7 @@ ALTER TABLE `correction_descriptions`
 -- AUTO_INCREMENT for table `fee_components`
 --
 ALTER TABLE `fee_components`
-  MODIFY `FeeComponentId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `FeeComponentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `fee_corrections`
@@ -1153,13 +1151,13 @@ ALTER TABLE `fee_corrections`
 -- AUTO_INCREMENT for table `fee_statements`
 --
 ALTER TABLE `fee_statements`
-  MODIFY `FeeStatementId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `FeeStatementId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `fee_structures`
 --
 ALTER TABLE `fee_structures`
-  MODIFY `FeeStructureId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `FeeStructureId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `gender`
@@ -1207,31 +1205,31 @@ ALTER TABLE `session_activities`
 -- AUTO_INCREMENT for table `session_logs`
 --
 ALTER TABLE `session_logs`
-  MODIFY `SessionLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `SessionLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=162;
 
 --
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `StudentsId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `StudentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `student_fee_components`
 --
 ALTER TABLE `student_fee_components`
-  MODIFY `StudentFeeComponentId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `StudentFeeComponentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `student_registration`
 --
 ALTER TABLE `student_registration`
-  MODIFY `StudentRegistrationId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `StudentRegistrationId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `student_types`
+-- AUTO_INCREMENT for table `student_residence`
 --
-ALTER TABLE `student_types`
-  MODIFY `StudentTypeId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+ALTER TABLE `student_residence`
+  MODIFY `StudentResidenceId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `term_iterations`
@@ -1273,7 +1271,7 @@ ALTER TABLE `user_roles`
 -- AUTO_INCREMENT for table `user_session_activities`
 --
 ALTER TABLE `user_session_activities`
-  MODIFY `UserSessionActivityId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `UserSessionActivityId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=169;
 
 --
 -- AUTO_INCREMENT for table `week_iterations`
@@ -1299,10 +1297,10 @@ ALTER TABLE `actual_weeks`
   ADD CONSTRAINT `actual_weeks_ibfk_2` FOREIGN KEY (`WeekIterationId`) REFERENCES `week_iterations` (`WeekIterationId`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `carryforward`
+-- Constraints for table `carry_forwards`
 --
-ALTER TABLE `carryforward`
-  ADD CONSTRAINT `carryforward_ibfk_1` FOREIGN KEY (`AdmissionNo`) REFERENCES `students` (`AdmissionNo`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `carry_forwards`
+  ADD CONSTRAINT `carry_forwards_ibfk_1` FOREIGN KEY (`StudentId`) REFERENCES `students` (`StudentId`);
 
 --
 -- Constraints for table `classes`
@@ -1323,13 +1321,15 @@ ALTER TABLE `class_fee_structures`
 --
 ALTER TABLE `class_fee_structure_breakdown`
   ADD CONSTRAINT `class_fee_structure_breakdown_ibfk_1` FOREIGN KEY (`ClassFeeStructureId`) REFERENCES `class_fee_structures` (`ClassFeeStructureId`),
-  ADD CONSTRAINT `class_fee_structure_breakdown_ibfk_2` FOREIGN KEY (`TermIterationId`) REFERENCES `term_iterations` (`TermIterationId`);
+  ADD CONSTRAINT `class_fee_structure_breakdown_ibfk_2` FOREIGN KEY (`TermIterationId`) REFERENCES `term_iterations` (`TermIterationId`),
+  ADD CONSTRAINT `class_fee_structure_breakdown_ibfk_3` FOREIGN KEY (`StudentResidenceId`) REFERENCES `student_residence` (`StudentResidenceId`);
 
 --
 -- Constraints for table `class_fee_structure_components`
 --
 ALTER TABLE `class_fee_structure_components`
-  ADD CONSTRAINT `class_fee_structure_components_ibfk_1` FOREIGN KEY (`ClassFeeStructureId`) REFERENCES `class_fee_structures` (`ClassFeeStructureId`);
+  ADD CONSTRAINT `class_fee_structure_components_ibfk_1` FOREIGN KEY (`ClassFeeStructureId`) REFERENCES `class_fee_structures` (`ClassFeeStructureId`),
+  ADD CONSTRAINT `class_fee_structure_components_ibfk_2` FOREIGN KEY (`FeeComponentId`) REFERENCES `fee_components` (`FeeComponentId`);
 
 --
 -- Constraints for table `fee_corrections`
@@ -1338,13 +1338,13 @@ ALTER TABLE `fee_corrections`
   ADD CONSTRAINT `fee_corrections_ibfk_1` FOREIGN KEY (`CorrectionDescriptionId`) REFERENCES `correction_descriptions` (`CorrectionDescriptionId`),
   ADD CONSTRAINT `fee_corrections_ibfk_2` FOREIGN KEY (`SessionLogId`) REFERENCES `session_logs` (`SessionLogId`),
   ADD CONSTRAINT `fee_corrections_ibfk_3` FOREIGN KEY (`ActualSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
-  ADD CONSTRAINT `fee_corrections_ibfk_4` FOREIGN KEY (`AdmissionNo`) REFERENCES `students` (`AdmissionNo`);
+  ADD CONSTRAINT `fee_corrections_ibfk_4` FOREIGN KEY (`StudentId`) REFERENCES `students` (`StudentId`);
 
 --
 -- Constraints for table `fee_statements`
 --
 ALTER TABLE `fee_statements`
-  ADD CONSTRAINT `fee_statements_ibfk_1` FOREIGN KEY (`AdmissionNo`) REFERENCES `students` (`AdmissionNo`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fee_statements_ibfk_1` FOREIGN KEY (`StudentId`) REFERENCES `students` (`StudentId`);
 
 --
 -- Constraints for table `fee_structures`
@@ -1356,10 +1356,9 @@ ALTER TABLE `fee_structures`
 -- Constraints for table `installments`
 --
 ALTER TABLE `installments`
-  ADD CONSTRAINT `installments_ibfk_1` FOREIGN KEY (`AdmissionNo`) REFERENCES `students` (`AdmissionNo`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `installments_ibfk_2` FOREIGN KEY (`AdmissionNo`) REFERENCES `students` (`AdmissionNo`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `installments_ibfk_3` FOREIGN KEY (`SessionLogId`) REFERENCES `session_logs` (`SessionLogId`),
-  ADD CONSTRAINT `installments_ibfk_4` FOREIGN KEY (`ActualSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`);
+  ADD CONSTRAINT `installments_ibfk_4` FOREIGN KEY (`ActualSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
+  ADD CONSTRAINT `installments_ibfk_5` FOREIGN KEY (`StudentId`) REFERENCES `students` (`StudentId`);
 
 --
 -- Constraints for table `lots`
@@ -1380,16 +1379,22 @@ ALTER TABLE `session_logs`
 --
 ALTER TABLE `students`
   ADD CONSTRAINT `students_ibfk_1` FOREIGN KEY (`ClassId`) REFERENCES `classes` (`ClassId`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `students_ibfk_2` FOREIGN KEY (`StudentTypeId`) REFERENCES `student_types` (`StudentTypeId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `students_ibfk_2` FOREIGN KEY (`StudentResidenceId`) REFERENCES `student_residence` (`StudentResidenceId`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `students_ibfk_3` FOREIGN KEY (`GenderId`) REFERENCES `gender` (`GenderId`);
+
+--
+-- Constraints for table `student_fee_components`
+--
+ALTER TABLE `student_fee_components`
+  ADD CONSTRAINT `student_fee_components_ibfk_1` FOREIGN KEY (`StudentId`) REFERENCES `students` (`StudentId`);
 
 --
 -- Constraints for table `student_registration`
 --
 ALTER TABLE `student_registration`
   ADD CONSTRAINT `student_registration_ibfk_1` FOREIGN KEY (`SessionLogId`) REFERENCES `session_logs` (`SessionLogId`),
-  ADD CONSTRAINT `student_registration_ibfk_2` FOREIGN KEY (`ActualSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
-  ADD CONSTRAINT `student_registration_ibfk_3` FOREIGN KEY (`AdmissionNo`) REFERENCES `students` (`AdmissionNo`);
+  ADD CONSTRAINT `student_registration_ibfk_2` FOREIGN KEY (`UserSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
+  ADD CONSTRAINT `student_registration_ibfk_3` FOREIGN KEY (`StudentId`) REFERENCES `students` (`StudentId`);
 
 --
 -- Constraints for table `transactions`
@@ -1397,11 +1402,11 @@ ALTER TABLE `student_registration`
 ALTER TABLE `transactions`
   ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`SessionLogId`) REFERENCES `session_logs` (`SessionLogId`),
   ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`ActualSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
-  ADD CONSTRAINT `transactions_ibfk_3` FOREIGN KEY (`AdmissionNo`) REFERENCES `students` (`AdmissionNo`),
   ADD CONSTRAINT `transactions_ibfk_4` FOREIGN KEY (`TransactionDescriptionId`) REFERENCES `transaction_descriptions` (`TransactionDescriptionId`),
   ADD CONSTRAINT `transactions_ibfk_5` FOREIGN KEY (`InstallmentId`) REFERENCES `installments` (`InstallmentId`),
   ADD CONSTRAINT `transactions_ibfk_6` FOREIGN KEY (`FeeCorrectionId`) REFERENCES `fee_corrections` (`FeeCorrectionId`),
-  ADD CONSTRAINT `transactions_ibfk_7` FOREIGN KEY (`CarryFowardId`) REFERENCES `carryforward` (`CarryFowardId`);
+  ADD CONSTRAINT `transactions_ibfk_7` FOREIGN KEY (`CarryFowardId`) REFERENCES `carry_forwards` (`CarryFowardId`),
+  ADD CONSTRAINT `transactions_ibfk_8` FOREIGN KEY (`StudentId`) REFERENCES `students` (`StudentId`);
 
 --
 -- Constraints for table `users`

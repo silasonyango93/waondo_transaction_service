@@ -54,12 +54,13 @@ public class UtilityClass {
     }
 
 
-    public static JSONArray getFeeStructureForParticularClassLevel(int academicClassLevelId) {
+    public static JSONArray getFeeStructureForParticularClassLevel(int academicClassLevelId, int studentResidenceId) {
         JSONArray dataArray = null;
         CustomOkHttp customOkHttp = new CustomOkHttp();
 
         RequestBody formBody = new FormBody.Builder()
                 .add("academicClassLevelId", String.valueOf(academicClassLevelId))
+                .add("studentResidenceId", String.valueOf(studentResidenceId))
                 .build();
 
         try {
@@ -74,17 +75,21 @@ public class UtilityClass {
         return dataArray;
     }
 
-    public static int getAStudentAnnualBalanceFromTermBalance(int studentId, int termBalance) {
+    public static int getAStudentAnnualBalanceFromTermBalance(int studentId, int termBalance, int studentResidenceId) {
         int annualBalance = 0;
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime now = LocalDateTime.now();
 
         JSONObject classDetailsObject = getAStudentClassDetails(studentId);
-        JSONArray feeStructureBreakDownArray = getFeeStructureForParticularClassLevel(classDetailsObject.getInt("AcademicClassLevelId"));
+        JSONArray feeStructureBreakDownArray = getFeeStructureForParticularClassLevel(classDetailsObject.getInt("AcademicClassLevelId"), studentResidenceId);
 
         for (int i = 0;i<feeStructureBreakDownArray.length();i++) {
             if(getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId") != feeStructureBreakDownArray.getJSONObject(i).getInt("TermIterationId")) {
-                annualBalance = annualBalance + feeStructureBreakDownArray.getJSONObject(i).getInt("FeeAmount");
+
+                if(getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId") < feeStructureBreakDownArray.getJSONObject(i).getInt("TermIterationId")) {
+                    annualBalance = annualBalance + feeStructureBreakDownArray.getJSONObject(i).getInt("FeeAmount");
+                }
+
             }
         }
 

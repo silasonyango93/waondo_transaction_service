@@ -74,12 +74,12 @@ public class StudentController {
             student.setClassId(studentRegistrationDto.getClassId());
             student.setStudentDob(studentRegistrationDto.getStudentDob());
             student.setProfPicName(studentRegistrationDto.getProfPicName());
-            student.setStudentTypeId(studentRegistrationDto.getStudentTypeId());
+            student.setStudentResidenceId(studentRegistrationDto.getStudentResidenceId());
             student.setAdmissionDate(dtf.format(now));
 
             StudentEntity dbSavedStudent = studentRepository.save(student);
 
-            createAFeeStatement(dbSavedStudent.getStudentId());
+            createAFeeStatement(dbSavedStudent.getStudentId(), dbSavedStudent.getStudentResidenceId());
 
             prepareStudentFeeComponent(dbSavedStudent.getStudentId());
 
@@ -96,13 +96,13 @@ public class StudentController {
         return successFailureResponseDto;
     }
 
-    public FeeStatementEntity createAFeeStatement(int studentId) {
+    public FeeStatementEntity createAFeeStatement(int studentId, int studentResidenceId) {
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime now = LocalDateTime.now();
 
-        int currentTermTermBalance = getCurrentFeeStructureCurrentTermFee(UtilityClass.getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId"), UtilityClass.getAStudentClassDetails(studentId).getInt("AcademicClassLevelId"));
-        int annualBalance = UtilityClass.getAStudentAnnualBalanceFromTermBalance(studentId,currentTermTermBalance);
+        int currentTermTermBalance = getCurrentFeeStructureCurrentTermFee(UtilityClass.getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId"), UtilityClass.getAStudentClassDetails(studentId).getInt("AcademicClassLevelId"), studentResidenceId);
+        int annualBalance = UtilityClass.getAStudentAnnualBalanceFromTermBalance(studentId,currentTermTermBalance,studentResidenceId);
 
         return feeStatementRepository.save(new FeeStatementEntity(studentId,0,0,currentTermTermBalance,annualBalance,0));
 
@@ -115,7 +115,7 @@ public class StudentController {
         }
     }
 
-    public int getCurrentFeeStructureCurrentTermFee(int termIterationId, int academicClassLevelId) {
+    public int getCurrentFeeStructureCurrentTermFee(int termIterationId, int academicClassLevelId, int studentResidenceId) {
 
         int feeAmount = 0;
         CustomOkHttp customOkHttp = new CustomOkHttp();
@@ -123,6 +123,7 @@ public class StudentController {
         RequestBody formBody = new FormBody.Builder()
                 .add("termIterationId", String.valueOf(termIterationId))
                 .add("academicClassLevelId", String.valueOf(academicClassLevelId))
+                .add("studentResidenceId", String.valueOf(studentResidenceId))
                 .build();
 
         try {

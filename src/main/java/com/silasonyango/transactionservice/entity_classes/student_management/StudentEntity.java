@@ -21,8 +21,8 @@ public class StudentEntity implements java.io.Serializable{
     @Column(name = "StudentDOB")
     private String studentDob;
 
-    @Column(name = "StudentTypeId")
-    private int studentTypeId;
+    @Column(name = "StudentResidenceId")
+    private int studentResidenceId;
 
     @Column(name = "ClassId")
     private int classId;
@@ -73,12 +73,12 @@ public class StudentEntity implements java.io.Serializable{
         this.studentDob = studentDob;
     }
 
-    public int getStudentTypeId() {
-        return studentTypeId;
+    public int getStudentResidenceId() {
+        return studentResidenceId;
     }
 
-    public void setStudentTypeId(int studentTypeId) {
-        this.studentTypeId = studentTypeId;
+    public void setStudentResidenceId(int studentResidenceId) {
+        this.studentResidenceId = studentResidenceId;
     }
 
     public int getClassId() {
