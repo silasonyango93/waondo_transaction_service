@@ -8,6 +8,7 @@ import com.silasonyango.transactionservice.entity_classes.fee_management.Install
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,5 +59,11 @@ public class InstallmentsController {
         FeeStatementEntity dbFeeStatement = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
 
         return dbFeeStatement.getCurrentTermBalance() - installmentAmount;
+    }
+
+    public int getNextStudentWorth() {
+
+        JSONObject termObject = UtilityClass.getTermDetailsByDate(UtilityClass.getToday());
+
     }
 }
