@@ -51,6 +51,25 @@ public class TransactionsEntity implements java.io.Serializable{
     @Column(name = "TransactionDate")
     private String transactionDate;
 
+    public TransactionsEntity() {}
+
+    public TransactionsEntity(int sessionLogId,int userSessionActivityId,int transactionDescriptionId,int studentId,int installmentId,int carryFowardId,int feeCorrectionId,int previousTermBalance,int previousAnnualBalance,int previousTotal,int nextTermBalance,int nextAnnualBalance,int nextTotal,String transactionDate) {
+        this.sessionLogId = sessionLogId;
+        this.userSessionActivityId = userSessionActivityId;
+        this.transactionDescriptionId = transactionDescriptionId;
+        this.studentId = studentId;
+        this.installmentId = installmentId;
+        this.carryFowardId = carryFowardId;
+        this.feeCorrectionId = feeCorrectionId;
+        this.previousTermBalance = previousTermBalance;
+        this.previousAnnualBalance = previousAnnualBalance;
+        this.previousTotal = previousTotal;
+        this.nextTermBalance = nextTermBalance;
+        this.nextAnnualBalance = nextAnnualBalance;
+        this.nextTotal = nextTotal;
+        this.transactionDate = transactionDate;
+    }
+
     public int getTransactionId() {
         return transactionId;
     }
