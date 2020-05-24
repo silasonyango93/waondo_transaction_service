@@ -109,4 +109,11 @@ public class UtilityClass {
 
         return dtf.format(now);
     }
+
+    public static String getCurrentYear() {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy");
+        LocalDateTime now = LocalDateTime.now();
+
+        return dtf.format(now);
+    }
 }

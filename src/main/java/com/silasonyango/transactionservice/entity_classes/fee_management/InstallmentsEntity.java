@@ -27,15 +27,19 @@ public class InstallmentsEntity implements java.io.Serializable{
     @Column(name = "UserSessionActivityId")
     private int userSessionActivityId;
 
+    @Column(name = "InstallmentYear")
+    private String installmentYear;
+
     public InstallmentsEntity() {}
 
-    public InstallmentsEntity(int studentId,int installmentAmount,String installmentDate,int isCarryForward,int sessionLogId,int userSessionActivityId) {
+    public InstallmentsEntity(int studentId,int installmentAmount,String installmentDate,int isCarryForward,int sessionLogId,int userSessionActivityId,String installmentYear) {
         this.studentId = studentId;
         this.installmentAmount = installmentAmount;
         this.installmentDate = installmentDate;
         this.isCarryForward = isCarryForward;
         this.sessionLogId = sessionLogId;
         this.userSessionActivityId = userSessionActivityId;
+        this.installmentYear = installmentYear;
     }
 
     public int getInstallmentId() {
@@ -92,5 +96,13 @@ public class InstallmentsEntity implements java.io.Serializable{
 
     public void setUserSessionActivityId(int userSessionActivityId) {
         this.userSessionActivityId = userSessionActivityId;
+    }
+
+    public String getInstallmentYear() {
+        return installmentYear;
+    }
+
+    public void setInstallmentYear(String installmentYear) {
+        this.installmentYear = installmentYear;
     }
 }
