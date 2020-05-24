@@ -116,4 +116,71 @@ public class UtilityClass {
 
         return dtf.format(now);
     }
+
+    public static JSONArray getInstallmentsBetweenACertainPeriod(String startDate, String endDate) {
+        JSONArray dataArray = null;
+        CustomOkHttp customOkHttp = new CustomOkHttp();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("startDate", String.valueOf(startDate))
+                .add("endDate", String.valueOf(endDate))
+                .build();
+
+        try {
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_installment_between_certain_period",formBody);
+            JSONObject object = new JSONObject(responseString);
+            dataArray = object.getJSONArray("results");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataArray;
+    }
+
+
+    public static JSONArray getInstallmentsForParticularStudentBetweenACertainPeriod(int studentId,String startDate, String endDate) {
+        JSONArray dataArray = null;
+        CustomOkHttp customOkHttp = new CustomOkHttp();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("studentId", String.valueOf(studentId))
+                .add("startDate", String.valueOf(startDate))
+                .add("endDate", String.valueOf(endDate))
+                .build();
+
+        try {
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_installment_for_particular_student_between_certain_period",formBody);
+            JSONObject object = new JSONObject(responseString);
+            dataArray = object.getJSONArray("results");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataArray;
+    }
+
+
+
+    public static JSONObject getAStudentResidenceDetails(int studentId) {
+        JSONObject dataObject = null;
+        CustomOkHttp customOkHttp = new CustomOkHttp();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("studentId", String.valueOf(studentId))
+                .build();
+
+        try {
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_a_student_residence_details",formBody);
+            JSONObject object = new JSONObject(responseString);
+            JSONArray jsonArray = object.getJSONArray("results");
+            dataObject  = jsonArray.getJSONObject(0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataObject;
+    }
 }
