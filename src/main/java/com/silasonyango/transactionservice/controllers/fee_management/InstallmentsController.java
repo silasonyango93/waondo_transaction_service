@@ -1,13 +1,16 @@
 package com.silasonyango.transactionservice.controllers.fee_management;
 
 import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
+import com.silasonyango.transactionservice.common.config.TransactionDescriptionsConfig;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsDto;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.TransactionsEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
+import com.silasonyango.transactionservice.repository.fee_management.TransactionsRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
@@ -32,8 +35,20 @@ public class InstallmentsController {
     @Autowired
     UserSessionActivitiesRepository userSessionActivitiesRepository;
 
+    @Autowired
+    TransactionsRepository transactionsRepository;
+
     @PostMapping("/add_installment")
     public FeeStatementEntity addInstallment(@Valid InstallmentsDto installmentsDto) {
+
+        int previousTermBalance = 0;
+        int previousAnnualBalance = 0;
+        int previousTotal = 0;
+
+        FeeStatementEntity feeStatementBeforeTransaction = feeStatementRepository.findFeeStatementByStudentId(installmentsDto.getStudentId()).get(0);
+        previousTermBalance = feeStatementBeforeTransaction.getCurrentTermBalance();
+        previousAnnualBalance = feeStatementBeforeTransaction.getAnnualBalance();
+        previousTotal = feeStatementBeforeTransaction.getCurrentYearTotal();
 
         UserSessionActivitiesEntity userSessionActivitiesEntity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(installmentsDto.getSessionLogId(),SessionActivitiesConfig.REGISTER_FEE_INSTALLMENT_SESSION_ACTIVITY,UtilityClass.getNow()));
 
@@ -47,8 +62,12 @@ public class InstallmentsController {
         dbFeeStatement.setAnnualBalance(UtilityClass.getAStudentAnnualBalanceFromTermBalance(dbFeeStatement.getStudentId(),dbFeeStatement.getCurrentTermBalance(),UtilityClass.getAStudentResidenceDetails(dbFeeStatement.getStudentId()).getInt("StudentResidenceId")));
         dbFeeStatement.setStudentWorth(getNextStudentWorth(dbFeeStatement.getStudentId()));
 
+        registerTransaction(installmentsDto.getSessionLogId(),userSessionActivitiesEntity.getUserSessionActivityId(),installmentsDto.getStudentId(),dbInstallment.getInstallmentId(),previousTermBalance,previousAnnualBalance,previousTotal,dbFeeStatement.getCurrentTermBalance(),dbFeeStatement.getAnnualBalance(),dbFeeStatement.getCurrentYearTotal());
+
         return feeStatementRepository.save(dbFeeStatement);
     }
+
+
 
     public int getNextYearTotalFromInstallment(int studentId,int installmentAmount) {
 
@@ -56,6 +75,8 @@ public class InstallmentsController {
 
         return dbFeeStatement.getCurrentYearTotal() + installmentAmount;
     }
+
+
 
     public int getNextAlternateTotal(int studentId) {
         int alternateTotal = 0;
@@ -73,11 +94,15 @@ public class InstallmentsController {
         return alternateTotal;
     }
 
+
+
     public int getNextTermBalance(int studentId,int installmentAmount) {
         FeeStatementEntity dbFeeStatement = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
 
         return dbFeeStatement.getCurrentTermBalance() - installmentAmount;
     }
+
+
 
     public int getNextStudentWorth(int studentId) {
         int studentWorth = 0;
@@ -92,5 +117,26 @@ public class InstallmentsController {
         }
 
         return studentWorth;
+    }
+
+
+    public void registerTransaction(int sessionLogId,int userSessionActivityId,int studentId,int installmentId,int previousTermBalance,int previousAnnualBalance,int previousTotal,int nextTermBalance,int nextAnnualBalance,int nextTotal) {
+
+        TransactionsEntity transaction = new TransactionsEntity();
+
+        transaction.setSessionLogId(sessionLogId);
+        transaction.setUserSessionActivityId(userSessionActivityId);
+        transaction.setTransactionDescriptionId(TransactionDescriptionsConfig.REGISTER_FEE_INSTALLMENT_TRANSACTION_DESCRIPTION);
+        transaction.setStudentId(studentId);
+        transaction.setInstallmentId(installmentId);
+        transaction.setPreviousTermBalance(previousTermBalance);
+        transaction.setPreviousAnnualBalance(previousAnnualBalance);
+        transaction.setPreviousTotal(previousTotal);
+        transaction.setNextTermBalance(nextTermBalance);
+        transaction.setNextAnnualBalance(nextAnnualBalance);
+        transaction.setNextTotal(nextTotal);
+        transaction.setTransactionDate(UtilityClass.getNow());
+
+        transactionsRepository.save(transaction);
     }
 }

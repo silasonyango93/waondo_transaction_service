@@ -11,6 +11,10 @@ import java.time.format.DateTimeFormatter;
 
 public class UtilityClass {
 
+
+
+
+
     public static JSONObject getTermDetailsByDate(String searchDate) {
         JSONObject dataObject = null;
         CustomOkHttp customOkHttp = new CustomOkHttp();
@@ -31,6 +35,11 @@ public class UtilityClass {
 
         return dataObject;
     }
+
+
+
+
+
 
     public static JSONObject getAStudentClassDetails(int studentId) {
         JSONObject dataObject = null;
@@ -54,6 +63,10 @@ public class UtilityClass {
     }
 
 
+
+
+
+
     public static JSONArray getFeeStructureForParticularClassLevel(int academicClassLevelId, int studentResidenceId) {
         JSONArray dataArray = null;
         CustomOkHttp customOkHttp = new CustomOkHttp();
@@ -74,6 +87,11 @@ public class UtilityClass {
 
         return dataArray;
     }
+
+
+
+
+
 
     public static int getAStudentAnnualBalanceFromTermBalance(int studentId, int termBalance, int studentResidenceId) {
         int annualBalance = 0;
@@ -96,12 +114,22 @@ public class UtilityClass {
         return annualBalance + termBalance;
     }
 
+
+
+
+
+
     public static String getNow() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
 
         return dtf.format(now);
     }
+
+
+
+
+
 
     public static String getToday() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -110,12 +138,22 @@ public class UtilityClass {
         return dtf.format(now);
     }
 
+
+
+
+
+
     public static String getCurrentYear() {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy");
         LocalDateTime now = LocalDateTime.now();
 
         return dtf.format(now);
     }
+
+
+
+
+
 
     public static JSONArray getInstallmentsBetweenACertainPeriod(String startDate, String endDate) {
         JSONArray dataArray = null;
@@ -139,6 +177,12 @@ public class UtilityClass {
     }
 
 
+
+
+
+
+
+
     public static JSONArray getInstallmentsForParticularStudentBetweenACertainPeriod(int studentId,String startDate, String endDate) {
         JSONArray dataArray = null;
         CustomOkHttp customOkHttp = new CustomOkHttp();
@@ -160,6 +204,10 @@ public class UtilityClass {
 
         return dataArray;
     }
+
+
+
+
 
 
 

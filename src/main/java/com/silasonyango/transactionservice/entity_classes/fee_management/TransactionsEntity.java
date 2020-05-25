@@ -22,13 +22,13 @@ public class TransactionsEntity implements java.io.Serializable{
     private int studentId;
 
     @Column(name = "InstallmentId")
-    private int installmentId;
+    private int installmentId = 0;
 
     @Column(name = "CarryFowardId")
-    private int carryFowardId;
+    private int carryFowardId = 0;
 
     @Column(name = "FeeCorrectionId")
-    private int feeCorrectionId;
+    private int feeCorrectionId = 0;
 
     @Column(name = "PreviousTermBalance")
     private int previousTermBalance;
