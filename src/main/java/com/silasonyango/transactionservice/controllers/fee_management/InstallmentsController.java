@@ -44,7 +44,7 @@ public class InstallmentsController {
         dbFeeStatement.setCurrentYearTotal(getNextYearTotalFromInstallment(dbFeeStatement.getStudentId(),installmentsDto.getInstallmentAmount()));
         dbFeeStatement.setAlternateTotal(getNextAlternateTotal(dbFeeStatement.getStudentId()));
         dbFeeStatement.setCurrentTermBalance(getNextTermBalance(dbFeeStatement.getStudentId(),installmentsDto.getInstallmentAmount()));
-        dbFeeStatement.setAnnualBalance(UtilityClass.getAStudentAnnualBalanceFromTermBalance(dbFeeStatement.getStudentId(),getNextTermBalance(dbFeeStatement.getStudentId(),installmentsDto.getInstallmentAmount()),UtilityClass.getAStudentResidenceDetails(dbFeeStatement.getStudentId()).getInt("StudentResidenceId")));
+        dbFeeStatement.setAnnualBalance(UtilityClass.getAStudentAnnualBalanceFromTermBalance(dbFeeStatement.getStudentId(),dbFeeStatement.getCurrentTermBalance(),UtilityClass.getAStudentResidenceDetails(dbFeeStatement.getStudentId()).getInt("StudentResidenceId")));
         dbFeeStatement.setStudentWorth(getNextStudentWorth(dbFeeStatement.getStudentId()));
 
         return feeStatementRepository.save(dbFeeStatement);
