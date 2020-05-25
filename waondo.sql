@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: May 20, 2020 at 05:12 PM
+-- Generation Time: May 25, 2020 at 06:25 PM
 -- Server version: 5.7.26
 -- PHP Version: 7.3.6
 
@@ -126,6 +126,13 @@ CREATE TABLE `carry_forwards` (
   `DateCarriedForward` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `carry_forwards`
+--
+
+INSERT INTO `carry_forwards` (`CarryFowardId`, `StudentId`, `CarryForwardAmount`, `DateCarriedForward`) VALUES
+(0, 26, 0, '2020-05-01 00:00:00');
+
 -- --------------------------------------------------------
 
 --
@@ -242,6 +249,13 @@ CREATE TABLE `correction_descriptions` (
   `CorrectionDescription` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `correction_descriptions`
+--
+
+INSERT INTO `correction_descriptions` (`CorrectionDescriptionId`, `CorrectionDescription`) VALUES
+(1, 'Wrong student paid for');
+
 -- --------------------------------------------------------
 
 --
@@ -272,7 +286,7 @@ INSERT INTO `fee_components` (`FeeComponentId`, `FeeComponentDescription`) VALUE
 CREATE TABLE `fee_corrections` (
   `FeeCorrectionId` int(11) NOT NULL,
   `SessionLogId` int(11) NOT NULL,
-  `ActualSessionActivityId` int(11) NOT NULL,
+  `UserSessionActivityId` int(11) NOT NULL,
   `CorrectionDescriptionId` int(11) NOT NULL,
   `StudentId` int(11) NOT NULL,
   `PreviousTermBalance` int(11) NOT NULL,
@@ -283,6 +297,13 @@ CREATE TABLE `fee_corrections` (
   `NextTotal` int(11) NOT NULL,
   `CorrectionDate` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `fee_corrections`
+--
+
+INSERT INTO `fee_corrections` (`FeeCorrectionId`, `SessionLogId`, `UserSessionActivityId`, `CorrectionDescriptionId`, `StudentId`, `PreviousTermBalance`, `PreviousAnnualBalance`, `PreviousTotal`, `NextTermBalance`, `NextAnnualBalance`, `NextTotal`, `CorrectionDate`) VALUES
+(0, 156, 161, 1, 26, 0, 0, 0, 0, 0, 0, '2020-05-01 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -306,7 +327,11 @@ CREATE TABLE `fee_statements` (
 
 INSERT INTO `fee_statements` (`FeeStatementId`, `StudentId`, `CurrentYearTotal`, `AlternateTotal`, `CurrentTermBalance`, `AnnualBalance`, `StudentWorth`) VALUES
 (7, 20, 0, 0, 20000, 25000, 0),
-(8, 21, 0, 0, 30000, 45000, 0);
+(8, 21, 25300, 13300, 4700, 19700, 25300),
+(9, 22, 34000, 34000, -14000, -43000, 34000),
+(10, 23, 10000, 10000, 10000, 5000, 10000),
+(11, 24, 10000, 10000, 10000, 5000, 10000),
+(12, 25, 10000, 10000, 10000, 15000, 10000);
 
 -- --------------------------------------------------------
 
@@ -364,8 +389,26 @@ CREATE TABLE `installments` (
   `InstallmentDate` datetime NOT NULL,
   `IsCarryForward` int(11) NOT NULL,
   `SessionLogId` int(11) NOT NULL,
-  `ActualSessionActivityId` int(11) NOT NULL
+  `UserSessionActivityId` int(11) NOT NULL,
+  `InstallmentYear` year(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `installments`
+--
+
+INSERT INTO `installments` (`InstallmentId`, `StudentId`, `InstallmentAmount`, `InstallmentDate`, `IsCarryForward`, `SessionLogId`, `UserSessionActivityId`, `InstallmentYear`) VALUES
+(0, 26, 0, '2020-05-01 00:00:00', 0, 156, 161, 2020),
+(2, 18, 23000, '2020-05-24 22:54:40', 0, 249, 258, 2020),
+(3, 22, 34000, '2020-05-24 22:57:02', 0, 250, 260, 2020),
+(4, 23, 10000, '2020-05-25 14:43:09', 0, 253, 265, 2020),
+(5, 24, 10000, '2020-05-25 14:49:17', 0, 254, 268, 2020),
+(6, 25, 10000, '2020-05-25 15:02:21', 0, 255, 271, 2020),
+(7, 21, 12000, '2020-05-01 19:44:47', 0, 256, 273, 2020),
+(8, 22, 18000, '2020-05-24 19:48:10', 0, 257, 275, 2020),
+(9, 22, 14000, '2020-05-01 20:44:31', 0, 258, 277, 2020),
+(11, 22, 22000, '2020-05-25 21:08:30', 0, 259, 279, 2020),
+(12, 21, 13300, '2020-05-25 21:10:52', 0, 260, 281, 2020);
 
 -- --------------------------------------------------------
 
@@ -403,7 +446,8 @@ CREATE TABLE `lot_descriptions` (
 --
 
 INSERT INTO `lot_descriptions` (`LotDescriptionId`, `LotDescription`) VALUES
-(1, 'Class of 2012');
+(1, 'Class of 2012'),
+(2, 'Class of 2020');
 
 -- --------------------------------------------------------
 
@@ -489,8 +533,107 @@ INSERT INTO `session_logs` (`SessionLogId`, `UserId`, `SessionStartDate`, `Sessi
 (157, 14, '2020-05-20 19:28:36', '2020-05-20 19:58:19'),
 (158, 14, '2020-05-20 19:59:22', '2020-05-20 20:02:39'),
 (159, 14, '2020-05-20 20:02:42', '2020-05-20 20:06:35'),
-(160, 14, '2020-05-20 20:06:38', '2020-05-20 20:08:11'),
-(161, 14, '2020-05-20 20:10:04', '2020-05-20 20:11:30');
+(160, 14, '2020-05-20 20:06:38', '2020-05-22 18:48:38'),
+(161, 14, '2020-05-20 20:10:04', '2020-05-22 18:48:38'),
+(162, 14, '2020-05-22 18:53:39', '2020-05-22 18:54:01'),
+(163, 14, '2020-05-22 18:54:05', '2020-05-22 20:10:06'),
+(164, 14, '2020-05-22 20:30:32', '2020-05-22 20:31:22'),
+(165, 14, '2020-05-22 20:31:23', '2020-05-22 20:33:00'),
+(166, 14, '2020-05-22 20:33:02', '2020-05-22 20:34:02'),
+(167, 14, '2020-05-22 20:34:04', '2020-05-22 20:39:10'),
+(168, 14, '2020-05-22 20:37:14', '2020-05-22 20:39:10'),
+(169, 14, '2020-05-22 20:38:27', '2020-05-22 20:39:10'),
+(170, 14, '2020-05-22 20:39:14', '2020-05-22 20:41:25'),
+(171, 14, '2020-05-22 20:41:28', '2020-05-22 20:47:48'),
+(172, 14, '2020-05-22 20:45:10', '2020-05-22 20:47:48'),
+(173, 14, '2020-05-22 20:55:55', '2020-05-22 20:56:26'),
+(174, 14, '2020-05-22 20:56:27', '2020-05-22 20:56:56'),
+(175, 14, '2020-05-22 20:56:57', '2020-05-22 20:57:33'),
+(176, 14, '2020-05-22 20:57:35', '2020-05-22 21:00:23'),
+(177, 14, '2020-05-22 21:00:04', '2020-05-22 21:00:23'),
+(178, 14, '2020-05-22 21:00:25', '2020-05-22 21:17:08'),
+(179, 14, '2020-05-22 21:08:53', '2020-05-22 21:17:08'),
+(180, 14, '2020-05-22 21:13:50', '2020-05-22 21:17:08'),
+(181, 14, '2020-05-22 21:15:26', '2020-05-22 21:17:08'),
+(182, 14, '2020-05-22 21:17:12', '2020-05-22 22:06:50'),
+(183, 14, '2020-05-22 21:44:15', '2020-05-22 22:06:50'),
+(184, 14, '2020-05-22 22:18:49', '2020-05-22 22:20:02'),
+(185, 14, '2020-05-22 22:21:12', '2020-05-22 22:23:47'),
+(186, 14, '2020-05-22 22:23:51', '2020-05-22 22:31:31'),
+(187, 14, '2020-05-22 22:31:34', '2020-05-22 22:43:44'),
+(188, 14, '2020-05-22 23:40:51', '2020-05-22 23:41:47'),
+(189, 14, '2020-05-22 23:46:14', '2020-05-22 23:47:23'),
+(190, 14, '2020-05-22 23:48:58', '2020-05-22 23:56:33'),
+(191, 14, '2020-05-23 11:07:28', '2020-05-23 11:08:28'),
+(192, 14, '2020-05-23 11:08:30', '2020-05-23 11:47:59'),
+(193, 14, '2020-05-23 11:48:01', '2020-05-23 11:58:28'),
+(194, 14, '2020-05-23 12:12:47', '2020-05-23 12:18:25'),
+(195, 14, '2020-05-23 12:18:27', '2020-05-23 12:19:37'),
+(196, 14, '2020-05-23 12:19:41', '2020-05-23 12:34:17'),
+(197, 14, '2020-05-23 12:21:42', '2020-05-23 12:34:17'),
+(198, 14, '2020-05-23 12:34:57', '2020-05-23 12:36:02'),
+(199, 14, '2020-05-23 12:36:03', '2020-05-23 12:37:37'),
+(200, 14, '2020-05-23 12:37:38', '2020-05-23 12:42:44'),
+(201, 14, '2020-05-23 12:40:31', '2020-05-23 12:42:44'),
+(202, 14, '2020-05-23 12:42:46', '2020-05-23 13:01:31'),
+(203, 14, '2020-05-23 12:44:07', '2020-05-23 13:01:31'),
+(204, 14, '2020-05-23 12:47:05', '2020-05-23 13:01:31'),
+(205, 14, '2020-05-23 13:01:33', '2020-05-23 13:02:28'),
+(206, 14, '2020-05-23 13:02:47', '2020-05-23 13:03:38'),
+(207, 14, '2020-05-23 13:03:40', '2020-05-23 13:06:48'),
+(208, 14, '2020-05-23 13:06:52', '2020-05-23 13:49:17'),
+(209, 14, '2020-05-23 13:18:23', '2020-05-23 13:49:17'),
+(210, 14, '2020-05-23 13:49:19', '2020-05-23 14:42:01'),
+(211, 14, '2020-05-23 14:52:00', '2020-05-23 14:52:49'),
+(212, 14, '2020-05-23 14:52:51', '2020-05-23 14:53:14'),
+(213, 14, '2020-05-23 14:53:15', '2020-05-23 14:58:14'),
+(214, 14, '2020-05-23 15:05:32', '2020-05-23 15:06:56'),
+(215, 14, '2020-05-23 15:06:59', '2020-05-23 15:09:15'),
+(216, 14, '2020-05-23 15:10:32', '2020-05-23 15:16:08'),
+(217, 14, '2020-05-23 15:16:28', '2020-05-23 15:43:37'),
+(218, 14, '2020-05-23 15:19:06', '2020-05-23 15:43:37'),
+(219, 14, '2020-05-23 15:23:49', '2020-05-23 15:43:37'),
+(220, 14, '2020-05-23 15:43:38', '2020-05-23 15:46:24'),
+(221, 14, '2020-05-23 15:49:41', '2020-05-23 15:50:05'),
+(222, 14, '2020-05-23 15:50:07', '2020-05-23 15:50:49'),
+(223, 14, '2020-05-23 15:50:50', '2020-05-23 15:51:58'),
+(224, 14, '2020-05-23 15:51:59', '2020-05-23 15:53:38'),
+(225, 14, '2020-05-23 15:53:38', '2020-05-23 15:54:00'),
+(226, 14, '2020-05-23 15:54:01', '2020-05-23 15:55:48'),
+(227, 14, '2020-05-23 15:56:16', '2020-05-23 15:56:52'),
+(228, 14, '2020-05-23 15:56:53', '2020-05-23 16:04:42'),
+(229, 14, '2020-05-23 16:04:43', '2020-05-23 16:08:52'),
+(230, 14, '2020-05-23 16:07:01', '2020-05-23 16:08:52'),
+(231, 14, '2020-05-23 16:08:54', '2020-05-23 16:14:02'),
+(232, 14, '2020-05-23 16:14:10', '2020-05-23 16:15:38'),
+(233, 14, '2020-05-23 16:15:40', '2020-05-23 16:15:57'),
+(234, 14, '2020-05-23 16:16:00', '2020-05-23 16:16:18'),
+(235, 14, '2020-05-23 16:16:21', '2020-05-23 16:22:57'),
+(236, 14, '2020-05-23 16:26:59', '2020-05-23 16:30:15'),
+(237, 14, '2020-05-23 16:30:16', '2020-05-23 16:33:15'),
+(238, 14, '2020-05-23 16:33:17', '2020-05-23 16:39:32'),
+(239, 14, '2020-05-23 16:41:17', '2020-05-23 16:46:42'),
+(240, 14, '2020-05-23 16:50:35', '2020-05-23 16:51:54'),
+(241, 14, '2020-05-23 16:51:56', '2020-05-23 16:58:20'),
+(242, 14, '2020-05-23 16:58:21', '2020-05-23 17:00:26'),
+(243, 14, '2020-05-23 17:00:27', '2020-05-23 17:42:24'),
+(244, 14, '2020-05-23 17:06:38', '2020-05-23 17:42:24'),
+(245, 14, '2020-05-23 17:42:28', '2020-05-23 17:45:26'),
+(246, 14, '2020-05-23 17:45:27', '2020-05-24 22:33:34'),
+(247, 14, '2020-05-23 17:47:13', '2020-05-24 22:33:34'),
+(248, 14, '2020-05-24 22:33:59', '2020-05-24 22:35:51'),
+(249, 14, '2020-05-24 22:54:22', '2020-05-24 22:59:35'),
+(250, 14, '2020-05-24 22:56:40', '2020-05-24 22:59:35'),
+(251, 14, '2020-05-24 22:59:38', '2020-05-25 14:42:18'),
+(252, 14, '2020-05-25 14:29:34', '2020-05-25 14:42:18'),
+(253, 14, '2020-05-25 14:42:49', '2020-05-25 15:01:30'),
+(254, 14, '2020-05-25 14:47:17', '2020-05-25 15:01:30'),
+(255, 14, '2020-05-25 15:01:32', '2020-05-25 19:43:20'),
+(256, 14, '2020-05-25 19:43:42', '2020-05-25 20:44:03'),
+(257, 14, '2020-05-25 19:47:49', '2020-05-25 20:44:03'),
+(258, 14, '2020-05-25 20:44:10', '2020-05-25 20:44:59'),
+(259, 14, '2020-05-25 21:08:13', '2020-05-25 21:09:53'),
+(260, 14, '2020-05-25 21:10:28', '2020-05-25 21:12:07');
 
 -- --------------------------------------------------------
 
@@ -518,7 +661,12 @@ INSERT INTO `students` (`StudentId`, `AdmissionNo`, `StudentName`, `GenderId`, `
 (18, '8032', 'Silas Onyango', 1, '2020-05-07', 1, 1, '2020-05-20 19:59:58', 'male_student.png'),
 (19, '630', 'Silas Onyango', 1, '2020-05-20', 1, 1, '2020-05-20 20:03:21', 'male_student.png'),
 (20, '8033', 'Silas Onyango', 1, '2020-05-20', 1, 1, '2020-05-20 20:07:03', 'male_student.png'),
-(21, '8034', 'Zain Konyango', 1, '2020-05-30', 2, 1, '2020-05-20 20:10:27', 'male_student.png');
+(21, '8034', 'Zain Konyango', 1, '2020-05-30', 2, 1, '2020-05-20 20:10:27', 'male_student.png'),
+(22, '7878', 'Ezekiel Ombima', 1, '2020-05-07', 1, 1, '2020-05-22 23:49:59', 'male_student.png'),
+(23, '9000', 'Ken Aruba', 1, '2020-05-01', 1, 1, '2020-05-25 14:30:38', 'male_student.png'),
+(24, '7070', 'Nana Gechaga', 2, '2020-05-01', 1, 1, '2020-05-25 14:47:48', 'female_student.png'),
+(25, '6060', 'Mudanyi Kiyangu', 2, '2020-05-01', 1, 1, '2020-05-25 15:02:03', 'female_student.png'),
+(26, '0', 'ADMIN_STUDENT', 1, '2020-05-01', 1, 1, '2020-05-01 00:00:00', 'male_student.png');
 
 -- --------------------------------------------------------
 
@@ -543,7 +691,19 @@ INSERT INTO `student_fee_components` (`StudentFeeComponentId`, `StudentId`, `Cla
 (21, 20, 3, 0),
 (22, 21, 1, 0),
 (23, 21, 2, 0),
-(24, 21, 3, 0);
+(24, 21, 3, 0),
+(25, 22, 1, 0),
+(26, 22, 2, 0),
+(27, 22, 3, 0),
+(28, 23, 1, 0),
+(29, 23, 2, 0),
+(30, 23, 3, 0),
+(31, 24, 1, 0),
+(32, 24, 2, 0),
+(33, 24, 3, 0),
+(34, 25, 1, 0),
+(35, 25, 2, 0),
+(36, 25, 3, 0);
 
 -- --------------------------------------------------------
 
@@ -565,7 +725,11 @@ CREATE TABLE `student_registration` (
 
 INSERT INTO `student_registration` (`StudentRegistrationId`, `SessionLogId`, `UserSessionActivityId`, `StudentId`, `StudentRegistrationDate`) VALUES
 (2, 160, 166, 20, '2020-05-20 20:07:03'),
-(3, 161, 168, 21, '2020-05-20 20:10:27');
+(3, 161, 168, 21, '2020-05-20 20:10:27'),
+(4, 190, 198, 22, '2020-05-22 23:49:59'),
+(5, 252, 263, 23, '2020-05-25 14:30:38'),
+(6, 254, 267, 24, '2020-05-25 14:47:48'),
+(7, 255, 270, 25, '2020-05-25 15:02:03');
 
 -- --------------------------------------------------------
 
@@ -615,7 +779,7 @@ INSERT INTO `term_iterations` (`TermIterationId`, `TermIterationDescription`) VA
 CREATE TABLE `transactions` (
   `TransactionId` int(11) NOT NULL,
   `SessionLogId` int(11) NOT NULL,
-  `ActualSessionActivityId` int(11) NOT NULL,
+  `UserSessionActivityId` int(11) NOT NULL,
   `TransactionDescriptionId` int(11) NOT NULL,
   `StudentId` int(11) NOT NULL,
   `InstallmentId` int(11) DEFAULT NULL,
@@ -630,6 +794,13 @@ CREATE TABLE `transactions` (
   `TransactionDate` datetime NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `transactions`
+--
+
+INSERT INTO `transactions` (`TransactionId`, `SessionLogId`, `UserSessionActivityId`, `TransactionDescriptionId`, `StudentId`, `InstallmentId`, `CarryFowardId`, `FeeCorrectionId`, `PreviousTermBalance`, `PreviousAnnualBalance`, `PreviousTotal`, `NextTermBalance`, `NextAnnualBalance`, `NextTotal`, `TransactionDate`) VALUES
+(4, 260, 281, 1, 21, 12, 0, 0, 18000, 33000, 12000, 4700, 19700, 25300, '2020-05-25 21:10:52');
+
 -- --------------------------------------------------------
 
 --
@@ -640,6 +811,16 @@ CREATE TABLE `transaction_descriptions` (
   `TransactionDescriptionId` int(11) NOT NULL,
   `TransactionDescription` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `transaction_descriptions`
+--
+
+INSERT INTO `transaction_descriptions` (`TransactionDescriptionId`, `TransactionDescription`) VALUES
+(1, 'Register a fee installment'),
+(2, 'Fee correction'),
+(3, 'An end of term carry forward'),
+(4, 'An end of year carry forward');
 
 -- --------------------------------------------------------
 
@@ -692,7 +873,7 @@ INSERT INTO `user_access_privileges` (`UserAccessPrivilegeId`, `UserRoleId`, `Ac
 (35, 20, 1, 1),
 (36, 20, 2, 1),
 (37, 20, 3, 0),
-(38, 20, 4, 0),
+(38, 20, 4, 1),
 (39, 20, 5, 0),
 (40, 20, 6, 0),
 (41, 21, 1, 0),
@@ -770,7 +951,120 @@ INSERT INTO `user_session_activities` (`UserSessionActivityId`, `SessionLogId`, 
 (165, 160, 1, '2020-05-20 20:06:38'),
 (166, 160, 2, '2020-05-20 20:07:03'),
 (167, 161, 1, '2020-05-20 20:10:04'),
-(168, 161, 2, '2020-05-20 20:10:27');
+(168, 161, 2, '2020-05-20 20:10:27'),
+(169, 162, 1, '2020-05-22 18:53:39'),
+(170, 163, 1, '2020-05-22 18:54:05'),
+(171, 164, 1, '2020-05-22 20:30:32'),
+(172, 165, 1, '2020-05-22 20:31:23'),
+(173, 166, 1, '2020-05-22 20:33:02'),
+(174, 167, 1, '2020-05-22 20:34:04'),
+(175, 168, 1, '2020-05-22 20:37:14'),
+(176, 169, 1, '2020-05-22 20:38:27'),
+(177, 170, 1, '2020-05-22 20:39:14'),
+(178, 171, 1, '2020-05-22 20:41:28'),
+(179, 172, 1, '2020-05-22 20:45:10'),
+(180, 173, 1, '2020-05-22 20:55:55'),
+(181, 174, 1, '2020-05-22 20:56:27'),
+(182, 175, 1, '2020-05-22 20:56:57'),
+(183, 176, 1, '2020-05-22 20:57:35'),
+(184, 177, 1, '2020-05-22 21:00:04'),
+(185, 178, 1, '2020-05-22 21:00:25'),
+(186, 179, 1, '2020-05-22 21:08:53'),
+(187, 180, 1, '2020-05-22 21:13:50'),
+(188, 181, 1, '2020-05-22 21:15:26'),
+(189, 182, 1, '2020-05-22 21:17:12'),
+(190, 183, 1, '2020-05-22 21:44:15'),
+(191, 184, 1, '2020-05-22 22:18:49'),
+(192, 185, 1, '2020-05-22 22:21:12'),
+(193, 186, 1, '2020-05-22 22:23:51'),
+(194, 187, 1, '2020-05-22 22:31:34'),
+(195, 188, 1, '2020-05-22 23:40:51'),
+(196, 189, 1, '2020-05-22 23:46:14'),
+(197, 190, 1, '2020-05-22 23:48:58'),
+(198, 190, 2, '2020-05-22 23:49:59'),
+(199, 191, 1, '2020-05-23 11:07:28'),
+(200, 192, 1, '2020-05-23 11:08:30'),
+(201, 193, 1, '2020-05-23 11:48:01'),
+(202, 194, 1, '2020-05-23 12:12:47'),
+(203, 195, 1, '2020-05-23 12:18:27'),
+(204, 196, 1, '2020-05-23 12:19:41'),
+(205, 197, 1, '2020-05-23 12:21:42'),
+(206, 198, 1, '2020-05-23 12:34:57'),
+(207, 199, 1, '2020-05-23 12:36:03'),
+(208, 200, 1, '2020-05-23 12:37:38'),
+(209, 201, 1, '2020-05-23 12:40:31'),
+(210, 202, 1, '2020-05-23 12:42:46'),
+(211, 203, 1, '2020-05-23 12:44:07'),
+(212, 204, 1, '2020-05-23 12:47:05'),
+(213, 205, 1, '2020-05-23 13:01:33'),
+(214, 206, 1, '2020-05-23 13:02:47'),
+(215, 207, 1, '2020-05-23 13:03:40'),
+(216, 208, 1, '2020-05-23 13:06:52'),
+(217, 209, 1, '2020-05-23 13:18:23'),
+(218, 210, 1, '2020-05-23 13:49:19'),
+(219, 211, 1, '2020-05-23 14:52:00'),
+(220, 212, 1, '2020-05-23 14:52:51'),
+(221, 213, 1, '2020-05-23 14:53:15'),
+(222, 214, 1, '2020-05-23 15:05:32'),
+(223, 215, 1, '2020-05-23 15:06:59'),
+(224, 216, 1, '2020-05-23 15:10:32'),
+(225, 217, 1, '2020-05-23 15:16:28'),
+(226, 218, 1, '2020-05-23 15:19:06'),
+(227, 219, 1, '2020-05-23 15:23:49'),
+(228, 220, 1, '2020-05-23 15:43:38'),
+(229, 221, 1, '2020-05-23 15:49:41'),
+(230, 222, 1, '2020-05-23 15:50:07'),
+(231, 223, 1, '2020-05-23 15:50:50'),
+(232, 224, 1, '2020-05-23 15:51:59'),
+(233, 225, 1, '2020-05-23 15:53:38'),
+(234, 226, 1, '2020-05-23 15:54:01'),
+(235, 227, 1, '2020-05-23 15:56:16'),
+(236, 228, 1, '2020-05-23 15:56:53'),
+(237, 229, 1, '2020-05-23 16:04:43'),
+(238, 230, 1, '2020-05-23 16:07:01'),
+(239, 231, 1, '2020-05-23 16:08:54'),
+(240, 232, 1, '2020-05-23 16:14:10'),
+(241, 233, 1, '2020-05-23 16:15:40'),
+(242, 234, 1, '2020-05-23 16:16:00'),
+(243, 235, 1, '2020-05-23 16:16:21'),
+(244, 236, 1, '2020-05-23 16:26:59'),
+(245, 237, 1, '2020-05-23 16:30:16'),
+(246, 238, 1, '2020-05-23 16:33:17'),
+(247, 239, 1, '2020-05-23 16:41:17'),
+(248, 240, 1, '2020-05-23 16:50:35'),
+(249, 241, 1, '2020-05-23 16:51:56'),
+(250, 242, 1, '2020-05-23 16:58:21'),
+(251, 243, 1, '2020-05-23 17:00:27'),
+(252, 244, 1, '2020-05-23 17:06:38'),
+(253, 245, 1, '2020-05-23 17:42:28'),
+(254, 246, 1, '2020-05-23 17:45:27'),
+(255, 247, 1, '2020-05-23 17:47:13'),
+(256, 248, 1, '2020-05-24 22:33:59'),
+(257, 249, 1, '2020-05-24 22:54:22'),
+(258, 249, 4, '2020-05-24 22:54:40'),
+(259, 250, 1, '2020-05-24 22:56:40'),
+(260, 250, 4, '2020-05-24 22:57:02'),
+(261, 251, 1, '2020-05-24 22:59:38'),
+(262, 252, 1, '2020-05-25 14:29:34'),
+(263, 252, 2, '2020-05-25 14:30:38'),
+(264, 253, 1, '2020-05-25 14:42:49'),
+(265, 253, 4, '2020-05-25 14:43:09'),
+(266, 254, 1, '2020-05-25 14:47:17'),
+(267, 254, 2, '2020-05-25 14:47:48'),
+(268, 254, 4, '2020-05-25 14:49:17'),
+(269, 255, 1, '2020-05-25 15:01:32'),
+(270, 255, 2, '2020-05-25 15:02:03'),
+(271, 255, 4, '2020-05-25 15:02:21'),
+(272, 256, 1, '2020-05-25 19:43:42'),
+(273, 256, 4, '2020-05-25 19:44:47'),
+(274, 257, 1, '2020-05-25 19:47:49'),
+(275, 257, 4, '2020-05-25 19:48:10'),
+(276, 258, 1, '2020-05-25 20:44:10'),
+(277, 258, 4, '2020-05-25 20:44:31'),
+(278, 259, 1, '2020-05-25 21:08:13'),
+(279, 259, 4, '2020-05-25 21:08:30'),
+(280, 260, 1, '2020-05-25 21:10:28'),
+(281, 260, 4, '2020-05-25 21:10:52');
 
 -- --------------------------------------------------------
 
@@ -899,7 +1193,7 @@ ALTER TABLE `fee_corrections`
   ADD PRIMARY KEY (`FeeCorrectionId`),
   ADD KEY `CorrectionDescriptionId` (`CorrectionDescriptionId`),
   ADD KEY `SessionLogId` (`SessionLogId`),
-  ADD KEY `ActualSessionActivityId` (`ActualSessionActivityId`),
+  ADD KEY `ActualSessionActivityId` (`UserSessionActivityId`),
   ADD KEY `StudentId` (`StudentId`);
 
 --
@@ -928,7 +1222,7 @@ ALTER TABLE `gender`
 ALTER TABLE `installments`
   ADD PRIMARY KEY (`InstallmentId`),
   ADD KEY `SessionLogId` (`SessionLogId`),
-  ADD KEY `ActualSessionActivityId` (`ActualSessionActivityId`),
+  ADD KEY `ActualSessionActivityId` (`UserSessionActivityId`),
   ADD KEY `StudentId` (`StudentId`);
 
 --
@@ -1014,7 +1308,7 @@ ALTER TABLE `term_iterations`
 ALTER TABLE `transactions`
   ADD PRIMARY KEY (`TransactionId`),
   ADD KEY `SessionLogId` (`SessionLogId`),
-  ADD KEY `ActualSessionActivityId` (`ActualSessionActivityId`),
+  ADD KEY `ActualSessionActivityId` (`UserSessionActivityId`),
   ADD KEY `TransactionDescriptionId` (`TransactionDescriptionId`),
   ADD KEY `InstallmentId` (`InstallmentId`),
   ADD KEY `FeeCorrectionId` (`FeeCorrectionId`),
@@ -1097,7 +1391,7 @@ ALTER TABLE `actual_weeks`
 -- AUTO_INCREMENT for table `carry_forwards`
 --
 ALTER TABLE `carry_forwards`
-  MODIFY `CarryFowardId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `CarryFowardId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `classes`
@@ -1133,7 +1427,7 @@ ALTER TABLE `class_streams`
 -- AUTO_INCREMENT for table `correction_descriptions`
 --
 ALTER TABLE `correction_descriptions`
-  MODIFY `CorrectionDescriptionId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `CorrectionDescriptionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `fee_components`
@@ -1145,13 +1439,13 @@ ALTER TABLE `fee_components`
 -- AUTO_INCREMENT for table `fee_corrections`
 --
 ALTER TABLE `fee_corrections`
-  MODIFY `FeeCorrectionId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `FeeCorrectionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `fee_statements`
 --
 ALTER TABLE `fee_statements`
-  MODIFY `FeeStatementId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `FeeStatementId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `fee_structures`
@@ -1169,7 +1463,7 @@ ALTER TABLE `gender`
 -- AUTO_INCREMENT for table `installments`
 --
 ALTER TABLE `installments`
-  MODIFY `InstallmentId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `InstallmentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `lots`
@@ -1181,7 +1475,7 @@ ALTER TABLE `lots`
 -- AUTO_INCREMENT for table `lot_descriptions`
 --
 ALTER TABLE `lot_descriptions`
-  MODIFY `LotDescriptionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `LotDescriptionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `month`
@@ -1205,25 +1499,25 @@ ALTER TABLE `session_activities`
 -- AUTO_INCREMENT for table `session_logs`
 --
 ALTER TABLE `session_logs`
-  MODIFY `SessionLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=162;
+  MODIFY `SessionLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=261;
 
 --
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `StudentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `StudentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `student_fee_components`
 --
 ALTER TABLE `student_fee_components`
-  MODIFY `StudentFeeComponentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `StudentFeeComponentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `student_registration`
 --
 ALTER TABLE `student_registration`
-  MODIFY `StudentRegistrationId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `StudentRegistrationId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `student_residence`
@@ -1241,13 +1535,13 @@ ALTER TABLE `term_iterations`
 -- AUTO_INCREMENT for table `transactions`
 --
 ALTER TABLE `transactions`
-  MODIFY `TransactionId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `TransactionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `transaction_descriptions`
 --
 ALTER TABLE `transaction_descriptions`
-  MODIFY `TransactionDescriptionId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `TransactionDescriptionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1271,7 +1565,7 @@ ALTER TABLE `user_roles`
 -- AUTO_INCREMENT for table `user_session_activities`
 --
 ALTER TABLE `user_session_activities`
-  MODIFY `UserSessionActivityId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=169;
+  MODIFY `UserSessionActivityId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=282;
 
 --
 -- AUTO_INCREMENT for table `week_iterations`
@@ -1337,7 +1631,7 @@ ALTER TABLE `class_fee_structure_components`
 ALTER TABLE `fee_corrections`
   ADD CONSTRAINT `fee_corrections_ibfk_1` FOREIGN KEY (`CorrectionDescriptionId`) REFERENCES `correction_descriptions` (`CorrectionDescriptionId`),
   ADD CONSTRAINT `fee_corrections_ibfk_2` FOREIGN KEY (`SessionLogId`) REFERENCES `session_logs` (`SessionLogId`),
-  ADD CONSTRAINT `fee_corrections_ibfk_3` FOREIGN KEY (`ActualSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
+  ADD CONSTRAINT `fee_corrections_ibfk_3` FOREIGN KEY (`UserSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
   ADD CONSTRAINT `fee_corrections_ibfk_4` FOREIGN KEY (`StudentId`) REFERENCES `students` (`StudentId`);
 
 --
@@ -1357,7 +1651,7 @@ ALTER TABLE `fee_structures`
 --
 ALTER TABLE `installments`
   ADD CONSTRAINT `installments_ibfk_3` FOREIGN KEY (`SessionLogId`) REFERENCES `session_logs` (`SessionLogId`),
-  ADD CONSTRAINT `installments_ibfk_4` FOREIGN KEY (`ActualSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
+  ADD CONSTRAINT `installments_ibfk_4` FOREIGN KEY (`UserSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
   ADD CONSTRAINT `installments_ibfk_5` FOREIGN KEY (`StudentId`) REFERENCES `students` (`StudentId`);
 
 --
@@ -1401,7 +1695,7 @@ ALTER TABLE `student_registration`
 --
 ALTER TABLE `transactions`
   ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`SessionLogId`) REFERENCES `session_logs` (`SessionLogId`),
-  ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`ActualSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
+  ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`UserSessionActivityId`) REFERENCES `user_session_activities` (`UserSessionActivityId`),
   ADD CONSTRAINT `transactions_ibfk_4` FOREIGN KEY (`TransactionDescriptionId`) REFERENCES `transaction_descriptions` (`TransactionDescriptionId`),
   ADD CONSTRAINT `transactions_ibfk_5` FOREIGN KEY (`InstallmentId`) REFERENCES `installments` (`InstallmentId`),
   ADD CONSTRAINT `transactions_ibfk_6` FOREIGN KEY (`FeeCorrectionId`) REFERENCES `fee_corrections` (`FeeCorrectionId`),
