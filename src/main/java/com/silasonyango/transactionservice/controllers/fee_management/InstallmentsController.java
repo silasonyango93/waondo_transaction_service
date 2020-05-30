@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -177,9 +178,12 @@ public class InstallmentsController {
         List<InstallmentsResponseDto> installmentsResponseDtoArrayList = new ArrayList<>();
 
         for(int i = 0;i<feeInstallmentsList.size();i++) {
-            if(feeInstallmentsList.get(i).getInstallmentYear().equals(UtilityClass.getCurrentYear())) {
+            if(feeInstallmentsList.get(i).getInstallmentYear().matches(".*?\\b" +UtilityClass.getCurrentYear()+ "\\b.*?")) {
 
-                installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),feeInstallmentsList.get(i).getInstallmentAmount(),feeInstallmentsList.get(i).getInstallmentDate(),feeInstallmentsList.get(i).getIsCarryForward(),feeInstallmentsList.get(i).getSessionLogId(),feeInstallmentsList.get(i).getUserSessionActivityId(),feeInstallmentsList.get(i).getInstallmentYear(),UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"),getTermDetailsByDate(feeInstallmentsList.get(i).getInstallmentDate()).getString("TermIterationDescription")));
+
+                String installmentDate = feeInstallmentsList.get(i).getInstallmentDate();
+
+                installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),feeInstallmentsList.get(i).getInstallmentAmount(),installmentDate,feeInstallmentsList.get(i).getIsCarryForward(),feeInstallmentsList.get(i).getSessionLogId(),feeInstallmentsList.get(i).getUserSessionActivityId(),feeInstallmentsList.get(i).getInstallmentYear(),UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"),getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
 
             }
         }
