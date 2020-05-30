@@ -9,6 +9,7 @@ public class InstallmentsResponseDto extends InstallmentsEntity {
     public InstallmentsResponseDto(int studentId,int installmentAmount,String installmentDate,int isCarryForward,int sessionLogId,int userSessionActivityId,String installmentYear,String bursarName,String termDetails) {
         super(studentId,installmentAmount,installmentDate,isCarryForward,sessionLogId,userSessionActivityId,installmentYear);
         this.bursarName = bursarName;
+        this.termDetails = termDetails;
     }
 
     public String getBursarName() {

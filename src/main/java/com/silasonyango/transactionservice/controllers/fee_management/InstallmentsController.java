@@ -24,9 +24,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static com.silasonyango.transactionservice.utility_classes.UtilityClass.getTermDetailsByDate;
 
@@ -177,11 +177,12 @@ public class InstallmentsController {
 
         List<InstallmentsResponseDto> installmentsResponseDtoArrayList = new ArrayList<>();
 
+
         for(int i = 0;i<feeInstallmentsList.size();i++) {
             if(feeInstallmentsList.get(i).getInstallmentYear().matches(".*?\\b" +UtilityClass.getCurrentYear()+ "\\b.*?")) {
 
 
-                String installmentDate = feeInstallmentsList.get(i).getInstallmentDate();
+                String installmentDate = feeInstallmentsList.get(i).getInstallmentDate().replaceAll(" .+$", "");
 
                 installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),feeInstallmentsList.get(i).getInstallmentAmount(),installmentDate,feeInstallmentsList.get(i).getIsCarryForward(),feeInstallmentsList.get(i).getSessionLogId(),feeInstallmentsList.get(i).getUserSessionActivityId(),feeInstallmentsList.get(i).getInstallmentYear(),UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"),getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
 
