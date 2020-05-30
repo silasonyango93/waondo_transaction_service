@@ -4,14 +4,17 @@ import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig
 import com.silasonyango.transactionservice.common.config.TransactionDescriptionsConfig;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsDto;
+import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsResponseDto;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.TransactionsEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
+import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
 import com.silasonyango.transactionservice.repository.fee_management.TransactionsRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
+import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,7 +24,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.silasonyango.transactionservice.utility_classes.UtilityClass.getTermDetailsByDate;
 
 @RestController
 @RequestMapping("/installments")
@@ -37,6 +43,9 @@ public class InstallmentsController {
 
     @Autowired
     TransactionsRepository transactionsRepository;
+
+    @Autowired
+    StudentRepository studentRepository;
 
     @PostMapping("/add_installment")
     public FeeStatementResponseDto addInstallment(@Valid InstallmentsDto installmentsDto) {
@@ -66,7 +75,7 @@ public class InstallmentsController {
 
         feeStatementRepository.save(dbFeeStatement);
 
-        return UtilityClass.getAStudentFeeStatementForCurrentYear(dbFeeStatement.getStudentId());
+        return getAStudentFeeStatementForCurrentYear(dbFeeStatement.getStudentId());
     }
 
 
@@ -108,7 +117,7 @@ public class InstallmentsController {
 
     public int getNextStudentWorth(int studentId) {
         int studentWorth = 0;
-        JSONObject termObject = UtilityClass.getTermDetailsByDate(UtilityClass.getToday());
+        JSONObject termObject = getTermDetailsByDate(UtilityClass.getToday());
 
         JSONArray installmentArray = UtilityClass.getInstallmentsForParticularStudentBetweenACertainPeriod(studentId,termObject.getString("TermStartDate"),termObject.getString("TermEndDate"));
 
@@ -141,4 +150,43 @@ public class InstallmentsController {
 
         transactionsRepository.save(transaction);
     }
+
+
+
+    public FeeStatementResponseDto getAStudentFeeStatementForCurrentYear(int studentId) {
+
+        FeeStatementResponseDto feeStatementResponseDto = new FeeStatementResponseDto();
+
+        StudentEntity studentPersonalDetails = studentRepository.findByStudentId(studentId).get(0);
+        JSONObject classDetails = UtilityClass.getAStudentClassDetails(studentId);
+        JSONObject residenceDetails = UtilityClass.getAStudentResidenceDetails(studentId);
+        FeeStatementEntity feeStatementEntity = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
+        List<InstallmentsEntity> feeInstallmentsList = installmentRepository.findInstallmentsByStudentId(studentId);
+
+
+        feeStatementResponseDto.setStudentId(studentId);
+        feeStatementResponseDto.setAdmissionNumber(studentPersonalDetails.getAdmissionNo());
+        feeStatementResponseDto.setStudentName(studentPersonalDetails.getStudentName());
+        feeStatementResponseDto.setGender(studentPersonalDetails.getGenderId() == 1 ? "Male" : "Female");
+        feeStatementResponseDto.setClassDetails(classDetails.getString("AcademicClassLevelName") +" "+classDetails.getString("ClassStreamName"));
+        feeStatementResponseDto.setResidenceDetails(residenceDetails.getString("StudentResidenceDescription"));
+        feeStatementResponseDto.setTermBalance(feeStatementEntity.getCurrentTermBalance());
+        feeStatementResponseDto.setAnnualBalance(feeStatementEntity.getAnnualBalance());
+        feeStatementResponseDto.setCurrentyearTotal(feeStatementEntity.getCurrentYearTotal());
+
+        List<InstallmentsResponseDto> installmentsResponseDtoArrayList = new ArrayList<>();
+
+        for(int i = 0;i<feeInstallmentsList.size();i++) {
+            if(feeInstallmentsList.get(i).getInstallmentYear().equals(UtilityClass.getCurrentYear())) {
+
+                installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),feeInstallmentsList.get(i).getInstallmentAmount(),feeInstallmentsList.get(i).getInstallmentDate(),feeInstallmentsList.get(i).getIsCarryForward(),feeInstallmentsList.get(i).getSessionLogId(),feeInstallmentsList.get(i).getUserSessionActivityId(),feeInstallmentsList.get(i).getInstallmentYear(),UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"),getTermDetailsByDate(feeInstallmentsList.get(i).getInstallmentDate()).getString("TermIterationDescription")));
+
+            }
+        }
+
+        feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);
+
+        return feeStatementResponseDto;
+    }
+
 }
