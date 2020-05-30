@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface StudentRepository extends JpaRepository<StudentEntity, Long> {
     public List<StudentEntity> findByAdmissionNo(@Param("AdmissionNo") String admissionNo);
+    public List<StudentEntity> findByStudentId(@Param("StudentId") int studentId);
 }

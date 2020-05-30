@@ -39,7 +39,7 @@ public class InstallmentsController {
     TransactionsRepository transactionsRepository;
 
     @PostMapping("/add_installment")
-    public FeeStatementEntity addInstallment(@Valid InstallmentsDto installmentsDto) {
+    public FeeStatementResponseDto addInstallment(@Valid InstallmentsDto installmentsDto) {
 
         int previousTermBalance = 0;
         int previousAnnualBalance = 0;
@@ -64,7 +64,9 @@ public class InstallmentsController {
 
         registerTransaction(installmentsDto.getSessionLogId(),userSessionActivitiesEntity.getUserSessionActivityId(),installmentsDto.getStudentId(),dbInstallment.getInstallmentId(),previousTermBalance,previousAnnualBalance,previousTotal,dbFeeStatement.getCurrentTermBalance(),dbFeeStatement.getAnnualBalance(),dbFeeStatement.getCurrentYearTotal());
 
-        return feeStatementRepository.save(dbFeeStatement);
+        feeStatementRepository.save(dbFeeStatement);
+
+        return UtilityClass.getAStudentFeeStatementForCurrentYear(dbFeeStatement.getStudentId());
     }
 
 

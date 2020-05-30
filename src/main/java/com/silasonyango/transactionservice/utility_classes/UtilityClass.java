@@ -1,17 +1,35 @@
 package com.silasonyango.transactionservice.utility_classes;
 
 import com.silasonyango.transactionservice.common.config.EndPoints;
+import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
+import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsResponseDto;
+import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
+import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
+import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
+import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
+import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import okhttp3.FormBody;
 import okhttp3.RequestBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UtilityClass {
 
+    @Autowired
+    public static StudentRepository studentRepository;
 
+    @Autowired
+    public static FeeStatementRepository feeStatementRepository;
+
+    @Autowired
+    public static InstallmentRepository installmentRepository;
 
 
 
@@ -221,6 +239,67 @@ public class UtilityClass {
 
         try {
             String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_a_student_residence_details",formBody);
+            JSONObject object = new JSONObject(responseString);
+            JSONArray jsonArray = object.getJSONArray("results");
+            dataObject  = jsonArray.getJSONObject(0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataObject;
+    }
+
+
+
+
+    public static FeeStatementResponseDto getAStudentFeeStatementForCurrentYear(int studentId) {
+
+        FeeStatementResponseDto feeStatementResponseDto = new FeeStatementResponseDto();
+
+        StudentEntity studentPersonalDetails = studentRepository.findByStudentId(studentId).get(0);
+        JSONObject classDetails = getAStudentClassDetails(studentId);
+        JSONObject residenceDetails = getAStudentResidenceDetails(studentId);
+        FeeStatementEntity feeStatementEntity = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
+        List<InstallmentsEntity> feeInstallmentsList = installmentRepository.findInstallmentsByStudentId(studentId);
+
+
+        feeStatementResponseDto.setStudentId(studentId);
+        feeStatementResponseDto.setAdmissionNumber(studentPersonalDetails.getAdmissionNo());
+        feeStatementResponseDto.setStudentName(studentPersonalDetails.getStudentName());
+        feeStatementResponseDto.setGender(studentPersonalDetails.getGenderId() == 1 ? "Male" : "Female");
+        feeStatementResponseDto.setClassDetails(classDetails.getString("AcademicClassLevelName") +" "+classDetails.getString("ClassStreamName"));
+        feeStatementResponseDto.setResidenceDetails(residenceDetails.getString("StudentResidenceDescription"));
+        feeStatementResponseDto.setTermBalance(feeStatementEntity.getCurrentTermBalance());
+        feeStatementResponseDto.setAnnualBalance(feeStatementEntity.getAnnualBalance());
+        feeStatementResponseDto.setCurrentyearTotal(feeStatementEntity.getCurrentYearTotal());
+
+        List<InstallmentsResponseDto> installmentsResponseDtoArrayList = new ArrayList<>();
+
+        for(int i = 0;i<feeInstallmentsList.size();i++) {
+            if(feeInstallmentsList.get(i).getInstallmentYear().equals(getCurrentYear())) {
+
+                installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),feeInstallmentsList.get(i).getInstallmentAmount(),feeInstallmentsList.get(i).getInstallmentDate(),feeInstallmentsList.get(i).getIsCarryForward(),feeInstallmentsList.get(i).getSessionLogId(),feeInstallmentsList.get(i).getUserSessionActivityId(),feeInstallmentsList.get(i).getInstallmentYear(),getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"),getTermDetailsByDate(feeInstallmentsList.get(i).getInstallmentDate()).getString("TermIterationDescription")));
+
+            }
+        }
+
+        feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);
+
+        return feeStatementResponseDto;
+    }
+
+
+    public static JSONObject getAUserByASessionLogId(int sessionLogId) {
+        JSONObject dataObject = null;
+        CustomOkHttp customOkHttp = new CustomOkHttp();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("sessionLogId", String.valueOf(sessionLogId))
+                .build();
+
+        try {
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_user_by_session_log",formBody);
             JSONObject object = new JSONObject(responseString);
             JSONArray jsonArray = object.getJSONArray("results");
             dataObject  = jsonArray.getJSONObject(0);

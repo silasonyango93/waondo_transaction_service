@@ -21,6 +21,7 @@ import okhttp3.RequestBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -402,4 +403,9 @@ public class UsersController {
 
         return isUserAllowedLogin;
     }
+
+//    @Scheduled(cron="*/02 * * * * *")
+//    public void doScheduledWork() {
+//        System.out.println("hahahahaha");
+//    }
 }
