@@ -268,4 +268,29 @@ public class UtilityClass {
 
         return dataObject;
     }
+
+
+
+
+
+    public static JSONArray getAStudentFeeComponents(int studentId) {
+        JSONArray dataArray = null;
+        CustomOkHttp customOkHttp = new CustomOkHttp();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("studentId", String.valueOf(studentId))
+                .build();
+
+        try {
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_a_student_fee_components",formBody);
+            JSONObject object = new JSONObject(responseString);
+            dataArray = object.getJSONArray("results");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataArray;
+    }
+
 }

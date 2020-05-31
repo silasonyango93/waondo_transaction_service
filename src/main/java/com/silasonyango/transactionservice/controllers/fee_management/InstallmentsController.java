@@ -7,11 +7,13 @@ import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsDto;
 import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsResponseDto;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.StudentFeeComponentEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.TransactionsEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
+import com.silasonyango.transactionservice.repository.fee_management.StudentFeeComponentRepository;
 import com.silasonyango.transactionservice.repository.fee_management.TransactionsRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
@@ -48,6 +50,9 @@ public class InstallmentsController {
     @Autowired
     StudentRepository studentRepository;
 
+    @Autowired
+    StudentFeeComponentRepository studentFeeComponentRepository;
+
     @PostMapping("/add_installment")
     public FeeStatementResponseDto addInstallment(@Valid InstallmentsDto installmentsDto) {
 
@@ -75,6 +80,8 @@ public class InstallmentsController {
         registerTransaction(installmentsDto.getSessionLogId(),userSessionActivitiesEntity.getUserSessionActivityId(),installmentsDto.getStudentId(),dbInstallment.getInstallmentId(),previousTermBalance,previousAnnualBalance,previousTotal,dbFeeStatement.getCurrentTermBalance(),dbFeeStatement.getAnnualBalance(),dbFeeStatement.getCurrentYearTotal());
 
         feeStatementRepository.save(dbFeeStatement);
+
+        updateAStudentFeeComponents(dbFeeStatement.getStudentId(),dbFeeStatement.getCurrentYearTotal());
 
         return getAStudentFeeStatementForCurrentYear(dbFeeStatement.getStudentId());
     }
@@ -192,6 +199,24 @@ public class InstallmentsController {
         feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);
 
         return feeStatementResponseDto;
+    }
+
+
+    public void updateAStudentFeeComponents(int studentId, int currentYearTotal) {
+
+        JSONArray feeComponentsArray = UtilityClass.getAStudentFeeComponents(studentId);
+
+        for(int i = 0;i<feeComponentsArray.length();i++) {
+
+            int feeComponentRatio = feeComponentsArray.getJSONObject(i).getInt("FeeComponentRatio");
+            int studentFeeComponentId = feeComponentsArray.getJSONObject(i).getInt("StudentFeeComponentId");
+            int classFeeStructureComponentId = feeComponentsArray.getJSONObject(i).getInt("ClassFeeStructureComponentId");
+
+            double ratio = (double)feeComponentRatio / 100;
+            double componentFeeAmount = currentYearTotal * ratio;
+
+            studentFeeComponentRepository.save(new StudentFeeComponentEntity(studentFeeComponentId,studentId,classFeeStructureComponentId,componentFeeAmount));
+        }
     }
 
 }

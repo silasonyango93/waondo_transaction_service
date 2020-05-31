@@ -16,7 +16,7 @@ public class StudentFeeComponentEntity implements java.io.Serializable{
     private int classFeeStructureComponentId;
 
     @Column(name = "ComponentFeeAmount")
-    private int componentFeeAmount;
+    private double componentFeeAmount;
 
     public StudentFeeComponentEntity() {}
 
@@ -24,6 +24,13 @@ public class StudentFeeComponentEntity implements java.io.Serializable{
         this.studentId = studentId;
         this.classFeeStructureComponentId = classFeeStructureComponentId;
         this.componentFeeAmount = componentFeeAmount;
+    }
+
+    public StudentFeeComponentEntity(int studentFeeComponentId,int studentId, int classFeeStructureComponentId, double componentFeeAmount) {
+        this.studentId = studentId;
+        this.classFeeStructureComponentId = classFeeStructureComponentId;
+        this.componentFeeAmount = componentFeeAmount;
+        this.studentFeeComponentId = studentFeeComponentId;
     }
 
     public int getStudentFeeComponentId() {
@@ -50,11 +57,11 @@ public class StudentFeeComponentEntity implements java.io.Serializable{
         this.classFeeStructureComponentId = classFeeStructureComponentId;
     }
 
-    public int getComponentFeeAmount() {
+    public double getComponentFeeAmount() {
         return componentFeeAmount;
     }
 
-    public void setComponentFeeAmount(int componentFeeAmount) {
+    public void setComponentFeeAmount(double componentFeeAmount) {
         this.componentFeeAmount = componentFeeAmount;
     }
 }
