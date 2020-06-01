@@ -174,6 +174,7 @@ public class InstallmentsController {
 
 
         feeStatementResponseDto.setStudentId(studentId);
+        feeStatementResponseDto.setProfPicName(studentPersonalDetails.getProfPicName());
         feeStatementResponseDto.setAdmissionNumber(studentPersonalDetails.getAdmissionNo());
         feeStatementResponseDto.setStudentName(studentPersonalDetails.getStudentName());
         feeStatementResponseDto.setGender(studentPersonalDetails.getGenderId() == 1 ? "Male" : "Female");

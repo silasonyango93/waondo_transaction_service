@@ -11,6 +11,7 @@ public class FeeStatementResponseDto implements java.io.Serializable{
     private int studentId;
     private String admissionNumber;
     private String studentName;
+    private String profPicName;
     private String gender;
     private String classDetails;
     private String residenceDetails;
@@ -116,5 +117,13 @@ public class FeeStatementResponseDto implements java.io.Serializable{
 
     public void setFeeStatementProcessedSuccessfully(boolean feeStatementProcessedSuccessfully) {
         isFeeStatementProcessedSuccessfully = feeStatementProcessedSuccessfully;
+    }
+
+    public String getProfPicName() {
+        return profPicName;
+    }
+
+    public void setProfPicName(String profPicName) {
+        this.profPicName = profPicName;
     }
 }
