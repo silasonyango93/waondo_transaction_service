@@ -214,6 +214,7 @@ public class InstallmentsController {
         }
 
         feeStatementResponseDto.setFeeComponentsResponseDtoList(feeComponentsResponseDtoList);
+        feeStatementResponseDto.setFeeStatementProcessedSuccessfully(true);
 
         return feeStatementResponseDto;
     }

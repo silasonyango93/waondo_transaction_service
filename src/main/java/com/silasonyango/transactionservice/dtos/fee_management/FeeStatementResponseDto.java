@@ -19,6 +19,7 @@ public class FeeStatementResponseDto implements java.io.Serializable{
     private int currentyearTotal;
     private List<InstallmentsResponseDto> installmentsResponseArray;
     private List<FeeComponentsResponseDto> feeComponentsResponseDtoList;
+    private boolean isFeeStatementProcessedSuccessfully;
 
 
     public int getStudentId() {
@@ -107,5 +108,13 @@ public class FeeStatementResponseDto implements java.io.Serializable{
 
     public void setFeeComponentsResponseDtoList(List<FeeComponentsResponseDto> feeComponentsResponseDtoList) {
         this.feeComponentsResponseDtoList = feeComponentsResponseDtoList;
+    }
+
+    public boolean isFeeStatementProcessedSuccessfully() {
+        return isFeeStatementProcessedSuccessfully;
+    }
+
+    public void setFeeStatementProcessedSuccessfully(boolean feeStatementProcessedSuccessfully) {
+        isFeeStatementProcessedSuccessfully = feeStatementProcessedSuccessfully;
     }
 }
