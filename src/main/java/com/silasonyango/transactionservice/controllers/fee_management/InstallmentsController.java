@@ -2,6 +2,7 @@ package com.silasonyango.transactionservice.controllers.fee_management;
 
 import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
 import com.silasonyango.transactionservice.common.config.TransactionDescriptionsConfig;
+import com.silasonyango.transactionservice.dtos.fee_management.FeeComponentsResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsDto;
 import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsResponseDto;
@@ -197,6 +198,22 @@ public class InstallmentsController {
         }
 
         feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);
+
+
+
+        JSONArray feeComponentsArray = UtilityClass.getAStudentFeeComponents(studentId);
+        List<FeeComponentsResponseDto> feeComponentsResponseDtoList = new ArrayList<>();
+
+        for(int i = 0;i<feeComponentsArray.length();i++) {
+
+            String feeComponentDescription = feeComponentsArray.getJSONObject(i).getString("FeeComponentDescription");
+            double componentFeeAmount = feeComponentsArray.getJSONObject(i).getDouble("ComponentFeeAmount");
+
+            feeComponentsResponseDtoList.add(new FeeComponentsResponseDto(feeComponentDescription,componentFeeAmount));
+
+        }
+
+        feeStatementResponseDto.setFeeComponentsResponseDtoList(feeComponentsResponseDtoList);
 
         return feeStatementResponseDto;
     }

@@ -1,8 +1,13 @@
 package com.silasonyango.transactionservice.dtos.fee_management;
 
+
+
+import org.json.JSONObject;
+
+import java.util.Iterator;
 import java.util.List;
 
-public class FeeStatementResponseDto {
+public class FeeStatementResponseDto implements java.io.Serializable{
     private int studentId;
     private String admissionNumber;
     private String studentName;
@@ -13,6 +18,8 @@ public class FeeStatementResponseDto {
     private int annualBalance;
     private int currentyearTotal;
     private List<InstallmentsResponseDto> installmentsResponseArray;
+    private List<FeeComponentsResponseDto> feeComponentsResponseDtoList;
+
 
     public int getStudentId() {
         return studentId;
@@ -92,5 +99,13 @@ public class FeeStatementResponseDto {
 
     public void setInstallmentsResponseArray(List<InstallmentsResponseDto> installmentsResponseArray) {
         this.installmentsResponseArray = installmentsResponseArray;
+    }
+
+    public List<FeeComponentsResponseDto> getFeeComponentsResponseDtoList() {
+        return feeComponentsResponseDtoList;
+    }
+
+    public void setFeeComponentsResponseDtoList(List<FeeComponentsResponseDto> feeComponentsResponseDtoList) {
+        this.feeComponentsResponseDtoList = feeComponentsResponseDtoList;
     }
 }
