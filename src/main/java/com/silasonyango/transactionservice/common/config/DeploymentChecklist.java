@@ -12,7 +12,7 @@ public class DeploymentChecklist {
     *  7). Configure transaction descriptions.
     *  8). Configure roles.
     *  9). Male and female profile pic upload
-    *  10).
+    *  10). Cron Term iteration config
     *
     *
     *
