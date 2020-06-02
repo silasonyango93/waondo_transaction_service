@@ -11,6 +11,8 @@ public class DeploymentChecklist {
     *  6). Configure student residence.
     *  7). Configure transaction descriptions.
     *  8). Configure roles.
+    *  9). Male and female profile pic upload
+    *  10).
     *
     *
     *
