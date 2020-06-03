@@ -13,6 +13,7 @@ public class DeploymentChecklist {
     *  8). Configure roles.
     *  9). Male and female profile pic upload
     *  10). Cron Term iteration config
+    *  11). Cron Week iteration config
     *
     *
     *
