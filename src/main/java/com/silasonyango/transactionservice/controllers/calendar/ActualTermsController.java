@@ -107,7 +107,7 @@ public class ActualTermsController {
         actualWeeksRepository.save(new ActualWeeksEntity(termId,10,year+"-11-03",year+"-11-09"));
         actualWeeksRepository.save(new ActualWeeksEntity(termId,11,year+"-11-10",year+"-11-16"));
         actualWeeksRepository.save(new ActualWeeksEntity(termId,12,year+"-11-17",year+"-11-23"));
-        actualWeeksRepository.save(new ActualWeeksEntity(termId,13,year+"-11-24",year+"-11-31"));
+        actualWeeksRepository.save(new ActualWeeksEntity(termId,13,year+"-11-24",year+"-11-30"));
     }
 
 }
