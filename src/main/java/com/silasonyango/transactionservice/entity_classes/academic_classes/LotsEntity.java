@@ -17,12 +17,12 @@ public class LotsEntity implements java.io.Serializable{
     private int academicClassLevelId;
 
     @Column(name = "RegisteredDate")
-    private int registeredDate;
+    private String registeredDate;
 
     public LotsEntity() {
     }
 
-    public LotsEntity(int lotDescriptionId, int academicClassLevelId, int registeredDate) {
+    public LotsEntity(int lotDescriptionId, int academicClassLevelId, String registeredDate) {
         this.lotDescriptionId = lotDescriptionId;
         this.academicClassLevelId = academicClassLevelId;
         this.registeredDate = registeredDate;
@@ -52,11 +52,11 @@ public class LotsEntity implements java.io.Serializable{
         this.academicClassLevelId = academicClassLevelId;
     }
 
-    public int getRegisteredDate() {
+    public String getRegisteredDate() {
         return registeredDate;
     }
 
-    public void setRegisteredDate(int registeredDate) {
+    public void setRegisteredDate(String registeredDate) {
         this.registeredDate = registeredDate;
     }
 }

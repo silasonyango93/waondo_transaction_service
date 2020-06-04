@@ -11,7 +11,7 @@ public class AcademicClassLevelsEntity implements java.io.Serializable{
     private int academicClassLevelId;
 
     @Column(name = "AcademicClassLevelName")
-    private int academicClassLevelName;
+    private String academicClassLevelName;
 
     @Column(name = "HierachyCode")
     private int hierachyCode;
@@ -20,7 +20,7 @@ public class AcademicClassLevelsEntity implements java.io.Serializable{
     public AcademicClassLevelsEntity() {
     }
 
-    public AcademicClassLevelsEntity(int academicClassLevelName, int hierachyCode) {
+    public AcademicClassLevelsEntity(String academicClassLevelName, int hierachyCode) {
         this.academicClassLevelName = academicClassLevelName;
         this.hierachyCode = hierachyCode;
     }
@@ -33,11 +33,11 @@ public class AcademicClassLevelsEntity implements java.io.Serializable{
         this.academicClassLevelId = academicClassLevelId;
     }
 
-    public int getAcademicClassLevelName() {
+    public String getAcademicClassLevelName() {
         return academicClassLevelName;
     }
 
-    public void setAcademicClassLevelName(int academicClassLevelName) {
+    public void setAcademicClassLevelName(String academicClassLevelName) {
         this.academicClassLevelName = academicClassLevelName;
     }
 

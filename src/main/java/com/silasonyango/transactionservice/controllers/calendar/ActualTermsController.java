@@ -31,7 +31,8 @@ public class ActualTermsController {
     @Autowired
     AcademicClassLevelsRepository academicClassLevelsRepository;
 
-    @Scheduled(cron="0 1 0 30 11 ?")
+//    @Scheduled(cron="0 1 0 30 11 ?")
+    @Scheduled(cron="*/02 * * * * *")
     public void createFirstTerm() {
         String currentYear = UtilityClass.getCurrentYear();
         int nextYear = Integer.parseInt(currentYear) + 1;
@@ -132,7 +133,9 @@ public class ActualTermsController {
 
             if(classLevelsList.size() > 0) {
                 lotsList.get(i).setAcademicClassLevelId(currentAcademicClassLevelId + 1);
+                lotsRepository.save(lotsList.get(i));
             }
+            System.out.println("");
 
         }
     }
