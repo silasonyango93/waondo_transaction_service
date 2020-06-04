@@ -21,7 +21,7 @@ public class ActualTermsController {
     @Autowired
     ActualWeeksRepository actualWeeksRepository;
 
-    @Scheduled(cron="0 01 0 31 11 ?")
+    @Scheduled(cron="0 1 0 30 11 ?")
     public void createFirstTerm() {
         String currentYear = UtilityClass.getCurrentYear();
         int nextYear = Integer.parseInt(currentYear) + 1;
@@ -35,7 +35,7 @@ public class ActualTermsController {
 
 
 
-    @Scheduled(cron="0 01 0 31 03 ?")
+    @Scheduled(cron="0 1 0 31 3 ?")
     public void createSecondTerm() {
         String currentYear = UtilityClass.getCurrentYear();
         ActualTermsEntity dbCreatedTerm = actualTermsRepository.save(new ActualTermsEntity(2,currentYear+"-05-01",currentYear+"-07-31",currentYear));
@@ -46,7 +46,7 @@ public class ActualTermsController {
 
 
 
-    @Scheduled(cron="0 01 0 31 07 ?")
+    @Scheduled(cron="0 1 0 31 7 ?")
     public void createThirdTerm() {
         String currentYear = UtilityClass.getCurrentYear();
         ActualTermsEntity dbCreatedTerm = actualTermsRepository.save(new ActualTermsEntity(3,currentYear+"-09-01",currentYear+"-011-30",currentYear));
