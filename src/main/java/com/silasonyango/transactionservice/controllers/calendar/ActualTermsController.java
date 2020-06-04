@@ -28,8 +28,6 @@ public class ActualTermsController {
         ActualTermsEntity dbCreatedTerm = actualTermsRepository.save(new ActualTermsEntity(1,String.valueOf(nextYear)+"-01-01",String.valueOf(nextYear)+"-03-31",String.valueOf(nextYear)));
 
         createTermOneWeeks(dbCreatedTerm.getTermId(),String.valueOf(nextYear));
-
-        System.out.println("");
     }
 
 
