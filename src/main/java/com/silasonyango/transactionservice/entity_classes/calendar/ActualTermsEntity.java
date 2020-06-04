@@ -16,7 +16,7 @@ import javax.persistence.*;
                 query="SELECT * FROM actual_terms ORDER BY TermEndDate DESC",
                 resultSetMapping = "actual_terms" )
 })
-public class ActualTermsEntity {
+public class ActualTermsEntity implements java.io.Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "TermId")

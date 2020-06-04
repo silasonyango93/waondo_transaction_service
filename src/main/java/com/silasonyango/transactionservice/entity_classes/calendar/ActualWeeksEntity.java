@@ -3,7 +3,7 @@ package com.silasonyango.transactionservice.entity_classes.calendar;
 import javax.persistence.*;
 @javax.persistence.Entity
 @Table(name = "actual_weeks")
-public class ActualWeeksEntity {
+public class ActualWeeksEntity implements java.io.Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ActualWeekId")
