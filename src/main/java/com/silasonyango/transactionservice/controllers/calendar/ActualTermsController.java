@@ -135,7 +135,6 @@ public class ActualTermsController {
                 lotsList.get(i).setAcademicClassLevelId(currentAcademicClassLevelId + 1);
                 lotsRepository.save(lotsList.get(i));
             }
-            System.out.println("");
 
         }
     }
