@@ -1,7 +1,11 @@
 package com.silasonyango.transactionservice.controllers.calendar;
 
+import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
+import com.silasonyango.transactionservice.entity_classes.academic_classes.LotsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualWeeksEntity;
+import com.silasonyango.transactionservice.repository.academic_classes.AcademicClassLevelsRepository;
+import com.silasonyango.transactionservice.repository.academic_classes.LotsRepository;
 import com.silasonyango.transactionservice.repository.calendar.ActualTermsRepository;
 import com.silasonyango.transactionservice.repository.calendar.ActualWeeksRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
@@ -21,6 +25,12 @@ public class ActualTermsController {
     @Autowired
     ActualWeeksRepository actualWeeksRepository;
 
+    @Autowired
+    LotsRepository lotsRepository;
+
+    @Autowired
+    AcademicClassLevelsRepository academicClassLevelsRepository;
+
     @Scheduled(cron="0 1 0 30 11 ?")
     public void createFirstTerm() {
         String currentYear = UtilityClass.getCurrentYear();
@@ -28,6 +38,7 @@ public class ActualTermsController {
         ActualTermsEntity dbCreatedTerm = actualTermsRepository.save(new ActualTermsEntity(1,String.valueOf(nextYear)+"-01-01",String.valueOf(nextYear)+"-03-31",String.valueOf(nextYear)));
 
         createTermOneWeeks(dbCreatedTerm.getTermId(),String.valueOf(nextYear));
+        elevateLotsToNextClass();
     }
 
 
@@ -106,6 +117,24 @@ public class ActualTermsController {
         actualWeeksRepository.save(new ActualWeeksEntity(termId,11,year+"-11-10",year+"-11-16"));
         actualWeeksRepository.save(new ActualWeeksEntity(termId,12,year+"-11-17",year+"-11-23"));
         actualWeeksRepository.save(new ActualWeeksEntity(termId,13,year+"-11-24",year+"-11-30"));
+    }
+
+
+    public void elevateLotsToNextClass() {
+        List<LotsEntity> lotsList = lotsRepository.findAll();
+
+        for (int i = 0;i < lotsList.size();i++) {
+
+            int currentAcademicClassLevelId = lotsList.get(i).getAcademicClassLevelId();
+
+
+            List<AcademicClassLevelsEntity> classLevelsList = academicClassLevelsRepository.findByAcademicClassLevelId(currentAcademicClassLevelId + 1);
+
+            if(classLevelsList.size() > 0) {
+                lotsList.get(i).setAcademicClassLevelId(currentAcademicClassLevelId + 1);
+            }
+
+        }
     }
 
 }
