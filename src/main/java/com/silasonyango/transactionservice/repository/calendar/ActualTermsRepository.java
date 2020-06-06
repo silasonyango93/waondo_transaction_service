@@ -12,4 +12,6 @@ public interface ActualTermsRepository extends JpaRepository<ActualTermsEntity, 
 
     @Query(nativeQuery = true)
     public List<ActualTermsEntity> getTheLatestRegisteredTerm();
+
+    public List<ActualTermsEntity> findActualTermByTermIterationIdAndYear(int termIterationId,String year);
 }

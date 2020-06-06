@@ -14,6 +14,9 @@ import javax.persistence.*;
 @NamedNativeQueries({
         @NamedNativeQuery(name="ActualTermsEntity.getTheLatestRegisteredTerm",
                 query="SELECT * FROM actual_terms ORDER BY TermEndDate DESC",
+                resultSetMapping = "actual_terms" ),
+        @NamedNativeQuery(name="ActualTermsEntity.findActualTermByTermIterationIdAndYear",
+                query="SELECT * FROM actual_terms WHERE actual_terms.TermIterationId = ? AND actual_terms.Year = ?",
                 resultSetMapping = "actual_terms" )
 })
 public class ActualTermsEntity implements java.io.Serializable{

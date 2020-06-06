@@ -1,14 +1,19 @@
 package com.silasonyango.transactionservice.controllers.calendar;
 
+import com.silasonyango.transactionservice.daos.ActualTermsDao;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.LotsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualWeeksEntity;
+import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.repository.academic_classes.AcademicClassLevelsRepository;
 import com.silasonyango.transactionservice.repository.academic_classes.LotsRepository;
 import com.silasonyango.transactionservice.repository.calendar.ActualTermsRepository;
 import com.silasonyango.transactionservice.repository.calendar.ActualWeeksRepository;
+import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,8 +36,15 @@ public class ActualTermsController {
     @Autowired
     AcademicClassLevelsRepository academicClassLevelsRepository;
 
-//    @Scheduled(cron="0 1 0 30 11 ?")
-    @Scheduled(cron="*/02 * * * * *")
+    @Autowired
+    StudentRepository studentRepository;
+
+    @Autowired
+    private ActualTermsDao actualTermsDao;
+
+   //ki @Scheduled(cron="*/02 * * * * *")
+
+    @Scheduled(cron="0 1 0 28 11 ?")
     public void createFirstTerm() {
         String currentYear = UtilityClass.getCurrentYear();
         int nextYear = Integer.parseInt(currentYear) + 1;
@@ -45,7 +57,7 @@ public class ActualTermsController {
 
 
 
-    @Scheduled(cron="0 1 0 31 3 ?")
+    @Scheduled(cron="0 1 0 28 3 ?")
     public void createSecondTerm() {
         String currentYear = UtilityClass.getCurrentYear();
         ActualTermsEntity dbCreatedTerm = actualTermsRepository.save(new ActualTermsEntity(2,currentYear+"-05-01",currentYear+"-07-31",currentYear));
@@ -56,7 +68,7 @@ public class ActualTermsController {
 
 
 
-    @Scheduled(cron="0 1 0 31 7 ?")
+    @Scheduled(cron="0 1 0 28 7 ?")
     public void createThirdTerm() {
         String currentYear = UtilityClass.getCurrentYear();
         ActualTermsEntity dbCreatedTerm = actualTermsRepository.save(new ActualTermsEntity(3,currentYear+"-09-01",currentYear+"-011-30",currentYear));
@@ -137,6 +149,28 @@ public class ActualTermsController {
             }
 
         }
+    }
+
+
+    public void transitionFee() {
+        List<StudentEntity> students = studentRepository.findAll();
+
+        for (int i = 0; i < students.size(); i++) {
+
+            JSONObject classDetailsObject = UtilityClass.getAStudentClassDetails(students.get(i).getStudentId());
+
+            JSONArray feeStructureBreakDownArray = UtilityClass.getFeeStructureForParticularClassLevel(classDetailsObject.getInt("AcademicClassLevelId"),students.get(i).getStudentResidenceId());
+            int probableNextTermIterationId = UtilityClass.getTermDetailsByDate(UtilityClass.getToday()).getInt("TermIterationId") + 1;
+
+        }
+    }
+
+    @Scheduled(cron="*/02 * * * * *")
+    public void testActualTermsDao() {
+
+       List<ActualTermsEntity> actualTermsEntityList = actualTermsDao.findActualTermByTermIterationIdAndYear(1,"2018");
+
+       System.out.println("");
     }
 
 }
