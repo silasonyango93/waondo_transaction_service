@@ -1,6 +1,6 @@
 package com.silasonyango.transactionservice.controllers.calendar;
 
-import com.silasonyango.transactionservice.daos.ActualTermsDao;
+import com.silasonyango.transactionservice.daos.calendar.ActualTermsDao;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.LotsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
@@ -165,12 +165,12 @@ public class ActualTermsController {
         }
     }
 
-    @Scheduled(cron="*/02 * * * * *")
-    public void testActualTermsDao() {
-
-       List<ActualTermsEntity> actualTermsEntityList = actualTermsDao.findActualTermByTermIterationIdAndYear(1,"2018");
-
-       System.out.println("");
-    }
+//    @Scheduled(cron="*/02 * * * * *")
+//    public void testActualTermsDao() {
+//
+//       List<ActualTermsEntity> actualTermsEntityList = actualTermsDao.findActualTermByTermIterationIdAndYear(1,"2018");
+//
+//       System.out.println("");
+//    }
 
 }

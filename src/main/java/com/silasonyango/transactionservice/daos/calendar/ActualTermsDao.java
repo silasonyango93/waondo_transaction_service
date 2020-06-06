@@ -1,4 +1,4 @@
-package com.silasonyango.transactionservice.daos;
+package com.silasonyango.transactionservice.daos.calendar;
 
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
 import com.silasonyango.transactionservice.repository.calendar.ActualTermsRepository;
