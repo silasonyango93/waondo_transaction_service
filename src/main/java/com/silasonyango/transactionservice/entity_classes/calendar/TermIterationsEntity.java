@@ -12,7 +12,11 @@ import java.util.List;
 )
 
 @NamedNativeQueries({
-        @NamedNativeQuery(name="TermIterationsEntity.findActualTermByTermIterationId",
+        @NamedNativeQuery(name="TermIterationsEntity.getAllTermIterationsInAscendingOrder",
+                query="SELECT * FROM term_iterations ORDER BY TermIterationId ASC",
+                resultSetMapping = "term_iterations" ),
+        @NamedNativeQuery(
+                name="TermIterationsEntity.findActualTermByTermIterationId",
                 query="SELECT * FROM term_iterations INNER JOIN actual_terms ON term_iterations.TermIterationId = actual_terms.TermIterationId WHERE term_iterations.TermIterationId = ?",
                 resultSetMapping = "term_iterations")
 })

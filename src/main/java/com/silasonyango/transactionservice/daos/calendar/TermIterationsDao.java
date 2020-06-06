@@ -30,6 +30,11 @@ public class TermIterationsDao implements TermIterationsRepository {
     }
 
     @Override
+    public List<TermIterationsEntity> getAllTermIterationsInAscendingOrder() {
+        return null;
+    }
+
+    @Override
     public List<TermIterationsEntity> findAll() {
         return null;
     }

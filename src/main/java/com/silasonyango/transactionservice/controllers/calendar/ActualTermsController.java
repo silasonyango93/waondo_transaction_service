@@ -7,6 +7,7 @@ import com.silasonyango.transactionservice.entity_classes.academic_classes.Acade
 import com.silasonyango.transactionservice.entity_classes.academic_classes.LotsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualWeeksEntity;
+import com.silasonyango.transactionservice.entity_classes.calendar.TermIterationsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.CarryForwardsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
@@ -16,6 +17,7 @@ import com.silasonyango.transactionservice.repository.academic_classes.AcademicC
 import com.silasonyango.transactionservice.repository.academic_classes.LotsRepository;
 import com.silasonyango.transactionservice.repository.calendar.ActualTermsRepository;
 import com.silasonyango.transactionservice.repository.calendar.ActualWeeksRepository;
+import com.silasonyango.transactionservice.repository.calendar.TermIterationsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.CarryForwardsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
@@ -63,6 +65,9 @@ public class ActualTermsController {
 
     @Autowired
     private TransactionsRepository transactionsRepository;
+
+    @Autowired
+    private TermIterationsRepository termIterationsRepository;
 
    //ki @Scheduled(cron="*/02 * * * * *")
 
@@ -202,6 +207,20 @@ public class ActualTermsController {
 
                 }
 
+            } else {
+
+                TermIterationsEntity topTermIteration = termIterationsRepository.getAllTermIterationsInAscendingOrder().get(0);
+
+                for (int j = 0;j < feeStructureBreakDownArray.length();j++) {
+
+                    if(feeStructureBreakDownArray.getJSONObject(i).getInt("TermIterationId") == topTermIteration.getTermIterationId()) {
+
+                        updateFeeStatements(students.get(i).getStudentId(),feeStructureBreakDownArray.getJSONObject(i).getInt("FeeAmount"),students.get(i).getStudentResidenceId(),carryForwardInstallmentDate,carryForwardInstallmentYear);
+
+                    }
+
+                }
+
             }
 
         }
@@ -236,5 +255,6 @@ public class ActualTermsController {
         transactionsRepository.save(new TransactionsEntity(0,SessionActivitiesConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT, TransactionDescriptionsConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT,studentId,dbSavedInstallment.getInstallmentId(),dbSavedCarryForward.getCarryFowardId(),0,previousTermBalance,previousAnnualBalance,previousTotal,nextTermBalance,nextAnnualBalance,nextTotal,UtilityClass.getNow()));
 
     }
+
 
 }
