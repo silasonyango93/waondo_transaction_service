@@ -14,6 +14,7 @@ public class DeploymentChecklist {
     *  9). Male and female profile pic upload
     *  10). Cron Term iteration config
     *  11). Cron Week iteration config
+    *  12). Session log zero
     *
     *
     *

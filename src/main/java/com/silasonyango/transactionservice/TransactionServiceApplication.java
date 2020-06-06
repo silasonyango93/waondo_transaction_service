@@ -40,6 +40,8 @@ public class TransactionServiceApplication {
 				registry.addMapping("/installments/*").allowedOrigins(clientUrl);
 				registry.addMapping("/actual_terms/*").allowedOrigins(clientUrl);
 				registry.addMapping("/actual_weeks/*").allowedOrigins(clientUrl);
+				registry.addMapping("/carry_forwards/*").allowedOrigins(clientUrl);
+				registry.addMapping("/term_iterations/*").allowedOrigins(clientUrl);
 			}
 		};
 	}

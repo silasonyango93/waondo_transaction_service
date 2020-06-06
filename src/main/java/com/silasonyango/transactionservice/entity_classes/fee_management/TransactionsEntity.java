@@ -53,7 +53,7 @@ public class TransactionsEntity implements java.io.Serializable{
 
     public TransactionsEntity() {}
 
-    public TransactionsEntity(int sessionLogId,int userSessionActivityId,int transactionDescriptionId,int studentId,int installmentId,int carryFowardId,int feeCorrectionId,int previousTermBalance,int previousAnnualBalance,int previousTotal,int nextTermBalance,int nextAnnualBalance,int nextTotal,String transactionDate) {
+    public TransactionsEntity(int sessionLogId, int userSessionActivityId, int transactionDescriptionId, int studentId, int installmentId, int carryFowardId, int feeCorrectionId, int previousTermBalance, int previousAnnualBalance, int previousTotal, int nextTermBalance, int nextAnnualBalance, int nextTotal, String transactionDate) {
         this.sessionLogId = sessionLogId;
         this.userSessionActivityId = userSessionActivityId;
         this.transactionDescriptionId = transactionDescriptionId;

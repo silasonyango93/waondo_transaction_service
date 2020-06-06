@@ -5,4 +5,5 @@ public class TransactionDescriptionsConfig {
     public static int FEE_CORRECTION_TRANSACTION_DESCRIPTION = 2;
     public static int END_OF_TERM_CARRY_FORWARD_TRANSACTION_DESCRIPTION = 3;
     public static int END_OF_YEAR_CARRY_FORWARD_TRANSACTION_DESCRIPTION = 4;
+    public static final int SYSTEM_CARRY_FORWARD_INSTALLMENT = 0;
 }

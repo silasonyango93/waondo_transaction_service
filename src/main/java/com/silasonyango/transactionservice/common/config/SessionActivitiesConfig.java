@@ -7,4 +7,5 @@ public class SessionActivitiesConfig {
     public static final int REGISTER_FEE_INSTALLMENT_SESSION_ACTIVITY = 4;
     public static final int CORRECT_A_FEE_PAYMENT_SESSION_ACTIVITY = 5;
     public static final int DELETE_A_STUDENT_SESSION_ACTIVITY = 6;
+    public static final int SYSTEM_CARRY_FORWARD_INSTALLMENT = 0;
 }

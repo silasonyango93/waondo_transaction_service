@@ -1,15 +1,25 @@
 package com.silasonyango.transactionservice.controllers.calendar;
 
+import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
+import com.silasonyango.transactionservice.common.config.TransactionDescriptionsConfig;
 import com.silasonyango.transactionservice.daos.calendar.ActualTermsDao;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.LotsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualWeeksEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.CarryForwardsEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.TransactionsEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.repository.academic_classes.AcademicClassLevelsRepository;
 import com.silasonyango.transactionservice.repository.academic_classes.LotsRepository;
 import com.silasonyango.transactionservice.repository.calendar.ActualTermsRepository;
 import com.silasonyango.transactionservice.repository.calendar.ActualWeeksRepository;
+import com.silasonyango.transactionservice.repository.fee_management.CarryForwardsRepository;
+import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
+import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
+import com.silasonyango.transactionservice.repository.fee_management.TransactionsRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
@@ -42,6 +52,18 @@ public class ActualTermsController {
     @Autowired
     private ActualTermsDao actualTermsDao;
 
+    @Autowired
+    private FeeStatementRepository feeStatementRepository;
+
+    @Autowired
+    private CarryForwardsRepository carryForwardsRepository;
+
+    @Autowired
+    private InstallmentRepository installmentRepository;
+
+    @Autowired
+    private TransactionsRepository transactionsRepository;
+
    //ki @Scheduled(cron="*/02 * * * * *")
 
     @Scheduled(cron="0 1 0 28 11 ?")
@@ -52,6 +74,7 @@ public class ActualTermsController {
 
         createTermOneWeeks(dbCreatedTerm.getTermId(),String.valueOf(nextYear));
         elevateLotsToNextClass();
+        transitionFee(String.valueOf(nextYear),String.valueOf(nextYear)+"-01-01",String.valueOf(nextYear));
     }
 
 
@@ -63,6 +86,8 @@ public class ActualTermsController {
         ActualTermsEntity dbCreatedTerm = actualTermsRepository.save(new ActualTermsEntity(2,currentYear+"-05-01",currentYear+"-07-31",currentYear));
 
         createTermTwoWeeks(dbCreatedTerm.getTermId(),currentYear);
+
+        transitionFee(currentYear,currentYear+"-05-01",currentYear);
     }
 
 
@@ -74,6 +99,7 @@ public class ActualTermsController {
         ActualTermsEntity dbCreatedTerm = actualTermsRepository.save(new ActualTermsEntity(3,currentYear+"-09-01",currentYear+"-011-30",currentYear));
 
         createTermThreeWeeks(dbCreatedTerm.getTermId(),currentYear);
+        transitionFee(currentYear,currentYear+"-09-01",currentYear);
     }
 
 
@@ -152,7 +178,7 @@ public class ActualTermsController {
     }
 
 
-    public void transitionFee() {
+    public void transitionFee(String year,String carryForwardInstallmentDate,String carryForwardInstallmentYear) {
         List<StudentEntity> students = studentRepository.findAll();
 
         for (int i = 0; i < students.size(); i++) {
@@ -162,15 +188,53 @@ public class ActualTermsController {
             JSONArray feeStructureBreakDownArray = UtilityClass.getFeeStructureForParticularClassLevel(classDetailsObject.getInt("AcademicClassLevelId"),students.get(i).getStudentResidenceId());
             int probableNextTermIterationId = UtilityClass.getTermDetailsByDate(UtilityClass.getToday()).getInt("TermIterationId") + 1;
 
+            List<ActualTermsEntity> actualTermsEntityList = actualTermsDao.findActualTermByTermIterationIdAndYear(probableNextTermIterationId,year);
+
+            if(actualTermsEntityList.size() > 0) {
+
+                for (int j = 0;j < feeStructureBreakDownArray.length();j++) {
+
+                    if(feeStructureBreakDownArray.getJSONObject(i).getInt("TermIterationId") == probableNextTermIterationId) {
+
+                        updateFeeStatements(students.get(i).getStudentId(),feeStructureBreakDownArray.getJSONObject(i).getInt("FeeAmount"),students.get(i).getStudentResidenceId(),carryForwardInstallmentDate,carryForwardInstallmentYear);
+
+                    }
+
+                }
+
+            }
+
         }
     }
 
-//    @Scheduled(cron="*/02 * * * * *")
-//    public void testActualTermsDao() {
-//
-//       List<ActualTermsEntity> actualTermsEntityList = actualTermsDao.findActualTermByTermIterationIdAndYear(1,"2018");
-//
-//       System.out.println("");
-//    }
+
+    public void updateFeeStatements(int studentId,int nextTermFee,int studentResidenceId,String carryForwardInstallmentDate,String carryForwardInstallmentYear) {
+
+        FeeStatementEntity studentFeeStatement = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
+
+        int previousTermBalance = studentFeeStatement.getCurrentTermBalance();
+        int previousAnnualBalance = studentFeeStatement.getAnnualBalance();
+        int previousTotal = studentFeeStatement.getCurrentYearTotal();
+
+        studentFeeStatement.setCurrentTermBalance(studentFeeStatement.getCurrentTermBalance() + nextTermFee);
+        studentFeeStatement.setAnnualBalance(UtilityClass.getAStudentAnnualBalanceFromTermBalance(studentId,studentFeeStatement.getCurrentTermBalance(),studentResidenceId));
+        studentFeeStatement.setCurrentYearTotal(previousTermBalance * -1);
+        studentFeeStatement.setStudentWorth(0);
+        studentFeeStatement.setAlternateTotal(previousTermBalance * -1);
+
+        feeStatementRepository.save(studentFeeStatement);
+
+        processCarryForward(studentId,previousTermBalance,previousAnnualBalance,previousTotal,studentFeeStatement.getCurrentTermBalance(),studentFeeStatement.getAnnualBalance(),previousTermBalance * -1,carryForwardInstallmentDate,carryForwardInstallmentYear);
+
+    }
+
+    public void processCarryForward(int studentId,int previousTermBalance,int previousAnnualBalance,int previousTotal,int nextTermBalance,int nextAnnualBalance,int nextTotal,String carryForwardInstallmentDate,String carryForwardInstallmentYear) {
+
+       CarryForwardsEntity dbSavedCarryForward = carryForwardsRepository.save(new CarryForwardsEntity(studentId,previousTermBalance,UtilityClass.getNow()));
+       InstallmentsEntity dbSavedInstallment = installmentRepository.save(new InstallmentsEntity(studentId,previousTermBalance * -1,carryForwardInstallmentDate,1,0, SessionActivitiesConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT,carryForwardInstallmentYear));
+
+        transactionsRepository.save(new TransactionsEntity(0,SessionActivitiesConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT, TransactionDescriptionsConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT,studentId,dbSavedInstallment.getInstallmentId(),dbSavedCarryForward.getCarryFowardId(),0,previousTermBalance,previousAnnualBalance,previousTotal,nextTermBalance,nextAnnualBalance,nextTotal,UtilityClass.getNow()));
+
+    }
 
 }
