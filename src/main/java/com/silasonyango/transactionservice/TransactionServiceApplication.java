@@ -42,6 +42,7 @@ public class TransactionServiceApplication {
 				registry.addMapping("/actual_weeks/*").allowedOrigins(clientUrl);
 				registry.addMapping("/carry_forwards/*").allowedOrigins(clientUrl);
 				registry.addMapping("/term_iterations/*").allowedOrigins(clientUrl);
+				registry.addMapping("/system_initialization/*").allowedOrigins(clientUrl);
 			}
 		};
 	}
