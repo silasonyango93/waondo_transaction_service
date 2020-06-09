@@ -18,13 +18,18 @@ public class SessionLogsEntity implements java.io.Serializable{
     @Column(name = "SessionEndDate")
     private String sessionEndDate;
 
+    @Column(name = "IsAdminSessionLog")
+    private int isAdminSessionLog;
+
     public SessionLogsEntity() {
 
     }
 
-    public SessionLogsEntity(int userId, String sessionStartDate) {
+    public SessionLogsEntity(int userId, String sessionStartDate, String sessionEndDate, int isAdminSessionLog) {
         this.userId = userId;
         this.sessionStartDate = sessionStartDate;
+        this.sessionEndDate = sessionEndDate;
+        this.isAdminSessionLog = isAdminSessionLog;
     }
 
     public SessionLogsEntity(String sessionEndDate) {
@@ -61,5 +66,13 @@ public class SessionLogsEntity implements java.io.Serializable{
 
     public void setSessionEndDate(String sessionEndDate) {
         this.sessionEndDate = sessionEndDate;
+    }
+
+    public int getIsAdminSessionLog() {
+        return isAdminSessionLog;
+    }
+
+    public void setIsAdminSessionLog(int isAdminSessionLog) {
+        this.isAdminSessionLog = isAdminSessionLog;
     }
 }

@@ -2,17 +2,27 @@ package com.silasonyango.transactionservice.controllers.system_initialization;
 
 import com.silasonyango.transactionservice.common.config.UtilityConfigs;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.*;
+import com.silasonyango.transactionservice.entity_classes.fee_management.CarryForwardsEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.TransactionDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.SessionActivitiesEntity;
+import com.silasonyango.transactionservice.entity_classes.session_management.SessionLogsEntity;
+import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentResidenceEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.correction_descriptions.CorrectionDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.gender.GenderEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.AccessPrivilegesEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.RolesEntity;
+import com.silasonyango.transactionservice.entity_classes.user_management.UserAccessPrivilegesEntity;
+import com.silasonyango.transactionservice.entity_classes.user_management.UsersEntity;
 import com.silasonyango.transactionservice.repository.academic_classes.*;
+import com.silasonyango.transactionservice.repository.fee_management.CarryForwardsRepository;
+import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
 import com.silasonyango.transactionservice.repository.fee_management.TransactionDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.session_management.SessionActivitiesRepository;
+import com.silasonyango.transactionservice.repository.session_management.SessionLogsRepository;
+import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentResidenceRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.correction_descriptions.CorrectionDescriptionsRepository;
@@ -20,6 +30,8 @@ import com.silasonyango.transactionservice.repository.system_initialization.gend
 import com.silasonyango.transactionservice.repository.system_initialization.system_configuration.SystemConfigurationRepository;
 import com.silasonyango.transactionservice.repository.user_management.AccessPrivilegesRepository;
 import com.silasonyango.transactionservice.repository.user_management.RolesRepository;
+import com.silasonyango.transactionservice.repository.user_management.UserAccessPrivilegesRepository;
+import com.silasonyango.transactionservice.repository.user_management.UsersRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -75,6 +87,21 @@ public class SystemInitialization {
     @Autowired
     ClassesRepository classesRepository;
 
+    @Autowired
+    UsersRepository usersRepository;
+
+    @Autowired
+    SessionLogsRepository sessionLogsRepository;
+
+    @Autowired
+    UserSessionActivitiesRepository userSessionActivitiesRepository;
+
+    @Autowired
+    InstallmentRepository installmentRepository;
+
+    @Autowired
+    CarryForwardsRepository carryForwardsRepository;
+
     @EventListener(ApplicationReadyEvent.class)
     public void checkIfSystemIsAlreadyConfigured() {
 
@@ -88,7 +115,8 @@ public class SystemInitialization {
             //configureTransactionDescriptions();
 
 
-            configureAdminAcademicClassLevel();
+            //configureAdminAcademicClassLevel();
+            createAdminUser();
 
         } else {
             System.out.println("Configured");
@@ -173,5 +201,33 @@ public class SystemInitialization {
         int genderId = genderRepository.findByGenderCode(1).get(0).getGenderId();
         int studentResidenceId = studentResidenceRepository.findByStudentResidenceCode(1).get(0).getStudentResidenceId();
         StudentEntity dbSavedAdminStudent = studentRepository.save(new StudentEntity("0000","Admin Student",genderId,UtilityClass.getToday(),studentResidenceId,classId,UtilityClass.getNow(), UtilityConfigs.MALE_PROF_PIC_NAME,1));
+    }
+
+    public void createAdminUser() {
+        int genderId = genderRepository.findByGenderCode(1).get(0).getGenderId();
+        UsersEntity dbSavedAdminUser = usersRepository.save(new UsersEntity("Admin User","admin email",genderId,"password",UtilityClass.getNow(),1));
+        createAdminSessionLog(dbSavedAdminUser.getUserId());
+    }
+
+    public void createAdminSessionLog(int userId) {
+        SessionLogsEntity dbSavedAdminSessionLog = sessionLogsRepository.save(new SessionLogsEntity(userId,UtilityClass.getNow(),UtilityClass.getNow(),1));
+        createAdminUserSessionActivity(dbSavedAdminSessionLog.getSessionLogId());
+    }
+
+    public void createAdminUserSessionActivity(int sessionLogId) {
+        int sessionActivityId = sessionActivitiesRepository.findBySessionActivityCode(0).get(0).getSessionActivityId();
+        UserSessionActivitiesEntity dbSavedAdminUserSessionActivity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(sessionLogId,sessionActivityId,UtilityClass.getNow(),1));
+        configureAdminInstallment(sessionLogId,dbSavedAdminUserSessionActivity.getUserSessionActivityId());
+    }
+
+    public void configureAdminInstallment(int sessionLogId,int userSessionActivityId) {
+        int studentId = studentRepository.findByIsAnAdminStudent(1).get(0).getStudentId();
+        InstallmentsEntity dbSavedAdminInstallment = installmentRepository.save(new InstallmentsEntity(studentId,0,UtilityClass.getNow(),0,sessionLogId,userSessionActivityId,UtilityClass.getCurrentYear(),1));
+        configureAdminCarryForward();
+    }
+
+    public void configureAdminCarryForward() {
+        int studentId = studentRepository.findByIsAnAdminStudent(1).get(0).getStudentId();
+        carryForwardsRepository.save(new CarryForwardsEntity(studentId,0,UtilityClass.getNow(),1));
     }
 }

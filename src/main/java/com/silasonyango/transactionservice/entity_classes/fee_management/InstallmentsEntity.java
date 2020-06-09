@@ -30,9 +30,12 @@ public class InstallmentsEntity implements java.io.Serializable{
     @Column(name = "InstallmentYear")
     private String installmentYear;
 
+    @Column(name = "IsAdminInstallment")
+    private int isAdminInstallment;
+
     public InstallmentsEntity() {}
 
-    public InstallmentsEntity(int studentId,int installmentAmount,String installmentDate,int isCarryForward,int sessionLogId,int userSessionActivityId,String installmentYear) {
+    public InstallmentsEntity(int studentId, int installmentAmount, String installmentDate, int isCarryForward, int sessionLogId, int userSessionActivityId, String installmentYear, int isAdminInstallment) {
         this.studentId = studentId;
         this.installmentAmount = installmentAmount;
         this.installmentDate = installmentDate;
@@ -40,6 +43,7 @@ public class InstallmentsEntity implements java.io.Serializable{
         this.sessionLogId = sessionLogId;
         this.userSessionActivityId = userSessionActivityId;
         this.installmentYear = installmentYear;
+        this.isAdminInstallment = isAdminInstallment;
     }
 
     public int getInstallmentId() {
@@ -104,5 +108,13 @@ public class InstallmentsEntity implements java.io.Serializable{
 
     public void setInstallmentYear(String installmentYear) {
         this.installmentYear = installmentYear;
+    }
+
+    public int getIsAdminInstallment() {
+        return isAdminInstallment;
+    }
+
+    public void setIsAdminInstallment(int isAdminInstallment) {
+        this.isAdminInstallment = isAdminInstallment;
     }
 }

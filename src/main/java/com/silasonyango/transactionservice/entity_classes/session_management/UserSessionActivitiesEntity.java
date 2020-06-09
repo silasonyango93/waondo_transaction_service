@@ -19,14 +19,18 @@ public class UserSessionActivitiesEntity implements java.io.Serializable{
     @Column(name = "SessionActivityDate")
     private String sessionActivityDate;
 
+    @Column(name = "IsAdminUserSessionActivity")
+    private int isAdminUserSessionActivity;
+
     public UserSessionActivitiesEntity() {
 
     }
 
-    public UserSessionActivitiesEntity(int sessionLogId, int sessionActivityId, String sessionActivityDate) {
+    public UserSessionActivitiesEntity(int sessionLogId, int sessionActivityId, String sessionActivityDate, int isAdminUserSessionActivity) {
         this.sessionLogId = sessionLogId;
         this.sessionActivityId = sessionActivityId;
         this.sessionActivityDate = sessionActivityDate;
+        this.isAdminUserSessionActivity = isAdminUserSessionActivity;
     }
 
     public int getUserSessionActivityId() {
@@ -59,5 +63,13 @@ public class UserSessionActivitiesEntity implements java.io.Serializable{
 
     public void setSessionActivityDate(String sessionActivityDate) {
         this.sessionActivityDate = sessionActivityDate;
+    }
+
+    public int getIsAdminUserSessionActivity() {
+        return isAdminUserSessionActivity;
+    }
+
+    public void setIsAdminUserSessionActivity(int isAdminUserSessionActivity) {
+        this.isAdminUserSessionActivity = isAdminUserSessionActivity;
     }
 }

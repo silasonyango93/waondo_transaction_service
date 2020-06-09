@@ -19,13 +19,17 @@ public class CarryForwardsEntity implements java.io.Serializable{
     @Column(name = "DateCarriedForward")
     private String dateCarriedForward;
 
+    @Column(name = "IsAdminCarryForward")
+    private int isAdminCarryForward;
+
     public CarryForwardsEntity() {
     }
 
-    public CarryForwardsEntity(int studentId, int carryForwardAmount, String dateCarriedForward) {
+    public CarryForwardsEntity(int studentId, int carryForwardAmount, String dateCarriedForward, int isAdminCarryForward) {
         this.studentId = studentId;
         this.carryForwardAmount = carryForwardAmount;
         this.dateCarriedForward = dateCarriedForward;
+        this.isAdminCarryForward = isAdminCarryForward;
     }
 
     public int getCarryFowardId() {
@@ -58,5 +62,13 @@ public class CarryForwardsEntity implements java.io.Serializable{
 
     public void setDateCarriedForward(String dateCarriedForward) {
         this.dateCarriedForward = dateCarriedForward;
+    }
+
+    public int getIsAdminCarryForward() {
+        return isAdminCarryForward;
+    }
+
+    public void setIsAdminCarryForward(int isAdminCarryForward) {
+        this.isAdminCarryForward = isAdminCarryForward;
     }
 }

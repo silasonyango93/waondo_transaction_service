@@ -36,6 +36,21 @@ public class UsersEntity implements java.io.Serializable{
     @Column(name = "RegisteredDate")
     private String registeredDate;
 
+    @Column(name = "IsAdminUser")
+    private int isAdminUser;
+
+    public UsersEntity() {
+    }
+
+    public UsersEntity(String name, String email, int genderId, String encryptedPassword, String registeredDate, int isAdminUser) {
+        this.name = name;
+        this.email = email;
+        this.genderId = genderId;
+        this.encryptedPassword = encryptedPassword;
+        this.registeredDate = registeredDate;
+        this.isAdminUser = isAdminUser;
+    }
+
     public int getUserId() {
         return userId;
     }
@@ -82,5 +97,13 @@ public class UsersEntity implements java.io.Serializable{
 
     public void setRegisteredDate(String registeredDate) {
         this.registeredDate = registeredDate;
+    }
+
+    public int getIsAdminUser() {
+        return isAdminUser;
+    }
+
+    public void setIsAdminUser(int isAdminUser) {
+        this.isAdminUser = isAdminUser;
     }
 }
