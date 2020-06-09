@@ -179,10 +179,10 @@ public class UsersController {
 
                             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
                             LocalDateTime now = LocalDateTime.now();
-                            SessionLogsEntity returnedSession = sessionLogsRepository.save(new SessionLogsEntity(user.getUserId(),dtf.format(now)));
+                            SessionLogsEntity returnedSession = sessionLogsRepository.save(new SessionLogsEntity(user.getUserId(),dtf.format(now),0));
                             authenticationResponseDto.setSessionLogsEntity(returnedSession);
 
-                            userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(returnedSession.getSessionLogId(), SessionActivitiesConfig.LOGIN_SESSION_ACTIVITY, dtf.format(now)));
+                            userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(returnedSession.getSessionLogId(), SessionActivitiesConfig.LOGIN_SESSION_ACTIVITY, dtf.format(now),0));
 
                             List<UserRolesEntity> userRolesEntityList = userRolesRepository.findByUserId(user.getUserId());
                             List<UserRolesDto> userRolesDtoList = new ArrayList<UserRolesDto>();

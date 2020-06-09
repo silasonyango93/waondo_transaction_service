@@ -7,7 +7,7 @@ public class InstallmentsResponseDto extends InstallmentsEntity {
     private String termDetails;
 
     public InstallmentsResponseDto(int studentId,int installmentAmount,String installmentDate,int isCarryForward,int sessionLogId,int userSessionActivityId,String installmentYear,String bursarName,String termDetails) {
-        super(studentId,installmentAmount,installmentDate,isCarryForward,sessionLogId,userSessionActivityId,installmentYear);
+        super(studentId,installmentAmount,installmentDate,isCarryForward,sessionLogId,userSessionActivityId,installmentYear,0);
         this.bursarName = bursarName;
         this.termDetails = termDetails;
     }

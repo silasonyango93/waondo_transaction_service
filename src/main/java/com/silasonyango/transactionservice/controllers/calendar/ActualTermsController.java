@@ -249,8 +249,8 @@ public class ActualTermsController {
 
     public void processCarryForward(int studentId,int previousTermBalance,int previousAnnualBalance,int previousTotal,int nextTermBalance,int nextAnnualBalance,int nextTotal,String carryForwardInstallmentDate,String carryForwardInstallmentYear) {
 
-       CarryForwardsEntity dbSavedCarryForward = carryForwardsRepository.save(new CarryForwardsEntity(studentId,previousTermBalance,UtilityClass.getNow()));
-       InstallmentsEntity dbSavedInstallment = installmentRepository.save(new InstallmentsEntity(studentId,previousTermBalance * -1,carryForwardInstallmentDate,1,0, SessionActivitiesConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT,carryForwardInstallmentYear));
+       CarryForwardsEntity dbSavedCarryForward = carryForwardsRepository.save(new CarryForwardsEntity(studentId,previousTermBalance,UtilityClass.getNow(),0));
+       InstallmentsEntity dbSavedInstallment = installmentRepository.save(new InstallmentsEntity(studentId,previousTermBalance * -1,carryForwardInstallmentDate,1,0, SessionActivitiesConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT,carryForwardInstallmentYear,0));
 
         transactionsRepository.save(new TransactionsEntity(0,SessionActivitiesConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT, TransactionDescriptionsConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT,studentId,dbSavedInstallment.getInstallmentId(),dbSavedCarryForward.getCarryFowardId(),0,previousTermBalance,previousAnnualBalance,previousTotal,nextTermBalance,nextAnnualBalance,nextTotal,UtilityClass.getNow()));
 
