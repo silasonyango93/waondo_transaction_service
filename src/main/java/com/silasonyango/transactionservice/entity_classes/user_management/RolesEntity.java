@@ -28,6 +28,14 @@ public class RolesEntity implements java.io.Serializable{
     @Column(name = "RoleCode")
     private int roleCode;
 
+    public RolesEntity() {
+    }
+
+    public RolesEntity(String roleDescription, int roleCode) {
+        this.roleDescription = roleDescription;
+        this.roleCode = roleCode;
+    }
+
     public int getRoleId() {
         return roleId;
     }

@@ -13,6 +13,17 @@ public class SessionActivitiesEntity implements java.io.Serializable{
     @Column(name = "SessionActivityDescription")
     private String sessionActivityDescription;
 
+    @Column(name = "SessionActivityCode")
+    private int sessionActivityCode;
+
+    public SessionActivitiesEntity() {
+    }
+
+    public SessionActivitiesEntity(String sessionActivityDescription, int sessionActivityCode) {
+        this.sessionActivityDescription = sessionActivityDescription;
+        this.sessionActivityCode = sessionActivityCode;
+    }
+
     public int getSessionActivityId() {
         return sessionActivityId;
     }

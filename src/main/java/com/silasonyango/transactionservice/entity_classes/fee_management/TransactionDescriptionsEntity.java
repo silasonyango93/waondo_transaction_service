@@ -10,12 +10,16 @@ public class TransactionDescriptionsEntity implements java.io.Serializable{
     private int transactionDescriptionId;
 
     @Column(name = "TransactionDescription")
-    private int transactionDescription;
+    private String transactionDescription;
+
+    @Column(name = "TransactionDescriptionCode")
+    private int transactionDescriptionCode;
 
     public TransactionDescriptionsEntity() {}
 
-    public TransactionDescriptionsEntity(int transactionDescription) {
+    public TransactionDescriptionsEntity(String transactionDescription, int transactionDescriptionCode) {
         this.transactionDescription = transactionDescription;
+        this.transactionDescriptionCode = transactionDescriptionCode;
     }
 
     public int getTransactionDescriptionId() {
@@ -26,11 +30,19 @@ public class TransactionDescriptionsEntity implements java.io.Serializable{
         this.transactionDescriptionId = transactionDescriptionId;
     }
 
-    public int getTransactionDescription() {
+    public String getTransactionDescription() {
         return transactionDescription;
     }
 
-    public void setTransactionDescription(int transactionDescription) {
+    public void setTransactionDescription(String transactionDescription) {
         this.transactionDescription = transactionDescription;
+    }
+
+    public int getTransactionDescriptionCode() {
+        return transactionDescriptionCode;
+    }
+
+    public void setTransactionDescriptionCode(int transactionDescriptionCode) {
+        this.transactionDescriptionCode = transactionDescriptionCode;
     }
 }
