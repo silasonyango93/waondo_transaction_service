@@ -118,8 +118,6 @@ public class SystemInitialization {
             configureSessionActivities();
             configureStudentResidence();
             configureTransactionDescriptions();
-
-
             configureAdminAcademicClassLevel();
             createAdminUser();
 

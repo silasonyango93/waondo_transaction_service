@@ -16,6 +16,7 @@ import com.silasonyango.transactionservice.repository.fee_management.StudentFeeC
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRegistrationRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
+import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
 import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import okhttp3.FormBody;
@@ -53,6 +54,9 @@ public class StudentController {
     @Autowired
     StudentRegistrationRepository studentRegistrationRepository;
 
+    @Autowired
+    GenderRepository genderRepository;
+
     @PostMapping("/create_student")
     public SuccessFailureResponseDto createAStudent(@Valid StudentRegistrationDto studentRegistrationDto) {
         SuccessFailureResponseDto successFailureResponseDto = new SuccessFailureResponseDto();
@@ -76,6 +80,7 @@ public class StudentController {
             student.setProfPicName(studentRegistrationDto.getProfPicName());
             student.setStudentResidenceId(studentRegistrationDto.getStudentResidenceId());
             student.setAdmissionDate(dtf.format(now));
+            student.setGenderId(genderRepository.findByGenderCode(studentRegistrationDto.getGenderId()).get(0).getGenderId());
 
             StudentEntity dbSavedStudent = studentRepository.save(student);
 

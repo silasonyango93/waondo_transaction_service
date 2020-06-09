@@ -14,6 +14,7 @@ import com.silasonyango.transactionservice.entity_classes.session_management.Use
 import com.silasonyango.transactionservice.entity_classes.user_management.*;
 import com.silasonyango.transactionservice.repository.session_management.SessionLogsRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
+import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
 import com.silasonyango.transactionservice.repository.user_management.*;
 import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
 import okhttp3.FormBody;
@@ -59,12 +60,16 @@ public class UsersController {
     @Autowired
     UserSessionActivitiesRepository userSessionActivitiesRepository;
 
+    @Autowired
+    GenderRepository genderRepository;
+
     @PostMapping("/create_user")
     public UserDto createUser(@Valid UsersEntity user) {
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String hashedPassword = passwordEncoder.encode(user.getEncryptedPassword());
         user.setEncryptedPassword(hashedPassword);
+        user.setGenderId(genderRepository.findByGenderCode(user.getGenderId()).get(0).getGenderId());
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
