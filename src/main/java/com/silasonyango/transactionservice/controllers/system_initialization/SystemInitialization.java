@@ -1,9 +1,7 @@
 package com.silasonyango.transactionservice.controllers.system_initialization;
 
-import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
-import com.silasonyango.transactionservice.entity_classes.academic_classes.ClassStreamsEntity;
-import com.silasonyango.transactionservice.entity_classes.academic_classes.LotDescriptionsEntity;
-import com.silasonyango.transactionservice.entity_classes.academic_classes.LotsEntity;
+import com.silasonyango.transactionservice.common.config.UtilityConfigs;
+import com.silasonyango.transactionservice.entity_classes.academic_classes.*;
 import com.silasonyango.transactionservice.entity_classes.fee_management.TransactionDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.SessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
@@ -12,10 +10,7 @@ import com.silasonyango.transactionservice.entity_classes.system_initialization.
 import com.silasonyango.transactionservice.entity_classes.system_initialization.gender.GenderEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.AccessPrivilegesEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.RolesEntity;
-import com.silasonyango.transactionservice.repository.academic_classes.AcademicClassLevelsRepository;
-import com.silasonyango.transactionservice.repository.academic_classes.ClassStreamsRepository;
-import com.silasonyango.transactionservice.repository.academic_classes.LotDescriptionsRepository;
-import com.silasonyango.transactionservice.repository.academic_classes.LotsRepository;
+import com.silasonyango.transactionservice.repository.academic_classes.*;
 import com.silasonyango.transactionservice.repository.fee_management.TransactionDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.session_management.SessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
@@ -77,6 +72,9 @@ public class SystemInitialization {
     @Autowired
     ClassStreamsRepository classStreamsRepository;
 
+    @Autowired
+    ClassesRepository classesRepository;
+
     @EventListener(ApplicationReadyEvent.class)
     public void checkIfSystemIsAlreadyConfigured() {
 
@@ -87,10 +85,10 @@ public class SystemInitialization {
            // configureRoles();
             //configureSessionActivities();
             //configureStudentResidence();
-            configureTransactionDescriptions();
+            //configureTransactionDescriptions();
 
 
-            //configureAdminAcademicClassLevel();
+            configureAdminAcademicClassLevel();
 
         } else {
             System.out.println("Configured");
@@ -160,15 +158,20 @@ public class SystemInitialization {
         configureAdminClassStream(dbSavedAdminLot.getLotId());
     }
 
-    public void configureAdminClass() {
-
-    }
-
     public void configureAdminClassStream(int lotId) {
         ClassStreamsEntity dbSavedAdminClassSttream = classStreamsRepository.save(new ClassStreamsEntity("Admin Class Stream",1));
+        configureAdminClass(lotId,dbSavedAdminClassSttream.getClassStreamId());
     }
 
-    public void configureAdminStudent() {
-        studentRepository.save(new StudentEntity());
+    public void configureAdminClass(int lotId,int classStreamId) {
+        ClassesEntity dbSavedAdminClass = classesRepository.save(new ClassesEntity(lotId,classStreamId,UtilityClass.getNow(),1));
+        configureAdminStudent(dbSavedAdminClass.getClassId());
+    }
+
+
+    public void configureAdminStudent(int classId) {
+        int genderId = genderRepository.findByGenderCode(1).get(0).getGenderId();
+        int studentResidenceId = studentResidenceRepository.findByStudentResidenceCode(1).get(0).getStudentResidenceId();
+        StudentEntity dbSavedAdminStudent = studentRepository.save(new StudentEntity("0000","Admin Student",genderId,UtilityClass.getToday(),studentResidenceId,classId,UtilityClass.getNow(), UtilityConfigs.MALE_PROF_PIC_NAME,1));
     }
 }
