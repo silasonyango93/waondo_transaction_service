@@ -16,13 +16,17 @@ public class AcademicClassLevelsEntity implements java.io.Serializable{
     @Column(name = "HierachyCode")
     private int hierachyCode;
 
+    @Column(name = "IsAdminClassLevel")
+    private int isAdminClassLevel;
+
 
     public AcademicClassLevelsEntity() {
     }
 
-    public AcademicClassLevelsEntity(String academicClassLevelName, int hierachyCode) {
+    public AcademicClassLevelsEntity(String academicClassLevelName, int hierachyCode, int isAdminClassLevel) {
         this.academicClassLevelName = academicClassLevelName;
         this.hierachyCode = hierachyCode;
+        this.isAdminClassLevel = isAdminClassLevel;
     }
 
     public int getAcademicClassLevelId() {
@@ -47,5 +51,13 @@ public class AcademicClassLevelsEntity implements java.io.Serializable{
 
     public void setHierachyCode(int hierachyCode) {
         this.hierachyCode = hierachyCode;
+    }
+
+    public int getIsAdminClassLevel() {
+        return isAdminClassLevel;
+    }
+
+    public void setIsAdminClassLevel(int isAdminClassLevel) {
+        this.isAdminClassLevel = isAdminClassLevel;
     }
 }

@@ -33,6 +33,24 @@ public class StudentEntity implements java.io.Serializable{
     @Column(name = "ProfPicName")
     private String profPicName;
 
+    @Column(name = "IsAnAdminStudent")
+    private int isAnAdminStudent;
+
+    public StudentEntity() {
+    }
+
+    public StudentEntity(String admissionNo, String studentName, int genderId, String studentDob, int studentResidenceId, int classId, String admissionDate, String profPicName, int isAnAdminStudent) {
+        this.admissionNo = admissionNo;
+        this.studentName = studentName;
+        this.genderId = genderId;
+        this.studentDob = studentDob;
+        this.studentResidenceId = studentResidenceId;
+        this.classId = classId;
+        this.admissionDate = admissionDate;
+        this.profPicName = profPicName;
+        this.isAnAdminStudent = isAnAdminStudent;
+    }
+
     public int getStudentId() {
         return studentId;
     }
@@ -103,5 +121,13 @@ public class StudentEntity implements java.io.Serializable{
 
     public void setProfPicName(String profPicName) {
         this.profPicName = profPicName;
+    }
+
+    public int getIsAnAdminStudent() {
+        return isAnAdminStudent;
+    }
+
+    public void setIsAnAdminStudent(int isAnAdminStudent) {
+        this.isAnAdminStudent = isAnAdminStudent;
     }
 }

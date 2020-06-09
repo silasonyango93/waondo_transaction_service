@@ -19,13 +19,17 @@ public class LotsEntity implements java.io.Serializable{
     @Column(name = "RegisteredDate")
     private String registeredDate;
 
+    @Column(name = "IsAdminLot")
+    private int isAdminLot;
+
     public LotsEntity() {
     }
 
-    public LotsEntity(int lotDescriptionId, int academicClassLevelId, String registeredDate) {
+    public LotsEntity(int lotDescriptionId, int academicClassLevelId, String registeredDate, int isAdminLot) {
         this.lotDescriptionId = lotDescriptionId;
         this.academicClassLevelId = academicClassLevelId;
         this.registeredDate = registeredDate;
+        this.isAdminLot = isAdminLot;
     }
 
     public int getLotId() {
@@ -58,5 +62,13 @@ public class LotsEntity implements java.io.Serializable{
 
     public void setRegisteredDate(String registeredDate) {
         this.registeredDate = registeredDate;
+    }
+
+    public int getIsAdminLot() {
+        return isAdminLot;
+    }
+
+    public void setIsAdminLot(int isAdminLot) {
+        this.isAdminLot = isAdminLot;
     }
 }

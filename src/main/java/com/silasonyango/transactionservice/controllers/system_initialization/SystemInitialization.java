@@ -1,20 +1,31 @@
 package com.silasonyango.transactionservice.controllers.system_initialization;
 
+import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
+import com.silasonyango.transactionservice.entity_classes.academic_classes.ClassStreamsEntity;
+import com.silasonyango.transactionservice.entity_classes.academic_classes.LotDescriptionsEntity;
+import com.silasonyango.transactionservice.entity_classes.academic_classes.LotsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.TransactionDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.SessionActivitiesEntity;
+import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentResidenceEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.correction_descriptions.CorrectionDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.gender.GenderEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.AccessPrivilegesEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.RolesEntity;
+import com.silasonyango.transactionservice.repository.academic_classes.AcademicClassLevelsRepository;
+import com.silasonyango.transactionservice.repository.academic_classes.ClassStreamsRepository;
+import com.silasonyango.transactionservice.repository.academic_classes.LotDescriptionsRepository;
+import com.silasonyango.transactionservice.repository.academic_classes.LotsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.TransactionDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.session_management.SessionActivitiesRepository;
+import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentResidenceRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.correction_descriptions.CorrectionDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.system_configuration.SystemConfigurationRepository;
 import com.silasonyango.transactionservice.repository.user_management.AccessPrivilegesRepository;
 import com.silasonyango.transactionservice.repository.user_management.RolesRepository;
+import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -51,6 +62,21 @@ public class SystemInitialization {
     @Autowired
     TransactionDescriptionsRepository transactionDescriptionsRepository;
 
+    @Autowired
+    StudentRepository studentRepository;
+
+    @Autowired
+    AcademicClassLevelsRepository academicClassLevelsRepository;
+
+    @Autowired
+    LotDescriptionsRepository lotDescriptionsRepository;
+
+    @Autowired
+    LotsRepository lotsRepository;
+
+    @Autowired
+    ClassStreamsRepository classStreamsRepository;
+
     @EventListener(ApplicationReadyEvent.class)
     public void checkIfSystemIsAlreadyConfigured() {
 
@@ -62,6 +88,10 @@ public class SystemInitialization {
             //configureSessionActivities();
             //configureStudentResidence();
             configureTransactionDescriptions();
+
+
+            //configureAdminAcademicClassLevel();
+
         } else {
             System.out.println("Configured");
         }
@@ -113,5 +143,32 @@ public class SystemInitialization {
         transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("Fee correction",2));
         transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("An end of term carry forward",3));
         transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("An end of year carry forward",4));
+    }
+
+    public void configureAdminAcademicClassLevel() {
+        AcademicClassLevelsEntity dbAdminAcademicClassLevel = academicClassLevelsRepository.save(new AcademicClassLevelsEntity("Class Zero",0,1));
+        configureAdminLotDescription(dbAdminAcademicClassLevel.getAcademicClassLevelId());
+    }
+
+    public void configureAdminLotDescription(int academicClassLevelId) {
+        LotDescriptionsEntity dbAdminLotDescription = lotDescriptionsRepository.save(new LotDescriptionsEntity("Admin Lot",1));
+        configureAdminLot(dbAdminLotDescription.getLotDescriptionId(),academicClassLevelId);
+    }
+
+    public void configureAdminLot(int lotDescriptionId,int academicClassLevelId) {
+        LotsEntity dbSavedAdminLot = lotsRepository.save(new LotsEntity(lotDescriptionId,academicClassLevelId, UtilityClass.getNow(),1));
+        configureAdminClassStream(dbSavedAdminLot.getLotId());
+    }
+
+    public void configureAdminClass() {
+
+    }
+
+    public void configureAdminClassStream(int lotId) {
+        ClassStreamsEntity dbSavedAdminClassSttream = classStreamsRepository.save(new ClassStreamsEntity("Admin Class Stream",1));
+    }
+
+    public void configureAdminStudent() {
+        studentRepository.save(new StudentEntity());
     }
 }
