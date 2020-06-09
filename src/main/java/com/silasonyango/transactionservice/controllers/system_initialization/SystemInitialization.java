@@ -3,6 +3,7 @@ package com.silasonyango.transactionservice.controllers.system_initialization;
 import com.silasonyango.transactionservice.common.config.UtilityConfigs;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.*;
 import com.silasonyango.transactionservice.entity_classes.fee_management.CarryForwardsEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.FeeCorrectionsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.TransactionDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.SessionActivitiesEntity;
@@ -18,6 +19,7 @@ import com.silasonyango.transactionservice.entity_classes.user_management.UserAc
 import com.silasonyango.transactionservice.entity_classes.user_management.UsersEntity;
 import com.silasonyango.transactionservice.repository.academic_classes.*;
 import com.silasonyango.transactionservice.repository.fee_management.CarryForwardsRepository;
+import com.silasonyango.transactionservice.repository.fee_management.FeeCorrectionsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
 import com.silasonyango.transactionservice.repository.fee_management.TransactionDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.session_management.SessionActivitiesRepository;
@@ -102,20 +104,23 @@ public class SystemInitialization {
     @Autowired
     CarryForwardsRepository carryForwardsRepository;
 
+    @Autowired
+    FeeCorrectionsRepository feeCorrectionsRepository;
+
     @EventListener(ApplicationReadyEvent.class)
     public void checkIfSystemIsAlreadyConfigured() {
 
         if(systemConfigurationRepository.findAll().size() == 0) {
-            //configureGender();
-            //configureAccessPrivileges();
-            //configureCorrectionDescriptions();
-           // configureRoles();
-            //configureSessionActivities();
-            //configureStudentResidence();
-            //configureTransactionDescriptions();
+            configureGender();
+            configureAccessPrivileges();
+            configureCorrectionDescriptions();
+            configureRoles();
+            configureSessionActivities();
+            configureStudentResidence();
+            configureTransactionDescriptions();
 
 
-            //configureAdminAcademicClassLevel();
+            configureAdminAcademicClassLevel();
             createAdminUser();
 
         } else {
@@ -140,6 +145,7 @@ public class SystemInitialization {
     }
 
     public void configureCorrectionDescriptions() {
+        correctionDescriptionsRepository.save(new CorrectionDescriptionsEntity("ADMIN CORRECTION",0));
         correctionDescriptionsRepository.save(new CorrectionDescriptionsEntity("Wrong student paid for",1));
     }
 
@@ -229,5 +235,14 @@ public class SystemInitialization {
     public void configureAdminCarryForward() {
         int studentId = studentRepository.findByIsAnAdminStudent(1).get(0).getStudentId();
         carryForwardsRepository.save(new CarryForwardsEntity(studentId,0,UtilityClass.getNow(),1));
+        configureAdminFeeCorrection();
+    }
+
+    public void configureAdminFeeCorrection() {
+        int sessionLogId = sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId();
+        int userSessionActivityId = userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId();
+        int correctionDescriptionId = correctionDescriptionsRepository.findByCorrectionDescriptionCode(0).get(0).getCorrectionDescriptionId();
+        int studentId = studentRepository.findByIsAnAdminStudent(1).get(0).getStudentId();
+        feeCorrectionsRepository.save(new FeeCorrectionsEntity(sessionLogId,userSessionActivityId,correctionDescriptionId,studentId,0,0,0,0,0,0,UtilityClass.getNow(),1));
     }
 }

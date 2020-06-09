@@ -11,7 +11,7 @@ public class DeploymentChecklist {
     *  6). Configure student residence.
     *  7). Configure transaction descriptions.
     *  8). Configure roles.
-    *  9). Male and female profile pic upload
+    *  9). Male and female profile pic upload **********************************************************************
     *  10). Cron Term iteration config
     *  11). Cron Week iteration config
     *  12). Session log zero

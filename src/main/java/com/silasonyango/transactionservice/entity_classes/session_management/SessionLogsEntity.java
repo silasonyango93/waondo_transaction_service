@@ -25,6 +25,12 @@ public class SessionLogsEntity implements java.io.Serializable{
 
     }
 
+    public SessionLogsEntity(int userId, String sessionStartDate, int isAdminSessionLog) {
+        this.userId = userId;
+        this.sessionStartDate = sessionStartDate;
+        this.isAdminSessionLog = isAdminSessionLog;
+    }
+
     public SessionLogsEntity(int userId, String sessionStartDate, String sessionEndDate, int isAdminSessionLog) {
         this.userId = userId;
         this.sessionStartDate = sessionStartDate;
