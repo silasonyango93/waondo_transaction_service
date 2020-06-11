@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jun 09, 2020 at 08:17 PM
+-- Generation Time: Jun 11, 2020 at 06:59 PM
 -- Server version: 5.7.26
 -- PHP Version: 7.3.6
 
@@ -708,13 +708,6 @@ CREATE TABLE `class_streams` (
   `IsAdminClassStream` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
--- Dumping data for table `class_streams`
---
-
-INSERT INTO `class_streams` (`ClassStreamId`, `ClassStreamName`, `IsAdminClassStream`) VALUES
-(3, 'Admin Class Stream', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -1378,13 +1371,13 @@ ALTER TABLE `week_iterations`
 -- AUTO_INCREMENT for table `academic_class_levels`
 --
 ALTER TABLE `academic_class_levels`
-  MODIFY `AcademicClassLevelId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `AcademicClassLevelId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `access_privileges`
 --
 ALTER TABLE `access_privileges`
-  MODIFY `AccessPrivilegeId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `AccessPrivilegeId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `actual_terms`
@@ -1402,13 +1395,13 @@ ALTER TABLE `actual_weeks`
 -- AUTO_INCREMENT for table `carry_forwards`
 --
 ALTER TABLE `carry_forwards`
-  MODIFY `CarryFowardId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `CarryFowardId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `classes`
 --
 ALTER TABLE `classes`
-  MODIFY `ClassId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ClassId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `class_fee_structures`
@@ -1432,13 +1425,13 @@ ALTER TABLE `class_fee_structure_components`
 -- AUTO_INCREMENT for table `class_streams`
 --
 ALTER TABLE `class_streams`
-  MODIFY `ClassStreamId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ClassStreamId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `correction_descriptions`
 --
 ALTER TABLE `correction_descriptions`
-  MODIFY `CorrectionDescriptionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `CorrectionDescriptionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `fee_components`
@@ -1450,7 +1443,7 @@ ALTER TABLE `fee_components`
 -- AUTO_INCREMENT for table `fee_corrections`
 --
 ALTER TABLE `fee_corrections`
-  MODIFY `FeeCorrectionId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `FeeCorrectionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `fee_statements`
@@ -1468,49 +1461,49 @@ ALTER TABLE `fee_structures`
 -- AUTO_INCREMENT for table `gender`
 --
 ALTER TABLE `gender`
-  MODIFY `GenderId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `GenderId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `installments`
 --
 ALTER TABLE `installments`
-  MODIFY `InstallmentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `InstallmentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `lots`
 --
 ALTER TABLE `lots`
-  MODIFY `LotId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `LotId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `lot_descriptions`
 --
 ALTER TABLE `lot_descriptions`
-  MODIFY `LotDescriptionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `LotDescriptionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
-  MODIFY `RoleId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `RoleId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `session_activities`
 --
 ALTER TABLE `session_activities`
-  MODIFY `SessionActivityId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `SessionActivityId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `session_logs`
 --
 ALTER TABLE `session_logs`
-  MODIFY `SessionLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=364;
+  MODIFY `SessionLogId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=366;
 
 --
 -- AUTO_INCREMENT for table `students`
 --
 ALTER TABLE `students`
-  MODIFY `StudentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `StudentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `student_fee_components`
@@ -1528,7 +1521,7 @@ ALTER TABLE `student_registration`
 -- AUTO_INCREMENT for table `student_residence`
 --
 ALTER TABLE `student_residence`
-  MODIFY `StudentResidenceId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `StudentResidenceId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `system_configuration`
@@ -1552,13 +1545,13 @@ ALTER TABLE `transactions`
 -- AUTO_INCREMENT for table `transaction_descriptions`
 --
 ALTER TABLE `transaction_descriptions`
-  MODIFY `TransactionDescriptionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `TransactionDescriptionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `UserId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `UserId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `user_access_privileges`
@@ -1576,7 +1569,7 @@ ALTER TABLE `user_roles`
 -- AUTO_INCREMENT for table `user_session_activities`
 --
 ALTER TABLE `user_session_activities`
-  MODIFY `UserSessionActivityId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=429;
+  MODIFY `UserSessionActivityId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=431;
 
 --
 -- AUTO_INCREMENT for table `week_iterations`

@@ -13,9 +13,9 @@ import com.silasonyango.transactionservice.entity_classes.student_management.Stu
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentResidenceEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.correction_descriptions.CorrectionDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.gender.GenderEntity;
+import com.silasonyango.transactionservice.entity_classes.system_initialization.system_configuration.SystemConfigurationEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.AccessPrivilegesEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.RolesEntity;
-import com.silasonyango.transactionservice.entity_classes.user_management.UserAccessPrivilegesEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.UsersEntity;
 import com.silasonyango.transactionservice.repository.academic_classes.*;
 import com.silasonyango.transactionservice.repository.fee_management.CarryForwardsRepository;
@@ -32,7 +32,6 @@ import com.silasonyango.transactionservice.repository.system_initialization.gend
 import com.silasonyango.transactionservice.repository.system_initialization.system_configuration.SystemConfigurationRepository;
 import com.silasonyango.transactionservice.repository.user_management.AccessPrivilegesRepository;
 import com.silasonyango.transactionservice.repository.user_management.RolesRepository;
-import com.silasonyango.transactionservice.repository.user_management.UserAccessPrivilegesRepository;
 import com.silasonyango.transactionservice.repository.user_management.UsersRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -242,5 +241,10 @@ public class SystemInitialization {
         int correctionDescriptionId = correctionDescriptionsRepository.findByCorrectionDescriptionCode(0).get(0).getCorrectionDescriptionId();
         int studentId = studentRepository.findByIsAnAdminStudent(1).get(0).getStudentId();
         feeCorrectionsRepository.save(new FeeCorrectionsEntity(sessionLogId,userSessionActivityId,correctionDescriptionId,studentId,0,0,0,0,0,0,UtilityClass.getNow(),1));
+        assertSystemSuccessfullyInitialized();
+    }
+
+    public void assertSystemSuccessfullyInitialized() {
+        systemConfigurationRepository.save(new SystemConfigurationEntity(UtilityConfigs.SYSTEM_CONFIGURATION_DESCRIPTION,UtilityConfigs.SYSTEM_CONFIGURATION_CODE));
     }
 }
