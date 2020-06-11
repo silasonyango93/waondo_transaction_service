@@ -18,10 +18,9 @@ import com.silasonyango.transactionservice.repository.academic_classes.LotsRepos
 import com.silasonyango.transactionservice.repository.calendar.ActualTermsRepository;
 import com.silasonyango.transactionservice.repository.calendar.ActualWeeksRepository;
 import com.silasonyango.transactionservice.repository.calendar.TermIterationsRepository;
-import com.silasonyango.transactionservice.repository.fee_management.CarryForwardsRepository;
-import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
-import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
-import com.silasonyango.transactionservice.repository.fee_management.TransactionsRepository;
+import com.silasonyango.transactionservice.repository.fee_management.*;
+import com.silasonyango.transactionservice.repository.session_management.SessionLogsRepository;
+import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
@@ -52,22 +51,34 @@ public class ActualTermsController {
     StudentRepository studentRepository;
 
     @Autowired
-    private ActualTermsDao actualTermsDao;
+    ActualTermsDao actualTermsDao;
 
     @Autowired
-    private FeeStatementRepository feeStatementRepository;
+    FeeStatementRepository feeStatementRepository;
 
     @Autowired
-    private CarryForwardsRepository carryForwardsRepository;
+    CarryForwardsRepository carryForwardsRepository;
 
     @Autowired
-    private InstallmentRepository installmentRepository;
+    InstallmentRepository installmentRepository;
 
     @Autowired
-    private TransactionsRepository transactionsRepository;
+    TransactionsRepository transactionsRepository;
 
     @Autowired
-    private TermIterationsRepository termIterationsRepository;
+    TermIterationsRepository termIterationsRepository;
+
+    @Autowired
+    FeeCorrectionsRepository feeCorrectionsRepository;
+
+    @Autowired
+    UserSessionActivitiesRepository userSessionActivitiesRepository;
+
+    @Autowired
+    TransactionDescriptionsRepository transactionDescriptionsRepository;
+
+    @Autowired
+    SessionLogsRepository sessionLogsRepository;
 
    //ki @Scheduled(cron="*/02 * * * * *")
 
@@ -252,7 +263,7 @@ public class ActualTermsController {
        CarryForwardsEntity dbSavedCarryForward = carryForwardsRepository.save(new CarryForwardsEntity(studentId,previousTermBalance,UtilityClass.getNow(),0));
        InstallmentsEntity dbSavedInstallment = installmentRepository.save(new InstallmentsEntity(studentId,previousTermBalance * -1,carryForwardInstallmentDate,1,0, SessionActivitiesConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT,carryForwardInstallmentYear,0));
 
-        transactionsRepository.save(new TransactionsEntity(0,SessionActivitiesConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT, TransactionDescriptionsConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT,studentId,dbSavedInstallment.getInstallmentId(),dbSavedCarryForward.getCarryFowardId(),0,previousTermBalance,previousAnnualBalance,previousTotal,nextTermBalance,nextAnnualBalance,nextTotal,UtilityClass.getNow()));
+        transactionsRepository.save(new TransactionsEntity(sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(), transactionDescriptionsRepository.findByTransactionDescriptionCode(0).get(0).getTransactionDescriptionId(),studentId,dbSavedInstallment.getInstallmentId(),dbSavedCarryForward.getCarryFowardId(),feeCorrectionsRepository.findByIsAdminFeeCorrection(1).get(0).getFeeCorrectionId(),previousTermBalance,previousAnnualBalance,previousTotal,nextTermBalance,nextAnnualBalance,nextTotal,UtilityClass.getNow()));
 
     }
 

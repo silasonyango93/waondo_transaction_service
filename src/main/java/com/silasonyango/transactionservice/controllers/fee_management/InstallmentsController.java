@@ -12,12 +12,10 @@ import com.silasonyango.transactionservice.entity_classes.fee_management.Student
 import com.silasonyango.transactionservice.entity_classes.fee_management.TransactionsEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
-import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
-import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
-import com.silasonyango.transactionservice.repository.fee_management.StudentFeeComponentRepository;
-import com.silasonyango.transactionservice.repository.fee_management.TransactionsRepository;
+import com.silasonyango.transactionservice.repository.fee_management.*;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
+import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,6 +51,18 @@ public class InstallmentsController {
 
     @Autowired
     StudentFeeComponentRepository studentFeeComponentRepository;
+
+    @Autowired
+    TransactionDescriptionsRepository transactionDescriptionsRepository;
+
+    @Autowired
+    GenderRepository genderRepository;
+
+    @Autowired
+    CarryForwardsRepository carryForwardsRepository;
+
+    @Autowired
+    FeeCorrectionsRepository feeCorrectionsRepository;
 
     @PostMapping("/add_installment")
     public FeeStatementResponseDto addInstallment(@Valid InstallmentsDto installmentsDto) {
@@ -146,7 +156,7 @@ public class InstallmentsController {
 
         transaction.setSessionLogId(sessionLogId);
         transaction.setUserSessionActivityId(userSessionActivityId);
-        transaction.setTransactionDescriptionId(TransactionDescriptionsConfig.REGISTER_FEE_INSTALLMENT_TRANSACTION_DESCRIPTION);
+        transaction.setTransactionDescriptionId(transactionDescriptionsRepository.findByTransactionDescriptionCode(TransactionDescriptionsConfig.REGISTER_FEE_INSTALLMENT_TRANSACTION_DESCRIPTION).get(0).getTransactionDescriptionId());
         transaction.setStudentId(studentId);
         transaction.setInstallmentId(installmentId);
         transaction.setPreviousTermBalance(previousTermBalance);
@@ -156,6 +166,8 @@ public class InstallmentsController {
         transaction.setNextAnnualBalance(nextAnnualBalance);
         transaction.setNextTotal(nextTotal);
         transaction.setTransactionDate(UtilityClass.getNow());
+        transaction.setCarryFowardId(carryForwardsRepository.findByIsAdminCarryForward(1).get(0).getCarryFowardId());
+        transaction.setFeeCorrectionId(feeCorrectionsRepository.findByIsAdminFeeCorrection(1).get(0).getFeeCorrectionId());
 
         transactionsRepository.save(transaction);
     }
@@ -177,7 +189,7 @@ public class InstallmentsController {
         feeStatementResponseDto.setProfPicName(studentPersonalDetails.getProfPicName());
         feeStatementResponseDto.setAdmissionNumber(studentPersonalDetails.getAdmissionNo());
         feeStatementResponseDto.setStudentName(studentPersonalDetails.getStudentName());
-        feeStatementResponseDto.setGender(studentPersonalDetails.getGenderId() == 1 ? "Male" : "Female");
+        feeStatementResponseDto.setGender(genderRepository.findByGenderId(studentPersonalDetails.getGenderId()).get(0).getGenderCode() == 1 ? "Male" : "Female");
         feeStatementResponseDto.setClassDetails(classDetails.getString("AcademicClassLevelName") +" "+classDetails.getString("ClassStreamName"));
         feeStatementResponseDto.setResidenceDetails(residenceDetails.getString("StudentResidenceDescription"));
         feeStatementResponseDto.setTermBalance(feeStatementEntity.getCurrentTermBalance());
