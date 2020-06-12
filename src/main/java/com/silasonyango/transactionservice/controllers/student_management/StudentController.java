@@ -13,9 +13,11 @@ import com.silasonyango.transactionservice.entity_classes.student_management.Stu
 import com.silasonyango.transactionservice.repository.fee_management.ClassFeeStructureComponentRepository;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.fee_management.StudentFeeComponentRepository;
+import com.silasonyango.transactionservice.repository.session_management.SessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRegistrationRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
+import com.silasonyango.transactionservice.repository.student_management.StudentResidenceRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
 import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
@@ -57,6 +59,12 @@ public class StudentController {
     @Autowired
     GenderRepository genderRepository;
 
+    @Autowired
+    SessionActivitiesRepository sessionActivitiesRepository;
+
+    @Autowired
+    StudentResidenceRepository studentResidenceRepository;
+
     @PostMapping("/create_student")
     public SuccessFailureResponseDto createAStudent(@Valid StudentRegistrationDto studentRegistrationDto) {
         SuccessFailureResponseDto successFailureResponseDto = new SuccessFailureResponseDto();
@@ -78,7 +86,7 @@ public class StudentController {
             student.setClassId(studentRegistrationDto.getClassId());
             student.setStudentDob(studentRegistrationDto.getStudentDob());
             student.setProfPicName(studentRegistrationDto.getProfPicName());
-            student.setStudentResidenceId(studentRegistrationDto.getStudentResidenceId());
+            student.setStudentResidenceId(studentResidenceRepository.findByStudentResidenceCode(studentRegistrationDto.getStudentResidenceId()).get(0).getStudentResidenceId());
             student.setAdmissionDate(dtf.format(now));
             student.setGenderId(genderRepository.findByGenderCode(studentRegistrationDto.getGenderId()).get(0).getGenderId());
 
@@ -88,7 +96,7 @@ public class StudentController {
 
             prepareStudentFeeComponent(dbSavedStudent.getStudentId());
 
-            UserSessionActivitiesEntity userSessionActivity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(studentRegistrationDto.getRegistrationSessionId(), SessionActivitiesConfig.REGISTER_A_STUDENT_SESSION_ACTIVITY, dtf.format(now),0));
+            UserSessionActivitiesEntity userSessionActivity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(studentRegistrationDto.getRegistrationSessionId(),sessionActivitiesRepository.findBySessionActivityCode(SessionActivitiesConfig.REGISTER_A_STUDENT_SESSION_ACTIVITY).get(0).getSessionActivityId() , dtf.format(now),0));
             studentRegistrationRepository.save(new StudentRegistrationEntity(studentRegistrationDto.getRegistrationSessionId(),userSessionActivity.getUserSessionActivityId(),dbSavedStudent.getStudentId(),dtf.format(now)));
 
             successFailureResponseDto.setSuccessStatus(true);

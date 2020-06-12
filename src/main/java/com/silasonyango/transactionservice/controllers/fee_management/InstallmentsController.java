@@ -13,6 +13,7 @@ import com.silasonyango.transactionservice.entity_classes.fee_management.Transac
 import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.repository.fee_management.*;
+import com.silasonyango.transactionservice.repository.session_management.SessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
@@ -64,6 +65,9 @@ public class InstallmentsController {
     @Autowired
     FeeCorrectionsRepository feeCorrectionsRepository;
 
+    @Autowired
+    SessionActivitiesRepository sessionActivitiesRepository;
+
     @PostMapping("/add_installment")
     public FeeStatementResponseDto addInstallment(@Valid InstallmentsDto installmentsDto) {
 
@@ -76,7 +80,7 @@ public class InstallmentsController {
         previousAnnualBalance = feeStatementBeforeTransaction.getAnnualBalance();
         previousTotal = feeStatementBeforeTransaction.getCurrentYearTotal();
 
-        UserSessionActivitiesEntity userSessionActivitiesEntity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(installmentsDto.getSessionLogId(),SessionActivitiesConfig.REGISTER_FEE_INSTALLMENT_SESSION_ACTIVITY,UtilityClass.getNow(),0));
+        UserSessionActivitiesEntity userSessionActivitiesEntity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(installmentsDto.getSessionLogId(),sessionActivitiesRepository.findBySessionActivityCode(SessionActivitiesConfig.REGISTER_FEE_INSTALLMENT_SESSION_ACTIVITY).get(0).getSessionActivityId(),UtilityClass.getNow(),0));
 
         InstallmentsEntity dbInstallment = installmentRepository.save(new InstallmentsEntity(installmentsDto.getStudentId(),installmentsDto.getInstallmentAmount(), UtilityClass.getNow(),0,installmentsDto.getSessionLogId(), userSessionActivitiesEntity.getUserSessionActivityId(),UtilityClass.getCurrentYear(),0));
 

@@ -121,7 +121,7 @@ public class SystemInitialization {
             createAdminUser();
 
         } else {
-            System.out.println("Configured");
+            System.out.println("System is configured ready for use");
         }
 
     }

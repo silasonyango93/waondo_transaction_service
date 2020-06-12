@@ -12,6 +12,7 @@ import com.silasonyango.transactionservice.dtos.user_management.UserIdDto;
 import com.silasonyango.transactionservice.entity_classes.session_management.SessionLogsEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.*;
+import com.silasonyango.transactionservice.repository.session_management.SessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.session_management.SessionLogsRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
@@ -63,6 +64,9 @@ public class UsersController {
     @Autowired
     GenderRepository genderRepository;
 
+    @Autowired
+    SessionActivitiesRepository sessionActivitiesRepository;
+
     @PostMapping("/create_user")
     public UserDto createUser(@Valid UsersEntity user) {
 
@@ -74,6 +78,7 @@ public class UsersController {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
         user.setRegisteredDate(dtf.format(now));
+        user.setIsAdminUser(0);
 
         UsersEntity savedUser = usersRepository.save(user);
 
@@ -179,7 +184,7 @@ public class UsersController {
                             authenticationResponseDto.setUserId(user.getUserId());
                             authenticationResponseDto.setName(user.getName());
                             authenticationResponseDto.setEmail(user.getEmail());
-                            authenticationResponseDto.setGenderId(user.getGenderId());
+                            authenticationResponseDto.setGenderId(genderRepository.findByGenderId(user.getGenderId()).get(0).getGenderId());
                             authenticationResponseDto.setUserRegistrationDate(user.getRegisteredDate());
 
                             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -187,7 +192,7 @@ public class UsersController {
                             SessionLogsEntity returnedSession = sessionLogsRepository.save(new SessionLogsEntity(user.getUserId(),dtf.format(now),0));
                             authenticationResponseDto.setSessionLogsEntity(returnedSession);
 
-                            userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(returnedSession.getSessionLogId(), SessionActivitiesConfig.LOGIN_SESSION_ACTIVITY, dtf.format(now),0));
+                            userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(returnedSession.getSessionLogId(), sessionActivitiesRepository.findBySessionActivityCode(SessionActivitiesConfig.LOGIN_SESSION_ACTIVITY).get(0).getSessionActivityId(), dtf.format(now),0));
 
                             List<UserRolesEntity> userRolesEntityList = userRolesRepository.findByUserId(user.getUserId());
                             List<UserRolesDto> userRolesDtoList = new ArrayList<UserRolesDto>();
@@ -270,7 +275,7 @@ public class UsersController {
             userDto.setUserId(usersEntityList.get(i).getUserId());
             userDto.setName(usersEntityList.get(i).getName());
             userDto.setEmail(usersEntityList.get(i).getEmail());
-            userDto.setGenderId(usersEntityList.get(i).getGenderId());
+            userDto.setGenderId(genderRepository.findByGenderId(usersEntityList.get(i).getGenderId()).get(0).getGenderId());
             userDto.setRegisteredDate(usersEntityList.get(i).getRegisteredDate());
 
 

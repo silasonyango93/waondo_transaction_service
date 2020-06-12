@@ -16,6 +16,7 @@ public class DeploymentChecklist {
     *  11). Cron Week iteration config
     *  12). Session log zero
     *  13). Fee correction zero
+    *  14). configure nodejs admin registration form post url
     *
     *
     *

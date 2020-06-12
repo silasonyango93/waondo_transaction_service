@@ -261,10 +261,17 @@ public class ActualTermsController {
     public void processCarryForward(int studentId,int previousTermBalance,int previousAnnualBalance,int previousTotal,int nextTermBalance,int nextAnnualBalance,int nextTotal,String carryForwardInstallmentDate,String carryForwardInstallmentYear) {
 
        CarryForwardsEntity dbSavedCarryForward = carryForwardsRepository.save(new CarryForwardsEntity(studentId,previousTermBalance,UtilityClass.getNow(),0));
-       InstallmentsEntity dbSavedInstallment = installmentRepository.save(new InstallmentsEntity(studentId,previousTermBalance * -1,carryForwardInstallmentDate,1,0, SessionActivitiesConfig.SYSTEM_CARRY_FORWARD_INSTALLMENT,carryForwardInstallmentYear,0));
+       InstallmentsEntity dbSavedInstallment = installmentRepository.save(new InstallmentsEntity(studentId,previousTermBalance * -1,carryForwardInstallmentDate,1,0, userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(),carryForwardInstallmentYear,0));
 
-        transactionsRepository.save(new TransactionsEntity(sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(), transactionDescriptionsRepository.findByTransactionDescriptionCode(0).get(0).getTransactionDescriptionId(),studentId,dbSavedInstallment.getInstallmentId(),dbSavedCarryForward.getCarryFowardId(),feeCorrectionsRepository.findByIsAdminFeeCorrection(1).get(0).getFeeCorrectionId(),previousTermBalance,previousAnnualBalance,previousTotal,nextTermBalance,nextAnnualBalance,nextTotal,UtilityClass.getNow()));
+        transactionsRepository.save(new TransactionsEntity(sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(), transactionDescriptionsRepository.findByTransactionDescriptionCode(isItEndOfTheYear() ? 4 : 3).get(0).getTransactionDescriptionId(),studentId,dbSavedInstallment.getInstallmentId(),dbSavedCarryForward.getCarryFowardId(),feeCorrectionsRepository.findByIsAdminFeeCorrection(1).get(0).getFeeCorrectionId(),previousTermBalance,previousAnnualBalance,previousTotal,nextTermBalance,nextAnnualBalance,nextTotal,UtilityClass.getNow()));
 
+    }
+
+
+    public boolean isItEndOfTheYear() {
+        int probableNextTermIterationId = UtilityClass.getTermDetailsByDate(UtilityClass.getToday()).getInt("TermIterationId") + 1;
+
+        return actualTermsDao.findActualTermByTermIterationIdAndYear(probableNextTermIterationId,UtilityClass.getCurrentYear()).size() == 0;
     }
 
 
