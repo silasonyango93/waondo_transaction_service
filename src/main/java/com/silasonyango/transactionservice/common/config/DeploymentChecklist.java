@@ -17,6 +17,8 @@ public class DeploymentChecklist {
     *  12). Session log zero
     *  13). Fee correction zero
     *  14). configure nodejs admin registration form post url
+    *  15). Set is current fee structure
+    *  16). Communicate to client on change of fee structure
     *
     *
     *
