@@ -3,6 +3,17 @@ package com.silasonyango.transactionservice.entity_classes.student_management;
 import javax.persistence.*;
 @javax.persistence.Entity
 @Table(name = "students")
+
+@javax.persistence.SqlResultSetMapping(
+        name = "students", entities =
+@javax.persistence.EntityResult(entityClass = StudentEntity.class)
+)
+
+@NamedNativeQueries({
+        @NamedNativeQuery(name="StudentEntity.getAllNoneAdminStudents",
+                query="SELECT * FROM students WHERE students.IsAnAdminStudent = 0",
+                resultSetMapping = "students" )
+})
 public class StudentEntity implements java.io.Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

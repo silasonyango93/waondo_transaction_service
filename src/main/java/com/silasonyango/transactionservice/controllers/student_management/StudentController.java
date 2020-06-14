@@ -4,6 +4,7 @@ import com.silasonyango.transactionservice.common.config.EndPoints;
 import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
 import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureResponseDto;
 import com.silasonyango.transactionservice.dtos.student_management.StudentRegistrationDto;
+import com.silasonyango.transactionservice.dtos.student_management.StudentsListDto;
 import com.silasonyango.transactionservice.entity_classes.fee_management.ClassFeeStructureComponentEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.StudentFeeComponentEntity;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -150,5 +152,23 @@ public class StudentController {
         }
 
         return feeAmount;
+    }
+
+    @PostMapping("/fetch_all_students")
+    public List<StudentsListDto> fetchAllStudents() {
+        List<StudentsListDto> studentsList = new ArrayList<>();
+
+        List<StudentEntity> dbStudentsList = studentRepository.getAllNoneAdminStudents();
+
+        for(int i = 0; i < dbStudentsList.size(); i++) {
+            int studentId = dbStudentsList.get(i).getStudentId();
+            JSONObject classDetailsObject = UtilityClass.getAStudentClassDetails(studentId);
+            JSONObject residenceObject = UtilityClass.getAStudentResidenceDetails(studentId);
+            String residenceDetails = residenceObject.getString("StudentResidenceDescription");
+            String classDetails = classDetailsObject.getString("AcademicClassLevelName") +" "+classDetailsObject.getString("ClassStreamName");
+            studentsList.add(new StudentsListDto(studentId,dbStudentsList.get(i).getAdmissionNo(),dbStudentsList.get(i).getStudentName(),genderRepository.findByGenderId(dbStudentsList.get(i).getGenderId()).get(0).getGenderDescription(),classDetails,residenceDetails));
+        }
+
+        return studentsList;
     }
 }
