@@ -19,6 +19,7 @@ public class DeploymentChecklist {
     *  14). configure nodejs admin registration form post url
     *  15). Set is current fee structure
     *  16). Communicate to client on change of fee structure
+    *  17). Configure school profile e.g School name and logo
     *
     *
     *

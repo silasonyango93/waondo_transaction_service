@@ -293,4 +293,54 @@ public class UtilityClass {
         return dataArray;
     }
 
+
+
+
+
+    public static JSONArray getAllStudentsWithAMinimumTermBalance(int minimunTermBalance) {
+        JSONArray dataArray = null;
+        CustomOkHttp customOkHttp = new CustomOkHttp();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("minimunTermBalance", String.valueOf(minimunTermBalance))
+                .build();
+
+        try {
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_all_students_with_minimum_term_balance",formBody);
+            JSONObject object = new JSONObject(responseString);
+            dataArray = object.getJSONArray("results");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataArray;
+    }
+
+
+
+
+
+
+    public static JSONArray getAllStudentsInAClassWithAMinimumTermBalance(int classId, int minimunTermBalance) {
+        JSONArray dataArray = null;
+        CustomOkHttp customOkHttp = new CustomOkHttp();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("classId", String.valueOf(classId))
+                .add("minimunTermBalance", String.valueOf(minimunTermBalance))
+                .build();
+
+        try {
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_all_students_in_a_class_with_minimum_term_balance",formBody);
+            JSONObject object = new JSONObject(responseString);
+            dataArray = object.getJSONArray("results");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataArray;
+    }
+
 }

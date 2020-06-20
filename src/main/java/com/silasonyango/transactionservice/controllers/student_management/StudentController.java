@@ -3,16 +3,22 @@ package com.silasonyango.transactionservice.controllers.student_management;
 import com.silasonyango.transactionservice.common.config.EndPoints;
 import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
 import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureResponseDto;
+import com.silasonyango.transactionservice.dtos.fee_management.FeeComponentsResponseDto;
+import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
+import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsResponseDto;
 import com.silasonyango.transactionservice.dtos.student_management.StudentRegistrationDto;
+import com.silasonyango.transactionservice.dtos.student_management.StudentRequestByAdmissionNoDto;
 import com.silasonyango.transactionservice.dtos.student_management.StudentsListDto;
 import com.silasonyango.transactionservice.entity_classes.fee_management.ClassFeeStructureComponentEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.StudentFeeComponentEntity;
 import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentRegistrationEntity;
 import com.silasonyango.transactionservice.repository.fee_management.ClassFeeStructureComponentRepository;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
+import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
 import com.silasonyango.transactionservice.repository.fee_management.StudentFeeComponentRepository;
 import com.silasonyango.transactionservice.repository.session_management.SessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
@@ -36,6 +42,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.silasonyango.transactionservice.utility_classes.UtilityClass.getTermDetailsByDate;
 
 @RestController
 @RequestMapping("/students")
@@ -66,6 +74,9 @@ public class StudentController {
 
     @Autowired
     StudentResidenceRepository studentResidenceRepository;
+
+    @Autowired
+    InstallmentRepository installmentRepository;
 
     @PostMapping("/create_student")
     public SuccessFailureResponseDto createAStudent(@Valid StudentRegistrationDto studentRegistrationDto) {
@@ -170,5 +181,61 @@ public class StudentController {
         }
 
         return studentsList;
+    }
+
+    @PostMapping("/get_a_student_fee_statement")
+    public FeeStatementResponseDto getAStudentFeeStatement(@Valid StudentRequestByAdmissionNoDto studentRequestByAdmissionNoDto) {
+
+        int studentId = studentRepository.findByAdmissionNo(studentRequestByAdmissionNoDto.getAdmissionNumber()).get(0).getStudentId();
+
+        FeeStatementResponseDto feeStatementResponseDto = new FeeStatementResponseDto();
+        StudentEntity studentPersonalDetails = studentRepository.findByStudentId(studentId).get(0);
+        JSONObject classDetails = UtilityClass.getAStudentClassDetails(studentId);
+        JSONObject residenceDetails = UtilityClass.getAStudentResidenceDetails(studentId);
+        FeeStatementEntity feeStatementEntity = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
+        List<InstallmentsEntity> feeInstallmentsList = installmentRepository.findInstallmentsByStudentId(studentId);
+
+
+        feeStatementResponseDto.setStudentId(studentId);
+        feeStatementResponseDto.setProfPicName(studentPersonalDetails.getProfPicName());
+        feeStatementResponseDto.setAdmissionNumber(studentPersonalDetails.getAdmissionNo());
+        feeStatementResponseDto.setStudentName(studentPersonalDetails.getStudentName());
+        feeStatementResponseDto.setGender(genderRepository.findByGenderId(studentPersonalDetails.getGenderId()).get(0).getGenderCode() == 1 ? "Male" : "Female");
+        feeStatementResponseDto.setClassDetails(classDetails.getString("AcademicClassLevelName") +" "+classDetails.getString("ClassStreamName"));
+        feeStatementResponseDto.setResidenceDetails(residenceDetails.getString("StudentResidenceDescription"));
+        feeStatementResponseDto.setTermBalance(feeStatementEntity.getCurrentTermBalance());
+        feeStatementResponseDto.setAnnualBalance(feeStatementEntity.getAnnualBalance());
+        feeStatementResponseDto.setCurrentyearTotal(feeStatementEntity.getCurrentYearTotal());
+
+        List<InstallmentsResponseDto> installmentsResponseDtoArrayList = new ArrayList<>();
+
+
+        for(int i = 0;i<feeInstallmentsList.size();i++) {
+
+                String installmentDate = feeInstallmentsList.get(i).getInstallmentDate().replaceAll(" .+$", "");
+                installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),feeInstallmentsList.get(i).getInstallmentAmount(),installmentDate,feeInstallmentsList.get(i).getIsCarryForward(),feeInstallmentsList.get(i).getSessionLogId(),feeInstallmentsList.get(i).getUserSessionActivityId(),feeInstallmentsList.get(i).getInstallmentYear(),UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"),getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
+
+        }
+
+        feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);
+
+
+
+        JSONArray feeComponentsArray = UtilityClass.getAStudentFeeComponents(studentId);
+        List<FeeComponentsResponseDto> feeComponentsResponseDtoList = new ArrayList<>();
+
+        for(int i = 0;i<feeComponentsArray.length();i++) {
+
+            String feeComponentDescription = feeComponentsArray.getJSONObject(i).getString("FeeComponentDescription");
+            double componentFeeAmount = feeComponentsArray.getJSONObject(i).getDouble("ComponentFeeAmount");
+
+            feeComponentsResponseDtoList.add(new FeeComponentsResponseDto(feeComponentDescription,componentFeeAmount));
+
+        }
+
+        feeStatementResponseDto.setFeeComponentsResponseDtoList(feeComponentsResponseDtoList);
+        feeStatementResponseDto.setFeeStatementProcessedSuccessfully(true);
+
+        return feeStatementResponseDto;
     }
 }
