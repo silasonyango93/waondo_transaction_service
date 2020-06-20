@@ -1,6 +1,7 @@
 package com.silasonyango.transactionservice.controllers.fee_management;
 
 import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureResponseDto;
+import com.silasonyango.transactionservice.dtos.fee_management.ClassFeeBalanceRequestDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceListDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceRequestDto;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
@@ -35,6 +36,21 @@ public class FeeStatementController {
     public List<FeeBalanceListDto> getAllStudentsWithAMinimumTermBalance(@Valid FeeBalanceRequestDto feeBalanceRequestDto) {
 
         JSONArray dataArray = UtilityClass.getAllStudentsWithAMinimumTermBalance(feeBalanceRequestDto.getMinimumFeeBalance());
+
+        List<FeeBalanceListDto> feeBalanceListDtoList = new ArrayList<>();
+
+        for (int i = 0; i < dataArray.length(); i++) {
+            feeBalanceListDtoList.add(new FeeBalanceListDto(dataArray.getJSONObject(i).getInt("StudentId"), dataArray.getJSONObject(i).getString("AdmissionNo"), dataArray.getJSONObject(i).getString("StudentName"), dataArray.getJSONObject(i).getString("GenderDescription"), dataArray.getJSONObject(i).getString("AcademicClassLevelName") +" "+dataArray.getJSONObject(i).getString("ClassStreamName"), dataArray.getJSONObject(i).getString("StudentResidenceDescription"), dataArray.getJSONObject(i).getInt("CurrentYearTotal"), dataArray.getJSONObject(i).getInt("CurrentTermBalance"), dataArray.getJSONObject(i).getInt("AnnualBalance")));
+        }
+
+        return feeBalanceListDtoList;
+    }
+
+
+    @PostMapping("/get_all_students_in_a_class_with_minimum_term_balance")
+    public List<FeeBalanceListDto> getAllStudentsInAClassWithAMinimumTermBalance(@Valid ClassFeeBalanceRequestDto classFeeBalanceRequestDto) {
+
+        JSONArray dataArray = UtilityClass.getAllStudentsInAClassWithAMinimumTermBalance(classFeeBalanceRequestDto.getClassId(),classFeeBalanceRequestDto.getMinimumFeeBalance());
 
         List<FeeBalanceListDto> feeBalanceListDtoList = new ArrayList<>();
 
