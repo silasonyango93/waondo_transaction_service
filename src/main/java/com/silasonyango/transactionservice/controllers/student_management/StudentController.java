@@ -250,7 +250,7 @@ public class StudentController {
 
         if(studentEntityList.size() > 0) {
             StudentEntity studentEntity = studentEntityList.get(0);
-            studentPersonalDetailsResponseDto = new StudentPersonalDetailsResponseDto(true,studentEntity.getAdmissionNo(),studentEntity.getStudentName(),genderRepository.findByGenderId(studentEntity.getGenderId()).get(0).getGenderDescription(),studentEntity.getStudentDob());
+            studentPersonalDetailsResponseDto = new StudentPersonalDetailsResponseDto(true,studentEntity.getStudentId(),studentEntity.getAdmissionNo(),studentEntity.getStudentName(),genderRepository.findByGenderId(studentEntity.getGenderId()).get(0).getGenderDescription(),studentEntity.getStudentDob());
         } else {
             studentPersonalDetailsResponseDto.setStudentDetailsAvailable(false);
         }

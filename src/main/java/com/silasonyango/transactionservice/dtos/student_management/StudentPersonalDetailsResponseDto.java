@@ -11,12 +11,13 @@ public class StudentPersonalDetailsResponseDto {
     public StudentPersonalDetailsResponseDto() {
     }
 
-    public StudentPersonalDetailsResponseDto(boolean isStudentDetailsAvailable, String admissionNumber, String studentName, String genderDetails, String dateOfBirth) {
+    public StudentPersonalDetailsResponseDto(boolean isStudentDetailsAvailable,int studentId, String admissionNumber, String studentName, String genderDetails, String dateOfBirth) {
         this.isStudentDetailsAvailable = isStudentDetailsAvailable;
         this.admissionNumber = admissionNumber;
         this.studentName = studentName;
         this.genderDetails = genderDetails;
         this.dateOfBirth = dateOfBirth;
+        this.studentId = studentId;
     }
 
     public int getStudentId() {
