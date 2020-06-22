@@ -5,17 +5,17 @@ public class StudentPersonalDetailsResponseDto {
     private int studentId;
     private String admissionNumber;
     private String studentName;
-    private String genderDetails;
+    private int genderCode;
     private String dateOfBirth;
 
     public StudentPersonalDetailsResponseDto() {
     }
 
-    public StudentPersonalDetailsResponseDto(boolean isStudentDetailsAvailable,int studentId, String admissionNumber, String studentName, String genderDetails, String dateOfBirth) {
+    public StudentPersonalDetailsResponseDto(boolean isStudentDetailsAvailable,int studentId, String admissionNumber, String studentName, int genderCode, String dateOfBirth) {
         this.isStudentDetailsAvailable = isStudentDetailsAvailable;
         this.admissionNumber = admissionNumber;
         this.studentName = studentName;
-        this.genderDetails = genderDetails;
+        this.genderCode = genderCode;
         this.dateOfBirth = dateOfBirth;
         this.studentId = studentId;
     }
@@ -44,12 +44,12 @@ public class StudentPersonalDetailsResponseDto {
         this.studentName = studentName;
     }
 
-    public String getGenderDetails() {
-        return genderDetails;
+    public int getGenderCode() {
+        return genderCode;
     }
 
-    public void setGenderDetails(String genderDetails) {
-        this.genderDetails = genderDetails;
+    public void setGenderCode(int genderCode) {
+        this.genderCode = genderCode;
     }
 
     public String getDateOfBirth() {

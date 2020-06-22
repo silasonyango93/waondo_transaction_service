@@ -247,7 +247,7 @@ public class StudentController {
 
         if(studentEntityList.size() > 0) {
             StudentEntity studentEntity = studentEntityList.get(0);
-            studentPersonalDetailsResponseDto = new StudentPersonalDetailsResponseDto(true,studentEntity.getStudentId(),studentEntity.getAdmissionNo(),studentEntity.getStudentName(),genderRepository.findByGenderId(studentEntity.getGenderId()).get(0).getGenderDescription(),studentEntity.getStudentDob());
+            studentPersonalDetailsResponseDto = new StudentPersonalDetailsResponseDto(true,studentEntity.getStudentId(),studentEntity.getAdmissionNo(),studentEntity.getStudentName(),genderRepository.findByGenderId(studentEntity.getGenderId()).get(0).getGenderCode(),studentEntity.getStudentDob());
         } else {
             studentPersonalDetailsResponseDto.setStudentDetailsAvailable(false);
         }
@@ -259,7 +259,6 @@ public class StudentController {
     @PostMapping("/update_a_student_personal_details")
     public boolean updateAStudentPersonalDetails(@Valid UpdateStudentBasicDetailsRequestDto updateStudentBasicDetailsRequestDto) {
         StudentEntity studentEntity = studentRepository.findByStudentId(updateStudentBasicDetailsRequestDto.getStudentId()).get(0);
-        studentEntity.setAdmissionNo(updateStudentBasicDetailsRequestDto.getAdmissionNumber());
         studentEntity.setStudentName(updateStudentBasicDetailsRequestDto.getStudentName());
         studentEntity.setStudentDob(updateStudentBasicDetailsRequestDto.getStudentDateOfBirth());
         studentEntity.setGenderId(genderRepository.findByGenderCode(updateStudentBasicDetailsRequestDto.getGenderCode()).get(0).getGenderId());
