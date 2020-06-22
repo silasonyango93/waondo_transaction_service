@@ -6,6 +6,7 @@ import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureRespo
 import com.silasonyango.transactionservice.dtos.fee_management.FeeComponentsResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsResponseDto;
+import com.silasonyango.transactionservice.dtos.student_management.StudentPersonalDetailsResponseDto;
 import com.silasonyango.transactionservice.dtos.student_management.StudentRegistrationDto;
 import com.silasonyango.transactionservice.dtos.student_management.StudentRequestByAdmissionNoDto;
 import com.silasonyango.transactionservice.dtos.student_management.StudentsListDto;
@@ -237,5 +238,23 @@ public class StudentController {
         feeStatementResponseDto.setFeeStatementProcessedSuccessfully(true);
 
         return feeStatementResponseDto;
+    }
+
+
+
+    @PostMapping("/get_a_student_personal_details")
+    public StudentPersonalDetailsResponseDto getAStudentPersonalDetails(@Valid StudentRequestByAdmissionNoDto studentRequestByAdmissionNoDto) {
+        List<StudentEntity> studentEntityList = studentRepository.findByAdmissionNo(studentRequestByAdmissionNoDto.getAdmissionNumber());
+
+        StudentPersonalDetailsResponseDto studentPersonalDetailsResponseDto = new StudentPersonalDetailsResponseDto();
+
+        if(studentEntityList.size() > 0) {
+            StudentEntity studentEntity = studentEntityList.get(0);
+            studentPersonalDetailsResponseDto = new StudentPersonalDetailsResponseDto(true,studentEntity.getAdmissionNo(),studentEntity.getStudentName(),genderRepository.findByGenderId(studentEntity.getGenderId()).get(0).getGenderDescription(),studentEntity.getStudentDob());
+        } else {
+            studentPersonalDetailsResponseDto.setStudentDetailsAvailable(false);
+        }
+
+        return studentPersonalDetailsResponseDto;
     }
 }
