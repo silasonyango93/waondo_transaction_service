@@ -6,10 +6,7 @@ import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureRespo
 import com.silasonyango.transactionservice.dtos.fee_management.FeeComponentsResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsResponseDto;
-import com.silasonyango.transactionservice.dtos.student_management.StudentPersonalDetailsResponseDto;
-import com.silasonyango.transactionservice.dtos.student_management.StudentRegistrationDto;
-import com.silasonyango.transactionservice.dtos.student_management.StudentRequestByAdmissionNoDto;
-import com.silasonyango.transactionservice.dtos.student_management.StudentsListDto;
+import com.silasonyango.transactionservice.dtos.student_management.*;
 import com.silasonyango.transactionservice.entity_classes.fee_management.ClassFeeStructureComponentEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
@@ -256,5 +253,17 @@ public class StudentController {
         }
 
         return studentPersonalDetailsResponseDto;
+    }
+
+
+    @PostMapping("/update_a_student_personal_details")
+    public boolean updateAStudentPersonalDetails(@Valid UpdateStudentBasicDetailsRequestDto updateStudentBasicDetailsRequestDto) {
+        StudentEntity studentEntity = studentRepository.findByStudentId(updateStudentBasicDetailsRequestDto.getStudentId()).get(0);
+        studentEntity.setAdmissionNo(updateStudentBasicDetailsRequestDto.getAdmissionNumber());
+        studentEntity.setStudentName(updateStudentBasicDetailsRequestDto.getStudentName());
+        studentEntity.setStudentDob(updateStudentBasicDetailsRequestDto.getStudentDateOfBirth());
+        studentEntity.setGenderId(genderRepository.findByGenderCode(updateStudentBasicDetailsRequestDto.getGenderCode()).get(0).getGenderId());
+
+        return studentRepository.save(studentEntity) instanceof StudentEntity;
     }
 }
