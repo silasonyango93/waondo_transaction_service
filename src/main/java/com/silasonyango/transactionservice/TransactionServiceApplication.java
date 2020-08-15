@@ -44,7 +44,7 @@ public class TransactionServiceApplication {
 				registry.addMapping("/term_iterations/*").allowedOrigins(clientUrl);
 				registry.addMapping("/system_initialization/*").allowedOrigins(clientUrl);
 				registry.addMapping("/class_fee_structure_breakdown/*").allowedOrigins(clientUrl);
-				registry.addMapping("/residence-swap/*").allowedOrigins(clientUrl);
+				registry.addMapping("/change_student_residence/*").allowedOrigins(clientUrl);
 				registry.addMapping("/student_residence/*").allowedOrigins(clientUrl);
 				registry.addMapping("/residence_swap_type/*").allowedOrigins(clientUrl);
 				registry.addMapping("/residence_swap/*").allowedOrigins(clientUrl);

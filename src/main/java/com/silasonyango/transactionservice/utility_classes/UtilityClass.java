@@ -343,4 +343,28 @@ public class UtilityClass {
         return dataArray;
     }
 
+
+
+
+    public static JSONObject getTheCurrentWeek(String todaysDate) {
+        JSONObject dataObject = null;
+        CustomOkHttp customOkHttp = new CustomOkHttp();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("todaysDate", String.valueOf(todaysDate))
+                .build();
+
+        try {
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_the_current_week",formBody);
+            JSONObject object = new JSONObject(responseString);
+            JSONArray jsonArray = object.getJSONArray("results");
+            dataObject  = jsonArray.getJSONObject(0);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return dataObject;
+    }
+
 }

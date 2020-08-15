@@ -3,6 +3,17 @@ package com.silasonyango.transactionservice.entity_classes.calendar;
 import javax.persistence.*;
 @javax.persistence.Entity
 @Table(name = "actual_weeks")
+
+@javax.persistence.SqlResultSetMapping(
+        name = "actual_weeks", entities =
+@javax.persistence.EntityResult(entityClass = ActualWeeksEntity.class)
+)
+
+@NamedNativeQueries({
+        @NamedNativeQuery(name="ActualWeeksEntity.findCurrentActualWeek",
+                query="SELECT * FROM actual_weeks WHERE ? BETWEEN WeekStartDate AND WeekEndDate",
+                resultSetMapping = "actual_weeks" )
+})
 public class ActualWeeksEntity implements java.io.Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
