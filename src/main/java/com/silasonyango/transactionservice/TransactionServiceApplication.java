@@ -48,6 +48,7 @@ public class TransactionServiceApplication {
 				registry.addMapping("/student_residence/*").allowedOrigins(clientUrl);
 				registry.addMapping("/residence_swap_type/*").allowedOrigins(clientUrl);
 				registry.addMapping("/residence_swap/*").allowedOrigins(clientUrl);
+				registry.addMapping("/week_iterations/*").allowedOrigins(clientUrl);
 			}
 		};
 	}
