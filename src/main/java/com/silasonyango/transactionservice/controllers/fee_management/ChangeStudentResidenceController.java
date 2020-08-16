@@ -31,10 +31,8 @@ public class ChangeStudentResidenceController {
     @PostMapping("/confirm_residence_swap")
     public ConfirmResidenceSwapResponse confirmResidenceSwapPeriodEligibility(@Valid StudentRequestByStudentIdDto studentRequestByStudentIdDto) {
         ConfirmResidenceSwapResponse confirmResidenceSwapResponse = new ConfirmResidenceSwapResponse();
-//        JSONObject currentTermObject = UtilityClass.getTermDetailsByDate(UtilityClass.getToday());
-//        JSONObject currentWeekObject = UtilityClass.getTheCurrentWeek(UtilityClass.getToday());
-        JSONObject currentTermObject = UtilityClass.getTermDetailsByDate("2020-09-15");
-        JSONObject currentWeekObject = UtilityClass.getTheCurrentWeek("2020-09-15");
+        JSONObject currentTermObject = UtilityClass.getTermDetailsByDate(UtilityClass.getToday());
+        JSONObject currentWeekObject = UtilityClass.getTheCurrentWeek(UtilityClass.getToday());
 
         if(currentTermObject == null) {
             confirmResidenceSwapResponse.setPeriodEligible(false);
