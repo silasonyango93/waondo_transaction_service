@@ -111,7 +111,7 @@ public class UtilityClass {
 
         JSONObject classDetailsObject = getAStudentClassDetails(studentId);
         JSONArray feeStructureBreakDownArray = getFeeStructureForParticularClassLevel(classDetailsObject.getInt("AcademicClassLevelId"), studentResidenceId);
-
+        System.out.println();
         for (int i = 0;i<feeStructureBreakDownArray.length();i++) {
             if(getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId") != feeStructureBreakDownArray.getJSONObject(i).getInt("TermIterationId")) {
 

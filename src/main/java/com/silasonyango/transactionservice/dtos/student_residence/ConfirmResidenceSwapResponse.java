@@ -1,10 +1,18 @@
 package com.silasonyango.transactionservice.dtos.student_residence;
 
+import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
+
 public class ConfirmResidenceSwapResponse {
     private boolean isPeriodEligible;
     private String eligibilityMessage;
     private int currentResidenceCode;
     private int proposedResidenceCode;
+    private double currentTermBalance;
+    private double currentAnnualBalance;
+    private double expectedTermBalance;
+    private double expectedAnnualBalance;
+    private double changeExtraCharge;
+
 
     public boolean isPeriodEligible() {
         return isPeriodEligible;
@@ -36,5 +44,45 @@ public class ConfirmResidenceSwapResponse {
 
     public void setProposedResidenceCode(int proposedResidenceCode) {
         this.proposedResidenceCode = proposedResidenceCode;
+    }
+
+    public double getCurrentTermBalance() {
+        return currentTermBalance;
+    }
+
+    public void setCurrentTermBalance(double currentTermBalance) {
+        this.currentTermBalance = currentTermBalance;
+    }
+
+    public double getCurrentAnnualBalance() {
+        return currentAnnualBalance;
+    }
+
+    public void setCurrentAnnualBalance(double currentAnnualBalance) {
+        this.currentAnnualBalance = currentAnnualBalance;
+    }
+
+    public double getExpectedTermBalance() {
+        return expectedTermBalance;
+    }
+
+    public void setExpectedTermBalance(double expectedTermBalance) {
+        this.expectedTermBalance = expectedTermBalance;
+    }
+
+    public double getExpectedAnnualBalance() {
+        return expectedAnnualBalance;
+    }
+
+    public void setExpectedAnnualBalance(double expectedAnnualBalance) {
+        this.expectedAnnualBalance = expectedAnnualBalance;
+    }
+
+    public double getChangeExtraCharge() {
+        return changeExtraCharge;
+    }
+
+    public void setChangeExtraCharge(double changeExtraCharge) {
+        this.changeExtraCharge = changeExtraCharge;
     }
 }
