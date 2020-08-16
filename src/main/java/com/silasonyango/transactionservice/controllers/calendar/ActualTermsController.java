@@ -3,6 +3,7 @@ package com.silasonyango.transactionservice.controllers.calendar;
 import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
 import com.silasonyango.transactionservice.common.config.TransactionDescriptionsConfig;
 import com.silasonyango.transactionservice.daos.calendar.ActualTermsDao;
+import com.silasonyango.transactionservice.dtos.calendar.RequestTermByTermId;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.LotsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
@@ -27,9 +28,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -272,6 +275,37 @@ public class ActualTermsController {
         int probableNextTermIterationId = UtilityClass.getTermDetailsByDate(UtilityClass.getToday()).getInt("TermIterationId") + 1;
 
         return actualTermsDao.findActualTermByTermIterationIdAndYear(probableNextTermIterationId,UtilityClass.getCurrentYear()).size() == 0;
+    }
+
+
+    @PostMapping("/create_a_terms_weeks")
+    public boolean createATermsWeeks(@Valid RequestTermByTermId requestTermByTermId) {
+        boolean weeksAreCreated = true;
+        JSONObject termDetails = UtilityClass.getTermDetailsByTermId(requestTermByTermId.getTermId());
+
+        if(termDetails.getInt("TermIterationCode") == 1) {
+
+            if(actualWeeksRepository.findByTermId(requestTermByTermId.getTermId()).size() == 0) {
+                createTermOneWeeks(requestTermByTermId.getTermId(),String.valueOf(termDetails.getInt("Year")));
+            } else {
+                weeksAreCreated = false;
+            }
+
+        } else if(termDetails.getInt("TermIterationCode") == 2) {
+            if(actualWeeksRepository.findByTermId(requestTermByTermId.getTermId()).size() == 0) {
+                createTermTwoWeeks(requestTermByTermId.getTermId(),String.valueOf(termDetails.getInt("Year")));
+            } else {
+                weeksAreCreated = false;
+            }
+        } else if(termDetails.getInt("TermIterationCode") == 3) {
+            if(actualWeeksRepository.findByTermId(requestTermByTermId.getTermId()).size() == 0) {
+                createTermThreeWeeks(requestTermByTermId.getTermId(),String.valueOf(termDetails.getInt("Year")));
+            } else {
+                weeksAreCreated = false;
+            }
+        }
+
+        return weeksAreCreated;
     }
 
 

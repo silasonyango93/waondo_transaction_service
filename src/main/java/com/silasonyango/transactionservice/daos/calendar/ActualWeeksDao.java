@@ -29,6 +29,11 @@ public class ActualWeeksDao implements ActualWeeksRepository {
     }
 
     @Override
+    public List<ActualWeeksEntity> findByTermId(int termId) {
+        return null;
+    }
+
+    @Override
     public List<ActualWeeksEntity> findAll() {
         return null;
     }

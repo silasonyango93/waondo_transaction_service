@@ -29,6 +29,9 @@ public class TermIterationsEntity implements java.io.Serializable{
     @Column(name = "TermIterationDescription")
     private String termIterationDescription;
 
+    @Column(name = "TermIterationCode")
+    private String termIterationCode;
+
     @OneToMany(mappedBy = "termIterationId",fetch = FetchType.EAGER)
     private List<ActualTermsEntity> actualTermsEntityList;
 
@@ -54,5 +57,13 @@ public class TermIterationsEntity implements java.io.Serializable{
 
     public void setPhones(List<ActualTermsEntity> actualTermsEntityList) {
         this.actualTermsEntityList = actualTermsEntityList;
+    }
+
+    public String getTermIterationCode() {
+        return termIterationCode;
+    }
+
+    public void setTermIterationCode(String termIterationCode) {
+        this.termIterationCode = termIterationCode;
     }
 }
