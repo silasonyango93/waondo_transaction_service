@@ -30,6 +30,7 @@ public class ChangeStudentResidenceController {
 
     @PostMapping("/confirm_residence_swap")
     public ConfirmResidenceSwapResponse confirmResidenceSwapPeriodEligibility(@Valid StudentRequestByStudentIdDto studentRequestByStudentIdDto) {
+        studentRequestByStudentIdDto.setStudentId(studentRepository.findByAdmissionNo(studentRequestByStudentIdDto.getAdmissionNo()).get(0).getStudentId());
         ConfirmResidenceSwapResponse confirmResidenceSwapResponse = new ConfirmResidenceSwapResponse();
         JSONObject currentTermObject = UtilityClass.getTermDetailsByDate(UtilityClass.getToday());
         JSONObject currentWeekObject = UtilityClass.getTheCurrentWeek(UtilityClass.getToday());

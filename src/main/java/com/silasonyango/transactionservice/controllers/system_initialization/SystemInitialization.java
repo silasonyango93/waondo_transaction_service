@@ -139,6 +139,7 @@ public class SystemInitialization {
         accessPrivilegesRepository.save(new AccessPrivilegesEntity("Register a fee installment",4));
         accessPrivilegesRepository.save(new AccessPrivilegesEntity("Correct a fee payment",5));
         accessPrivilegesRepository.save(new AccessPrivilegesEntity("Delete a student",6));
+        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Change a student residence",7));
     }
 
     public void configureCorrectionDescriptions() {
