@@ -1,5 +1,6 @@
 package com.silasonyango.transactionservice.controllers.system_initialization;
 
+import com.silasonyango.transactionservice.common.config.EndPoints;
 import com.silasonyango.transactionservice.common.config.UtilityConfigs;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.*;
 import com.silasonyango.transactionservice.entity_classes.fee_management.CarryForwardsEntity;
@@ -33,6 +34,9 @@ import com.silasonyango.transactionservice.repository.system_initialization.syst
 import com.silasonyango.transactionservice.repository.user_management.AccessPrivilegesRepository;
 import com.silasonyango.transactionservice.repository.user_management.RolesRepository;
 import com.silasonyango.transactionservice.repository.user_management.UsersRepository;
+import com.silasonyango.transactionservice.services.retrofit.RetrofitClientInstance;
+import com.silasonyango.transactionservice.services.retrofit.waondo_node.user_management.AllUsersResponse;
+import com.silasonyango.transactionservice.services.retrofit.waondo_node.user_management.UsersService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -40,6 +44,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import retrofit2.Call;
+import retrofit2.Response;
 
 import java.util.List;
 
@@ -122,8 +128,18 @@ public class SystemInitialization {
 
         } else {
             System.out.println("System is configured ready for use");
+            //fetchAllUsers();
         }
 
+    }
+
+    public void fetchAllUsers() {
+        UsersService usersService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL+"/").create(UsersService.class);
+        Call<AllUsersResponse> callSync = usersService.getAllUsers();
+        try {
+            Response<AllUsersResponse> response = callSync.execute();
+            AllUsersResponse user = response.body();
+        } catch (Exception ex) { }
     }
 
 
