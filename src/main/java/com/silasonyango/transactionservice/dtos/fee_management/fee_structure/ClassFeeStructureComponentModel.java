@@ -1,10 +1,21 @@
 package com.silasonyango.transactionservice.dtos.fee_management.fee_structure;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ClassFeeStructureComponentModel {
+    @SerializedName("ClassFeeStructureComponentId")
     private int classFeeStructureComponentId;
+
+    @SerializedName("ClassFeeStructureId")
     private int classFeeStructureId;
+
+    @SerializedName("FeeComponentId")
     private int feeComponentId;
+
+    @SerializedName("FeeComponentRatio")
     private int feeComponentRatio;
+
+    @SerializedName("FeeComponentDescription")
     private String feeComponentDescription;
 
     public ClassFeeStructureComponentModel() {

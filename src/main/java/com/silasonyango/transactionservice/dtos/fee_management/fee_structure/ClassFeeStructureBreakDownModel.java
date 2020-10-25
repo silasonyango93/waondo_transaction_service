@@ -1,14 +1,33 @@
 package com.silasonyango.transactionservice.dtos.fee_management.fee_structure;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ClassFeeStructureBreakDownModel {
+    @SerializedName("ClassFeeStructureBreakDownId")
     private int classFeeStructureBreakDownId;
+
+    @SerializedName("ClassFeeStructureId")
     private int classFeeStructureId;
+
+    @SerializedName("StudentResidenceId")
     private int studentResidenceId;
+
+    @SerializedName("TermIterationId")
     private int termIterationId;
+
+    @SerializedName("FeeAmount")
     private double feeAmount;
+
+    @SerializedName("StudentResidenceDescription")
     private String studentResidenceDescription;
+
+    @SerializedName("StudentResidenceCode")
     private int studentResidenceCode;
+
+    @SerializedName("TermIterationDescription")
     private String termIterationDescription;
+
+    @SerializedName("TermIterationCode")
     private int termIterationCode;
 
     public ClassFeeStructureBreakDownModel() {

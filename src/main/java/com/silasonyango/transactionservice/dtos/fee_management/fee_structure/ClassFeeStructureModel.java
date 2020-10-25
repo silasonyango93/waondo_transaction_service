@@ -36,6 +36,20 @@ public class ClassFeeStructureModel {
         this.classFeeStructureComponents = classFeeStructureComponents;
     }
 
+    public ClassFeeStructureModel(int feeStructureId, int userId, String feeStructureDescription, String dateCreated, int isCurrentFeeStructure, int isProspect, int classFeeStructureId, int academicClassLevelId, String academicClassLevelName, int hierachyCode, int isAdminClassLevel) {
+        this.feeStructureId = feeStructureId;
+        this.userId = userId;
+        this.feeStructureDescription = feeStructureDescription;
+        this.dateCreated = dateCreated;
+        this.isCurrentFeeStructure = isCurrentFeeStructure;
+        this.isProspect = isProspect;
+        this.classFeeStructureId = classFeeStructureId;
+        this.academicClassLevelId = academicClassLevelId;
+        this.academicClassLevelName = academicClassLevelName;
+        this.hierachyCode = hierachyCode;
+        this.isAdminClassLevel = isAdminClassLevel;
+    }
+
     public int getFeeStructureId() {
         return feeStructureId;
     }
