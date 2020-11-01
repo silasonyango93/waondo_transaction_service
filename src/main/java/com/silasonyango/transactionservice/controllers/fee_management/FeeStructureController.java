@@ -1,6 +1,8 @@
 package com.silasonyango.transactionservice.controllers.fee_management;
 
 import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.FeeStructureCreationRequestModel;
+import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.FeeStructureCreationResponseModel;
+import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.FeeStructureRequestDto;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.TermIterationsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.*;
@@ -45,8 +47,11 @@ public class FeeStructureController {
     @Autowired
     ClassFeeStructureComponentRepository classFeeStructureComponentRepository;
 
+    @Autowired
+    ClassFeeStructureController classFeeStructureController;
+
     @PostMapping("/create_a_fee_structure")
-    public void createFeeStructure(@Valid FeeStructureCreationRequestModel feeStructureCreationRequestModel) {
+    public FeeStructureCreationResponseModel createFeeStructure(@Valid FeeStructureCreationRequestModel feeStructureCreationRequestModel) {
         FeeStructureEntity createdFeeStructure = feeStructureRepository.save(new FeeStructureEntity(
                 feeStructureCreationRequestModel.getUserId(),
                 feeStructureCreationRequestModel.getFeeStructureDescription(),
@@ -68,6 +73,8 @@ public class FeeStructureController {
             createFeeComponentsForAClassLevel(classFeeStructuresEntity.getClassFeeStructureId());
 
         }
+
+        return returnCreatedFeeStructure(createdFeeStructure);
     }
 
 
@@ -98,5 +105,18 @@ public class FeeStructureController {
                     0.0
             ));
         }
+    }
+
+
+    public FeeStructureCreationResponseModel returnCreatedFeeStructure(FeeStructureEntity feeStructureEntity) {
+        return new FeeStructureCreationResponseModel(
+                feeStructureEntity.getFeeStructureId(),
+                feeStructureEntity.getUserId(),
+                feeStructureEntity.getFeeStructureDescription(),
+                feeStructureEntity.getDateCreated(),
+                feeStructureEntity.getIsCurrentFeeStructure(),
+                feeStructureEntity.getIsProspect(),
+                classFeeStructureController.retrieveClassFeeStructuresOfAFeeStructure(new FeeStructureRequestDto(feeStructureEntity.getFeeStructureId()))
+        );
     }
 }
