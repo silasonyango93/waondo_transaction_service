@@ -1,8 +1,6 @@
 package com.silasonyango.transactionservice.controllers.fee_management;
 
-import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.FeeStructureCreationRequestModel;
-import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.FeeStructureCreationResponseModel;
-import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.FeeStructureRequestDto;
+import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.*;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.TermIterationsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.*;
@@ -14,6 +12,7 @@ import com.silasonyango.transactionservice.repository.student_management.Student
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -118,5 +117,16 @@ public class FeeStructureController {
                 feeStructureEntity.getIsProspect(),
                 classFeeStructureController.retrieveClassFeeStructuresOfAFeeStructure(new FeeStructureRequestDto(feeStructureEntity.getFeeStructureId()))
         );
+    }
+
+
+    @PostMapping("/edit_a_fee_structure")
+    public boolean editAFeeStructure(@RequestBody EditFeeStructureBreakdownRequestModel editFeeStructureBreakdownRequestModel) {
+        for (BreakDownEditRequestModel requestedChange : editFeeStructureBreakdownRequestModel.getRequestedChanges()) {
+            ClassFeeStructureBreakDownEntity breakDownToBeChanged = classFeeStructureBreakDownRepository.findByClassFeestructureBreakDownId(requestedChange.getClassFeeStructureBreakDownId());
+            breakDownToBeChanged.setFeeAmount((int) requestedChange.getFeeAmount());
+            classFeeStructureBreakDownRepository.save(breakDownToBeChanged);
+        }
+        return true;
     }
 }
