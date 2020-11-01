@@ -50,6 +50,7 @@ public class TransactionServiceApplication {
 				registry.addMapping("/residence_swap/*").allowedOrigins(clientUrl);
 				registry.addMapping("/week_iterations/*").allowedOrigins(clientUrl);
 				registry.addMapping("/class_fee_structure/*").allowedOrigins(clientUrl);
+				registry.addMapping("/fee_structure/*").allowedOrigins(clientUrl);
 			}
 		};
 	}
