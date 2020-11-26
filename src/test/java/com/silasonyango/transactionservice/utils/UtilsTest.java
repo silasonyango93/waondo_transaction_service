@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals;
 public class UtilsTest {
     @Test
     public void toCamelCase_works_properly() {
-        assertEquals("Silas Onyango", Utils.toCamelCase("SILAS ONYANGO"));
+        assertEquals("Sila Onyango", Utils.toCamelCase("SILAS ONYANGO"));
     }
 
 }
