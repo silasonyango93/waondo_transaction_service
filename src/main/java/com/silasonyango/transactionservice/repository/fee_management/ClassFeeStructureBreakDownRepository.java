@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface ClassFeeStructureBreakDownRepository extends JpaRepository<ClassFeeStructureBreakDownEntity, Long> {
-    public ClassFeeStructureBreakDownEntity findByClassFeestructureBreakDownId(@Param("ClassFeeStructureBreakDownId") int classFeeStructureBreakDownId);
+    public ClassFeeStructureBreakDownEntity findByAcademicLevelFeeStructureBreakDownId(@Param("ClassFeeStructureBreakDownId") int academicLevelFeeStructureBreakDownId);
 }

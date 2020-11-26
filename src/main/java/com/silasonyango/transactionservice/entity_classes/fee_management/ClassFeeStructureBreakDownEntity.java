@@ -8,7 +8,7 @@ public class ClassFeeStructureBreakDownEntity implements java.io.Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ClassFeeStructureBreakDownId")
-    private int classFeeStructureBreakDownId;
+    private int academicLevelFeeStructureBreakDownId;
 
     @Column(name = "ClassFeeStructureId")
     private int classFeeStructureId;
@@ -33,11 +33,11 @@ public class ClassFeeStructureBreakDownEntity implements java.io.Serializable{
     }
 
     public int getClassFeeStructureBreakDownId() {
-        return classFeeStructureBreakDownId;
+        return academicLevelFeeStructureBreakDownId;
     }
 
     public void setClassFeeStructureBreakDownId(int classFeeStructureBreakDownId) {
-        this.classFeeStructureBreakDownId = classFeeStructureBreakDownId;
+        this.academicLevelFeeStructureBreakDownId = classFeeStructureBreakDownId;
     }
 
     public int getClassFeeStructureId() {
