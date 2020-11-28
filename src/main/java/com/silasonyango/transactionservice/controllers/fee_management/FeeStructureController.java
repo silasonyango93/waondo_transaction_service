@@ -129,4 +129,9 @@ public class FeeStructureController {
         }
         return true;
     }
+
+    @PostMapping("/comprehensively_retrieve_a_fee_structure")
+    public FeeStructureCreationResponseModel comprehensivelyRetrieveAFeeStructure(@Valid FeeStructureRequestDto feeStructureRequestDto) {
+        return returnCreatedFeeStructure(feeStructureRepository.findByFeeStructureId(feeStructureRequestDto.getFeeStructureId()));
+    }
 }

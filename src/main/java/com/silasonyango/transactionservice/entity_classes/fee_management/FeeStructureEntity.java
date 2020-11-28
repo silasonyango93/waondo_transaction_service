@@ -24,6 +24,9 @@ public class FeeStructureEntity {
     @Column(name = "IsProspect")
     private int isProspect;
 
+    public FeeStructureEntity() {
+    }
+
     public FeeStructureEntity(int userId, String feeStructureDescription, String dateCreated, int isCurrentFeeStructure, int isProspect) {
         this.userId = userId;
         this.feeStructureDescription = feeStructureDescription;
