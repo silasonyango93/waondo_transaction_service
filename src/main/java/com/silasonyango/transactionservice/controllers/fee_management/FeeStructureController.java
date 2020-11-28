@@ -134,4 +134,42 @@ public class FeeStructureController {
     public FeeStructureCreationResponseModel comprehensivelyRetrieveAFeeStructure(@Valid FeeStructureRequestDto feeStructureRequestDto) {
         return returnCreatedFeeStructure(feeStructureRepository.findByFeeStructureId(feeStructureRequestDto.getFeeStructureId()));
     }
+
+    @PostMapping("/duplicate_a_fee_structure")
+    public FeeStructureCreationResponseModel duplicateAFeeStructure(@Valid FeeStructureDuplicateRequestDto feeStructureDuplicateRequestDto) {
+        FeeStructureCreationResponseModel feeStructureCreationResponseModel = comprehensivelyRetrieveAFeeStructure(new FeeStructureRequestDto(feeStructureDuplicateRequestDto.getFeeStructureId()));
+
+        FeeStructureEntity duplicatedFeeStructure = feeStructureRepository.save(new FeeStructureEntity(
+                feeStructureDuplicateRequestDto.getUserId(),
+                feeStructureDuplicateRequestDto.getDuplicateFeeStructureName(),
+                UtilityClass.getToday(),
+                0,
+                0
+        ));
+
+        for (ClassFeeStructureModel classFeeStructureModel : feeStructureCreationResponseModel.getClassFeeStructureModelList()) {
+            ClassFeeStructuresEntity classFeeStructuresEntity = classFeeStructureRepository.save(new ClassFeeStructuresEntity(
+                    duplicatedFeeStructure.getFeeStructureId(),
+                    classFeeStructureModel.getAcademicClassLevelId()
+            ));
+
+            for (ClassFeeStructureBreakDownModel classFeeStructureBreakDownModel : classFeeStructureModel.getClassFeeStructureBreakDown()) {
+                classFeeStructureBreakDownRepository.save(new ClassFeeStructureBreakDownEntity(
+                        classFeeStructuresEntity.getClassFeeStructureId(),
+                        classFeeStructureBreakDownModel.getStudentResidenceId(),
+                        classFeeStructureBreakDownModel.getTermIterationId(),
+                        (int) classFeeStructureBreakDownModel.getFeeAmount()
+                ));
+            }
+
+            for (ClassFeeStructureComponentModel classFeeStructureComponentModel : classFeeStructureModel.getClassFeeStructureComponents()) {
+                classFeeStructureComponentRepository.save(new ClassFeeStructureComponentEntity(
+                        classFeeStructuresEntity.getClassFeeStructureId(),
+                        classFeeStructureComponentModel.getFeeComponentId(),
+                        classFeeStructureComponentModel.getFeeComponentRatio()
+                ));
+            }
+        }
+        return returnCreatedFeeStructure(duplicatedFeeStructure);
+    }
 }
