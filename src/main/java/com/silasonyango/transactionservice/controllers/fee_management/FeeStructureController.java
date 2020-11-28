@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -171,5 +172,15 @@ public class FeeStructureController {
             }
         }
         return returnCreatedFeeStructure(duplicatedFeeStructure);
+    }
+
+    @PostMapping("/fetch_all_fee_structures_comprehensively")
+    public List<FeeStructureCreationResponseModel> fetchAllFeeStructuresComprehensively() {
+        List<FeeStructureCreationResponseModel> feeStructureCreationResponseModelList = new ArrayList<>();
+        List<FeeStructureEntity> feeStructureEntityList = feeStructureRepository.findAll();
+        for (FeeStructureEntity feeStructureEntity : feeStructureEntityList) {
+            feeStructureCreationResponseModelList.add(comprehensivelyRetrieveAFeeStructure(new FeeStructureRequestDto(feeStructureEntity.getFeeStructureId())));
+        }
+        return feeStructureCreationResponseModelList;
     }
 }
