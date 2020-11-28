@@ -18,6 +18,12 @@ public class ClassFeeStructuresEntity {
     public ClassFeeStructuresEntity() {
     }
 
+    public ClassFeeStructuresEntity(int classFeeStructureId, int feeStructureId, int academicClassLevelId) {
+        this.classFeeStructureId = classFeeStructureId;
+        this.feeStructureId = feeStructureId;
+        this.academicClassLevelId = academicClassLevelId;
+    }
+
     public ClassFeeStructuresEntity(int feeStructureId, int academicClassLevelId) {
         this.feeStructureId = feeStructureId;
         this.academicClassLevelId = academicClassLevelId;
