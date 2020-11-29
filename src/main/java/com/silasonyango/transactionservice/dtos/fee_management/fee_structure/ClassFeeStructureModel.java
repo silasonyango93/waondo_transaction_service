@@ -1,5 +1,7 @@
 package com.silasonyango.transactionservice.dtos.fee_management.fee_structure;
 
+import org.apache.tomcat.util.codec.binary.Base64;
+
 import java.util.List;
 
 public class ClassFeeStructureModel {

@@ -1,15 +1,13 @@
 package com.silasonyango.transactionservice.controllers.fee_management;
 
 import com.silasonyango.transactionservice.common.config.EndPoints;
-import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.ClassFeeStructureBreakDownModel;
-import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.ClassFeeStructureComponentModel;
-import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.ClassFeeStructureModel;
-import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.FeeStructureRequestDto;
+import com.silasonyango.transactionservice.dtos.fee_management.fee_structure.*;
 import com.silasonyango.transactionservice.services.retrofit.RetrofitClientInstance;
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.fee_management.fee_structure.ClassFeeStructureServiceModel;
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.fee_management.fee_structure.FeeStructureService;
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.user_management.AllUsersResponse;
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.user_management.UsersService;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -81,5 +79,11 @@ public class ClassFeeStructureController {
         } catch (Exception ex) {}
 
         return null;
+    }
+
+    @PostMapping("/retrieve_class_fee_structures_using_encoded_fee_structure_id")
+    public List<ClassFeeStructureModel> retrieveClassFeeStructuresUsingEncodedFeeStructureId(EncodedFeeStructureIdClassFeeStructureRequest encodedFeeStructureIdClassFeeStructureRequest) {
+        byte[] valueDecoded = Base64.decodeBase64(encodedFeeStructureIdClassFeeStructureRequest.getEncodedFeeStructureId());
+        return retrieveClassFeeStructuresOfAFeeStructure(new FeeStructureRequestDto(Integer.parseInt(new String(valueDecoded))));
     }
 }

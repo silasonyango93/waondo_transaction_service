@@ -1,5 +1,7 @@
 package com.silasonyango.transactionservice.dtos.fee_management.fee_structure;
 
+import org.apache.tomcat.util.codec.binary.Base64;
+
 import java.util.List;
 
 public class FeeStructureCreationResponseModel {
@@ -9,6 +11,7 @@ public class FeeStructureCreationResponseModel {
     private String dateCreated;
     private int isCurrentFeeStructure;
     private int isProspectFeeStructure;
+    private String encodedFeeStructureId;
     List<ClassFeeStructureModel> classFeeStructureModelList;
 
     public FeeStructureCreationResponseModel() {
@@ -22,6 +25,8 @@ public class FeeStructureCreationResponseModel {
         this.isCurrentFeeStructure = isCurrentFeeStructure;
         this.isProspectFeeStructure = isProspectFeeStructure;
         this.classFeeStructureModelList = classFeeStructureModelList;
+        byte[] bytesEncoded = Base64.encodeBase64(String.valueOf(feeStructureId).getBytes());
+        this.encodedFeeStructureId = new String(bytesEncoded);
     }
 
     public int getFeeStructureId() {
@@ -78,5 +83,13 @@ public class FeeStructureCreationResponseModel {
 
     public void setClassFeeStructureModelList(List<ClassFeeStructureModel> classFeeStructureModelList) {
         this.classFeeStructureModelList = classFeeStructureModelList;
+    }
+
+    public String getEncodedFeeStructureId() {
+        return encodedFeeStructureId;
+    }
+
+    public void setEncodedFeeStructureId(String encodedFeeStructureId) {
+        this.encodedFeeStructureId = encodedFeeStructureId;
     }
 }
