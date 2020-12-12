@@ -3,6 +3,7 @@ package com.silasonyango.transactionservice.dtos.student_residence;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
 
 public class ConfirmResidenceSwapResponse {
+    private String admissionNumber;
     private boolean isPeriodEligible;
     private String eligibilityMessage;
     private int currentResidenceCode;
@@ -84,5 +85,13 @@ public class ConfirmResidenceSwapResponse {
 
     public void setChangeExtraCharge(double changeExtraCharge) {
         this.changeExtraCharge = changeExtraCharge;
+    }
+
+    public String getAdmissionNumber() {
+        return admissionNumber;
+    }
+
+    public void setAdmissionNumber(String admissionNumber) {
+        this.admissionNumber = admissionNumber;
     }
 }

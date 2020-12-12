@@ -43,6 +43,7 @@ public class ChangeStudentResidenceController {
             confirmResidenceSwapResponse.setEligibilityMessage("You cannot change a student's residence more than 5 weeks into the term");
         } else {
             JSONObject studentResidenceDetails = UtilityClass.getAStudentResidenceDetails(studentRequestByStudentIdDto.getStudentId());
+            confirmResidenceSwapResponse.setAdmissionNumber(studentRequestByStudentIdDto.getAdmissionNo());
             confirmResidenceSwapResponse.setPeriodEligible(true);
             confirmResidenceSwapResponse.setEligibilityMessage("Change of residence in this period is allowed");
             confirmResidenceSwapResponse.setCurrentResidenceCode(studentResidenceDetails.getInt("StudentResidenceCode"));
