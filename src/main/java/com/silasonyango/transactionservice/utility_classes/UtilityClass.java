@@ -6,6 +6,8 @@ import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsRespo
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
+import com.silasonyango.transactionservice.repository.fee_management.CarryForwardsRepository;
+import com.silasonyango.transactionservice.repository.fee_management.FeeCorrectionsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
@@ -21,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UtilityClass {
-
-
 
     public UtilityClass() {}
 

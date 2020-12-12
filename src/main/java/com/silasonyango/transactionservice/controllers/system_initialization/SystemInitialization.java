@@ -183,6 +183,8 @@ public class SystemInitialization {
         sessionActivitiesRepository.save(new SessionActivitiesEntity("Registered a fee installment", 4));
         sessionActivitiesRepository.save(new SessionActivitiesEntity("Corrected a fee payment", 5));
         sessionActivitiesRepository.save(new SessionActivitiesEntity("Deleted a student", 6));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("Change Student Residence To Boarding", 7));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("Change Student Residence To Day School", 8));
     }
 
     public void configureStudentResidence() {

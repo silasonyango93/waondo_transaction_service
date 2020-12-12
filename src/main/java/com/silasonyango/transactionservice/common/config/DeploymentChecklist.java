@@ -21,6 +21,7 @@ public class DeploymentChecklist {
     *  16). Communicate to client on change of fee structure
     *  17). Configure school profile e.g School name and logo
     *  18). Residence Swap Type
+    *  19). Outgoing lots
     *
     *
     *
