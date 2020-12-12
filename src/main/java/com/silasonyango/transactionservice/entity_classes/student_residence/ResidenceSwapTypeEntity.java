@@ -15,6 +15,11 @@ public class ResidenceSwapTypeEntity implements java.io.Serializable{
     @Column(name = "ResidenceSwapTypeCode")
     private int residenceSwapTypeCode;
 
+    public ResidenceSwapTypeEntity(String residenceSwapTypeDescription, int residenceSwapTypeCode) {
+        this.residenceSwapTypeDescription = residenceSwapTypeDescription;
+        this.residenceSwapTypeCode = residenceSwapTypeCode;
+    }
+
     public int getResidenceSwapTypeId() {
         return residenceSwapTypeId;
     }

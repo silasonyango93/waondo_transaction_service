@@ -12,6 +12,7 @@ import com.silasonyango.transactionservice.entity_classes.session_management.Ses
 import com.silasonyango.transactionservice.entity_classes.session_management.UserSessionActivitiesEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentResidenceEntity;
+import com.silasonyango.transactionservice.entity_classes.student_residence.ResidenceSwapTypeEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.correction_descriptions.CorrectionDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.gender.GenderEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.system_configuration.SystemConfigurationEntity;
@@ -28,6 +29,7 @@ import com.silasonyango.transactionservice.repository.session_management.Session
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentResidenceRepository;
+import com.silasonyango.transactionservice.repository.student_residence.ResidenceSwapTypeRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.correction_descriptions.CorrectionDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.system_configuration.SystemConfigurationRepository;
@@ -112,10 +114,13 @@ public class SystemInitialization {
     @Autowired
     FeeCorrectionsRepository feeCorrectionsRepository;
 
+    @Autowired
+    ResidenceSwapTypeRepository residenceSwapTypeRepository;
+
     @EventListener(ApplicationReadyEvent.class)
     public void checkIfSystemIsAlreadyConfigured() {
 
-        if(systemConfigurationRepository.findAll().size() == 0) {
+        if (systemConfigurationRepository.findAll().size() == 0) {
             configureGender();
             configureAccessPrivileges();
             configureCorrectionDescriptions();
@@ -124,6 +129,7 @@ public class SystemInitialization {
             configureStudentResidence();
             configureTransactionDescriptions();
             configureAdminAcademicClassLevel();
+            configureResidenceSwapTypes();
             createAdminUser();
 
         } else {
@@ -134,85 +140,90 @@ public class SystemInitialization {
     }
 
     public void fetchAllUsers() {
-        UsersService usersService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL+"/").create(UsersService.class);
+        UsersService usersService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL + "/").create(UsersService.class);
         Call<AllUsersResponse> callSync = usersService.getAllUsers();
         try {
             Response<AllUsersResponse> response = callSync.execute();
             AllUsersResponse user = response.body();
-        } catch (Exception ex) { }
+        } catch (Exception ex) {
+        }
     }
 
 
     public void configureGender() {
-        genderRepository.save(new GenderEntity("Male",1));
-        genderRepository.save(new GenderEntity("Female",2));
+        genderRepository.save(new GenderEntity("Male", 1));
+        genderRepository.save(new GenderEntity("Female", 2));
     }
 
     public void configureAccessPrivileges() {
-        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Login",1));
-        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Register a student",2));
-        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Correct a student's personal details",3));
-        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Register a fee installment",4));
-        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Correct a fee payment",5));
-        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Delete a student",6));
-        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Change a student residence",7));
+        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Login", 1));
+        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Register a student", 2));
+        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Correct a student's personal details", 3));
+        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Register a fee installment", 4));
+        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Correct a fee payment", 5));
+        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Delete a student", 6));
+        accessPrivilegesRepository.save(new AccessPrivilegesEntity("Change a student residence", 7));
     }
 
     public void configureCorrectionDescriptions() {
-        correctionDescriptionsRepository.save(new CorrectionDescriptionsEntity("ADMIN CORRECTION",0));
-        correctionDescriptionsRepository.save(new CorrectionDescriptionsEntity("Wrong student paid for",1));
+        correctionDescriptionsRepository.save(new CorrectionDescriptionsEntity("ADMIN CORRECTION", 0));
+        correctionDescriptionsRepository.save(new CorrectionDescriptionsEntity("Wrong student paid for", 1));
     }
 
     public void configureRoles() {
-        rolesRepository.save(new RolesEntity("Admin",1));
-        rolesRepository.save(new RolesEntity("Bursar",2));
+        rolesRepository.save(new RolesEntity("Admin", 1));
+        rolesRepository.save(new RolesEntity("Bursar", 2));
     }
 
     public void configureSessionActivities() {
-        sessionActivitiesRepository.save(new SessionActivitiesEntity("SYSTEM_CARRY_FORWARD_INSTALLMENT",0));
-        sessionActivitiesRepository.save(new SessionActivitiesEntity("Logged into the system",1));
-        sessionActivitiesRepository.save(new SessionActivitiesEntity("Registered a student",2));
-        sessionActivitiesRepository.save(new SessionActivitiesEntity("Corrected a student's personal details",3));
-        sessionActivitiesRepository.save(new SessionActivitiesEntity("Registered a fee installment",4));
-        sessionActivitiesRepository.save(new SessionActivitiesEntity("Corrected a fee payment",5));
-        sessionActivitiesRepository.save(new SessionActivitiesEntity("Deleted a student",6));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("SYSTEM_CARRY_FORWARD_INSTALLMENT", 0));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("Logged into the system", 1));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("Registered a student", 2));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("Corrected a student's personal details", 3));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("Registered a fee installment", 4));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("Corrected a fee payment", 5));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("Deleted a student", 6));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("Change Student Residence To Boarding", 7));
+        sessionActivitiesRepository.save(new SessionActivitiesEntity("Change Student Residence To Day School", 8));
     }
 
     public void configureStudentResidence() {
-        studentResidenceRepository.save(new StudentResidenceEntity("Boarder",1));
-        studentResidenceRepository.save(new StudentResidenceEntity("Day Scholar",2));
+        studentResidenceRepository.save(new StudentResidenceEntity("Boarder", 1));
+        studentResidenceRepository.save(new StudentResidenceEntity("Day Scholar", 2));
     }
 
     public void configureTransactionDescriptions() {
-        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("SYSTEM_CARRY_FORWARD_INSTALLMENT",0));
-        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("Register a fee installment",1));
-        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("Fee correction",2));
-        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("An end of term carry forward",3));
-        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("An end of year carry forward",4));
+        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("SYSTEM_CARRY_FORWARD_INSTALLMENT", 0));
+        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("Register a fee installment", 1));
+        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("Fee correction", 2));
+        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("An end of term carry forward", 3));
+        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("An end of year carry forward", 4));
+        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("To Boarder Residence Swap", 5));
+        transactionDescriptionsRepository.save(new TransactionDescriptionsEntity("To Day Scholar Residence Swap", 6));
     }
 
     public void configureAdminAcademicClassLevel() {
-        AcademicClassLevelsEntity dbAdminAcademicClassLevel = academicClassLevelsRepository.save(new AcademicClassLevelsEntity("Class Zero",0,1));
+        AcademicClassLevelsEntity dbAdminAcademicClassLevel = academicClassLevelsRepository.save(new AcademicClassLevelsEntity("Class Zero", 0, 1));
         configureAdminLotDescription(dbAdminAcademicClassLevel.getAcademicClassLevelId());
     }
 
     public void configureAdminLotDescription(int academicClassLevelId) {
-        LotDescriptionsEntity dbAdminLotDescription = lotDescriptionsRepository.save(new LotDescriptionsEntity("Admin Lot",1));
-        configureAdminLot(dbAdminLotDescription.getLotDescriptionId(),academicClassLevelId);
+        LotDescriptionsEntity dbAdminLotDescription = lotDescriptionsRepository.save(new LotDescriptionsEntity("Admin Lot", 1));
+        configureAdminLot(dbAdminLotDescription.getLotDescriptionId(), academicClassLevelId);
     }
 
-    public void configureAdminLot(int lotDescriptionId,int academicClassLevelId) {
-        LotsEntity dbSavedAdminLot = lotsRepository.save(new LotsEntity(lotDescriptionId,academicClassLevelId, UtilityClass.getNow(),1));
+    public void configureAdminLot(int lotDescriptionId, int academicClassLevelId) {
+        LotsEntity dbSavedAdminLot = lotsRepository.save(new LotsEntity(lotDescriptionId, academicClassLevelId, UtilityClass.getNow(), 1));
         configureAdminClassStream(dbSavedAdminLot.getLotId());
     }
 
     public void configureAdminClassStream(int lotId) {
-        ClassStreamsEntity dbSavedAdminClassSttream = classStreamsRepository.save(new ClassStreamsEntity("Admin Class Stream",1));
-        configureAdminClass(lotId,dbSavedAdminClassSttream.getClassStreamId());
+        ClassStreamsEntity dbSavedAdminClassSttream = classStreamsRepository.save(new ClassStreamsEntity("Admin Class Stream", 1));
+        configureAdminClass(lotId, dbSavedAdminClassSttream.getClassStreamId());
     }
 
-    public void configureAdminClass(int lotId,int classStreamId) {
-        ClassesEntity dbSavedAdminClass = classesRepository.save(new ClassesEntity(lotId,classStreamId,UtilityClass.getNow(),1));
+    public void configureAdminClass(int lotId, int classStreamId) {
+        ClassesEntity dbSavedAdminClass = classesRepository.save(new ClassesEntity(lotId, classStreamId, UtilityClass.getNow(), 1));
         configureAdminStudent(dbSavedAdminClass.getClassId());
     }
 
@@ -220,35 +231,35 @@ public class SystemInitialization {
     public void configureAdminStudent(int classId) {
         int genderId = genderRepository.findByGenderCode(1).get(0).getGenderId();
         int studentResidenceId = studentResidenceRepository.findByStudentResidenceCode(1).get(0).getStudentResidenceId();
-        StudentEntity dbSavedAdminStudent = studentRepository.save(new StudentEntity("0000","Admin Student",genderId,UtilityClass.getToday(),studentResidenceId,classId,UtilityClass.getNow(), UtilityConfigs.MALE_PROF_PIC_NAME,1));
+        StudentEntity dbSavedAdminStudent = studentRepository.save(new StudentEntity("0000", "Admin Student", genderId, UtilityClass.getToday(), studentResidenceId, classId, UtilityClass.getNow(), UtilityConfigs.MALE_PROF_PIC_NAME, 1));
     }
 
     public void createAdminUser() {
         int genderId = genderRepository.findByGenderCode(1).get(0).getGenderId();
-        UsersEntity dbSavedAdminUser = usersRepository.save(new UsersEntity("Admin User","admin email",genderId,"password",UtilityClass.getNow(),1));
+        UsersEntity dbSavedAdminUser = usersRepository.save(new UsersEntity("Admin User", "admin email", genderId, "password", UtilityClass.getNow(), 1));
         createAdminSessionLog(dbSavedAdminUser.getUserId());
     }
 
     public void createAdminSessionLog(int userId) {
-        SessionLogsEntity dbSavedAdminSessionLog = sessionLogsRepository.save(new SessionLogsEntity(userId,UtilityClass.getNow(),UtilityClass.getNow(),1));
+        SessionLogsEntity dbSavedAdminSessionLog = sessionLogsRepository.save(new SessionLogsEntity(userId, UtilityClass.getNow(), UtilityClass.getNow(), 1));
         createAdminUserSessionActivity(dbSavedAdminSessionLog.getSessionLogId());
     }
 
     public void createAdminUserSessionActivity(int sessionLogId) {
         int sessionActivityId = sessionActivitiesRepository.findBySessionActivityCode(0).get(0).getSessionActivityId();
-        UserSessionActivitiesEntity dbSavedAdminUserSessionActivity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(sessionLogId,sessionActivityId,UtilityClass.getNow(),1));
-        configureAdminInstallment(sessionLogId,dbSavedAdminUserSessionActivity.getUserSessionActivityId());
+        UserSessionActivitiesEntity dbSavedAdminUserSessionActivity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(sessionLogId, sessionActivityId, UtilityClass.getNow(), 1));
+        configureAdminInstallment(sessionLogId, dbSavedAdminUserSessionActivity.getUserSessionActivityId());
     }
 
-    public void configureAdminInstallment(int sessionLogId,int userSessionActivityId) {
+    public void configureAdminInstallment(int sessionLogId, int userSessionActivityId) {
         int studentId = studentRepository.findByIsAnAdminStudent(1).get(0).getStudentId();
-        InstallmentsEntity dbSavedAdminInstallment = installmentRepository.save(new InstallmentsEntity(studentId,0,UtilityClass.getNow(),0,sessionLogId,userSessionActivityId,UtilityClass.getCurrentYear(),1));
+        InstallmentsEntity dbSavedAdminInstallment = installmentRepository.save(new InstallmentsEntity(studentId, 0, UtilityClass.getNow(), 0, sessionLogId, userSessionActivityId, UtilityClass.getCurrentYear(), 1));
         configureAdminCarryForward();
     }
 
     public void configureAdminCarryForward() {
         int studentId = studentRepository.findByIsAnAdminStudent(1).get(0).getStudentId();
-        carryForwardsRepository.save(new CarryForwardsEntity(studentId,0,UtilityClass.getNow(),1));
+        carryForwardsRepository.save(new CarryForwardsEntity(studentId, 0, UtilityClass.getNow(), 1));
         configureAdminFeeCorrection();
     }
 
@@ -257,11 +268,22 @@ public class SystemInitialization {
         int userSessionActivityId = userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId();
         int correctionDescriptionId = correctionDescriptionsRepository.findByCorrectionDescriptionCode(0).get(0).getCorrectionDescriptionId();
         int studentId = studentRepository.findByIsAnAdminStudent(1).get(0).getStudentId();
-        feeCorrectionsRepository.save(new FeeCorrectionsEntity(sessionLogId,userSessionActivityId,correctionDescriptionId,studentId,0,0,0,0,0,0,UtilityClass.getNow(),1));
+        feeCorrectionsRepository.save(new FeeCorrectionsEntity(sessionLogId, userSessionActivityId, correctionDescriptionId, studentId, 0, 0, 0, 0, 0, 0, UtilityClass.getNow(), 1));
         assertSystemSuccessfullyInitialized();
     }
 
+    public void configureResidenceSwapTypes() {
+        residenceSwapTypeRepository.save(new ResidenceSwapTypeEntity(
+                "To Boarder",
+                1
+        ));
+        residenceSwapTypeRepository.save(new ResidenceSwapTypeEntity(
+                "To Day Scholar",
+                2
+        ));
+    }
+
     public void assertSystemSuccessfullyInitialized() {
-        systemConfigurationRepository.save(new SystemConfigurationEntity(UtilityConfigs.SYSTEM_CONFIGURATION_DESCRIPTION,UtilityConfigs.SYSTEM_CONFIGURATION_CODE));
+        systemConfigurationRepository.save(new SystemConfigurationEntity(UtilityConfigs.SYSTEM_CONFIGURATION_DESCRIPTION, UtilityConfigs.SYSTEM_CONFIGURATION_CODE));
     }
 }
