@@ -13,6 +13,7 @@ public class ConfirmResidenceSwapResponse {
     private double expectedTermBalance;
     private double expectedAnnualBalance;
     private double changeExtraCharge;
+    private int sessionLogId;
 
 
     public boolean isPeriodEligible() {
@@ -93,5 +94,13 @@ public class ConfirmResidenceSwapResponse {
 
     public void setAdmissionNumber(String admissionNumber) {
         this.admissionNumber = admissionNumber;
+    }
+
+    public int getSessionLogId() {
+        return sessionLogId;
+    }
+
+    public void setSessionLogId(int sessionLogId) {
+        this.sessionLogId = sessionLogId;
     }
 }

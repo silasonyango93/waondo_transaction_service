@@ -1,11 +1,16 @@
 package com.silasonyango.transactionservice.controllers.fee_management;
 
+import com.silasonyango.transactionservice.common.config.ResidenceSwapCodes;
 import com.silasonyango.transactionservice.common.config.UtilityConfigs;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
 import com.silasonyango.transactionservice.dtos.student_management.StudentRequestByStudentIdDto;
 import com.silasonyango.transactionservice.dtos.student_residence.ConfirmResidenceSwapResponse;
+import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
+import com.silasonyango.transactionservice.entity_classes.student_residence.ResidenceSwapEntity;
+import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentResidenceRepository;
+import com.silasonyango.transactionservice.repository.student_residence.ResidenceSwapRepository;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -28,6 +33,12 @@ public class ChangeStudentResidenceController {
     @Autowired
     StudentResidenceRepository studentResidenceRepository;
 
+    @Autowired
+    FeeStatementRepository feeStatementRepository;
+
+    @Autowired
+    ResidenceSwapRepository residenceSwapRepository;
+
     @PostMapping("/confirm_residence_swap")
     public ConfirmResidenceSwapResponse confirmResidenceSwapPeriodEligibility(@Valid StudentRequestByStudentIdDto studentRequestByStudentIdDto) {
         studentRequestByStudentIdDto.setStudentId(studentRepository.findByAdmissionNo(studentRequestByStudentIdDto.getAdmissionNo()).get(0).getStudentId());
@@ -35,10 +46,10 @@ public class ChangeStudentResidenceController {
         JSONObject currentTermObject = UtilityClass.getTermDetailsByDate(UtilityClass.getToday());
         JSONObject currentWeekObject = UtilityClass.getTheCurrentWeek(UtilityClass.getToday());
 
-        if(currentTermObject == null) {
+        if (currentTermObject == null) {
             confirmResidenceSwapResponse.setPeriodEligible(false);
             confirmResidenceSwapResponse.setEligibilityMessage("The change residence module does not work over the holidays. Kindly wait till the begining of the next term");
-        } else if(currentTermObject != null && currentWeekObject != null && currentWeekObject.getInt("WeekIterationCode") > 5) {
+        } else if (currentTermObject != null && currentWeekObject != null && currentWeekObject.getInt("WeekIterationCode") > 5) {
             confirmResidenceSwapResponse.setPeriodEligible(false);
             confirmResidenceSwapResponse.setEligibilityMessage("You cannot change a student's residence more than 5 weeks into the term");
         } else {
@@ -59,7 +70,7 @@ public class ChangeStudentResidenceController {
             JSONArray currentFeeStructureArray = UtilityClass.getFeeStructureForParticularClassLevel(classDetails.getInt("AcademicClassLevelId"), studentRepository.findByStudentId(studentRequestByStudentIdDto.getStudentId()).get(0).getStudentResidenceId());
 
             JSONObject currentTermFeeObject = null;
-            for (int i = 0;i < currentFeeStructureArray.length();i++) {
+            for (int i = 0; i < currentFeeStructureArray.length(); i++) {
                 if (currentFeeStructureArray.getJSONObject(i).getInt("TermIterationId") == currentTermObject.getInt("TermIterationId")) {
                     currentTermFeeObject = currentFeeStructureArray.getJSONObject(i);
                 }
@@ -70,7 +81,7 @@ public class ChangeStudentResidenceController {
 
             JSONArray proposedFeeStructureArray = UtilityClass.getFeeStructureForParticularClassLevel(classDetails.getInt("AcademicClassLevelId"), studentResidenceRepository.findByStudentResidenceCode(confirmResidenceSwapResponse.getProposedResidenceCode()).get(0).getStudentResidenceId());
             JSONObject proposedTermFeeObject = null;
-            for (int i = 0;i < proposedFeeStructureArray.length();i++) {
+            for (int i = 0; i < proposedFeeStructureArray.length(); i++) {
                 if (proposedFeeStructureArray.getJSONObject(i).getInt("TermIterationId") == currentTermObject.getInt("TermIterationId")) {
                     proposedTermFeeObject = proposedFeeStructureArray.getJSONObject(i);
                 }
@@ -79,7 +90,7 @@ public class ChangeStudentResidenceController {
             replacementTermFee = (double) proposedTermFeeObject.getInt("FeeAmount");
 
 
-            if(confirmResidenceSwapResponse.getProposedResidenceCode() == 1) {
+            if (confirmResidenceSwapResponse.getProposedResidenceCode() == 1) {
                 double tempTermBalance = confirmResidenceSwapResponse.getCurrentTermBalance();
 
                 tempTermBalance = tempTermBalance - currentTermFee;
@@ -98,5 +109,25 @@ public class ChangeStudentResidenceController {
         }
 
         return confirmResidenceSwapResponse;
+    }
+
+    @PostMapping("/execute_residence_swap")
+    public void executeResidenceSwap(@Valid ConfirmResidenceSwapResponse confirmResidenceSwapResponse) {
+        int studentId = studentRepository.findByAdmissionNo(confirmResidenceSwapResponse.getAdmissionNumber()).get(0).getStudentId();
+        FeeStatementEntity feeStatementEntity = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
+        feeStatementEntity.setCurrentTermBalance((int) confirmResidenceSwapResponse.getExpectedTermBalance());
+        feeStatementEntity.setAnnualBalance((int) confirmResidenceSwapResponse.getExpectedAnnualBalance());
+        feeStatementRepository.save(feeStatementEntity);
+
+        residenceSwapRepository.save(new ResidenceSwapEntity(
+                determineResidenceSwapCode(confirmResidenceSwapResponse.getProposedResidenceCode()),
+                confirmResidenceSwapResponse.getSessionLogId(),
+                studentId,
+                UtilityClass.getNow()
+        ));
+    }
+
+    public int determineResidenceSwapCode(int proposedResidenceCode) {
+        return proposedResidenceCode == 1 ? ResidenceSwapCodes.TO_BOARDER_SWAP_CODE : ResidenceSwapCodes.TO_DAY_SCHOLAR_SWAP_CODE;
     }
 }

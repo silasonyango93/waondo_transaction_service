@@ -21,6 +21,13 @@ public class ResidenceSwapEntity implements java.io.Serializable{
     @Column(name = "ResidenceSwapDate")
     private String residenceSwapDate;
 
+    public ResidenceSwapEntity(int residenceSwapTypeId, int sessionLogId, int studentId, String residenceSwapDate) {
+        this.residenceSwapTypeId = residenceSwapTypeId;
+        this.sessionLogId = sessionLogId;
+        this.studentId = studentId;
+        this.residenceSwapDate = residenceSwapDate;
+    }
+
     public int getResidenceSwapId() {
         return residenceSwapId;
     }
