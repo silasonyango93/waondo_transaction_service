@@ -22,6 +22,9 @@ public class LotsEntity implements java.io.Serializable{
     @Column(name = "IsAdminLot")
     private int isAdminLot;
 
+    @Column(name = "hasCompletedSchool")
+    private int hasCompletedSchool = 0;
+
     public LotsEntity() {
     }
 
@@ -70,5 +73,13 @@ public class LotsEntity implements java.io.Serializable{
 
     public void setIsAdminLot(int isAdminLot) {
         this.isAdminLot = isAdminLot;
+    }
+
+    public int getHasCompletedSchool() {
+        return hasCompletedSchool;
+    }
+
+    public void setHasCompletedSchool(int hasCompletedSchool) {
+        this.hasCompletedSchool = hasCompletedSchool;
     }
 }

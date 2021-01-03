@@ -112,7 +112,7 @@ public class StudentController {
 
             successFailureResponseDto.setSuccessStatus(true);
             successFailureResponseDto.setResponseMessage("Student successfully registered");
-            successFailureResponseDto.setReturnValue("N/A");
+            successFailureResponseDto.setReturnValue(String.valueOf(dbSavedStudent.getStudentId()));
         }
 
 

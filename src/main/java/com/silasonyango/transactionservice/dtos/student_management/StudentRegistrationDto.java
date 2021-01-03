@@ -12,6 +12,18 @@ public class StudentRegistrationDto {
     private String profPicName;
     private int registrationSessionId;
 
+    public StudentRegistrationDto(String admissionNo, String studentName, int genderId, String studentDob, int studentResidenceId, int classId, String admissionDate, String profPicName, int registrationSessionId) {
+        this.admissionNo = admissionNo;
+        this.studentName = studentName;
+        this.genderId = genderId;
+        this.studentDob = studentDob;
+        this.studentResidenceId = studentResidenceId;
+        this.classId = classId;
+        this.admissionDate = admissionDate;
+        this.profPicName = profPicName;
+        this.registrationSessionId = registrationSessionId;
+    }
+
     public int getStudentId() {
         return studentId;
     }
