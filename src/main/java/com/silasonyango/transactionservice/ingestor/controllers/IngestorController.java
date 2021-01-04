@@ -5,14 +5,21 @@ import com.silasonyango.transactionservice.controllers.student_management.Studen
 import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureResponseDto;
 import com.silasonyango.transactionservice.dtos.student_management.StudentRegistrationDto;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.ClassStreamsEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentResidenceEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.gender.GenderEntity;
+import com.silasonyango.transactionservice.ingestor.models.IngFeeStatement;
+import com.silasonyango.transactionservice.ingestor.models.IngInstallmentModel;
 import com.silasonyango.transactionservice.ingestor.models.IngStudentModel;
 import com.silasonyango.transactionservice.ingestor.services.IngestorService;
 import com.silasonyango.transactionservice.repository.academic_classes.ClassStreamsRepository;
 import com.silasonyango.transactionservice.repository.academic_classes.ClassesRepository;
+import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
+import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
 import com.silasonyango.transactionservice.repository.session_management.SessionLogsRepository;
+import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentResidenceRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
@@ -28,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import retrofit2.Call;
 import retrofit2.Response;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -54,6 +62,15 @@ public class IngestorController {
     @Autowired
     StudentRepository studentRepository;
 
+    @Autowired
+    FeeStatementRepository feeStatementRepository;
+
+    @Autowired
+    UserSessionActivitiesRepository userSessionActivitiesRepository;
+
+    @Autowired
+    InstallmentRepository installmentRepository;
+
     @PostMapping("/ingest")
     public void ingest() {
         List<IngStudentModel> allStudents = getAllStudents();
@@ -73,8 +90,37 @@ public class IngestorController {
             ));
 
             StudentEntity savedStudent = studentRepository.findByStudentId(Integer.parseInt(successFailureResponseDto.getReturnValue())).get(0);
+            IngFeeStatement ingStudentFeeStatement = fetchAStudentFeeStatement(ingestedStudent.getAdmissionNo());
+            if (ingStudentFeeStatement != null) {
+                FeeStatementEntity savedStudentFeeStatement = feeStatementRepository.findFeeStatementByStudentId(savedStudent.getStudentId()).get(0);
+                savedStudentFeeStatement.setCurrentYearTotal(ingStudentFeeStatement.getTotal());
+                savedStudentFeeStatement.setCurrentTermBalance(ingStudentFeeStatement.getTermBalance());
+                savedStudentFeeStatement.setAnnualBalance(ingStudentFeeStatement.getAnnualBalance());
+                feeStatementRepository.save(savedStudentFeeStatement);
+            }
+
+            List<IngInstallmentModel> ingestedInstallments = fetchAStudentInstallments(ingestedStudent.getAdmissionNo());
+            List<InstallmentsEntity> savedInstallments = new ArrayList<>();
+            if (ingestedInstallments != null && ingestedInstallments.size() > 0) {
+                for (IngInstallmentModel ingInstallmentModel : ingestedInstallments) {
+                    savedInstallments.add(new InstallmentsEntity(
+                            savedStudent.getStudentId(),
+                            ingInstallmentModel.getInstallmentAmount(),
+                            ingInstallmentModel.getInstallmentDate(),
+                            0,
+                            sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),
+                            userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(),
+                            ingInstallmentModel.getInstallmentDate().substring(0,4),
+                            1
+                    ));
+                }
+                installmentRepository.saveAll(savedInstallments);
+            }
+
 
         }
+        System.out.println("Done");
+        System.out.println();
     }
 
     public List<IngStudentModel> getAllStudents() {
@@ -170,6 +216,30 @@ public class IngestorController {
         Call<AcademicClassResponseDto> callSync = academicClassService.retrieveClassByAcademicClassLevelIdAndStreamName(academicClassLevelId, streamName);
         try {
             Response<AcademicClassResponseDto> response = callSync.execute();
+            return response.body();
+        } catch (Exception ex) {
+        }
+
+        return null;
+    }
+
+    public IngFeeStatement fetchAStudentFeeStatement(String admissionNumber) {
+        IngestorService ingestorService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL + "/").create(IngestorService.class);
+        Call<IngFeeStatement> callSync = ingestorService.fetchAStudentFeeStatement(admissionNumber);
+        try {
+            Response<IngFeeStatement> response = callSync.execute();
+            return response.body();
+        } catch (Exception ex) {
+        }
+
+        return null;
+    }
+
+    public List<IngInstallmentModel> fetchAStudentInstallments(String admissionNumber) {
+        IngestorService ingestorService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL + "/").create(IngestorService.class);
+        Call<List<IngInstallmentModel>> callSync = ingestorService.fetchAStudentInstallments(admissionNumber);
+        try {
+            Response<List<IngInstallmentModel>> response = callSync.execute();
             return response.body();
         } catch (Exception ex) {
         }
