@@ -82,7 +82,7 @@ public class StudentController {
 
         List<StudentEntity> existingStudentsArrayList = studentRepository.findByAdmissionNo(studentRegistrationDto.getAdmissionNo());
 
-        if(existingStudentsArrayList.size() > 0) {
+        if (existingStudentsArrayList.size() > 0) {
             successFailureResponseDto.setSuccessStatus(false);
             successFailureResponseDto.setResponseMessage("A student already exists by this admission number");
             successFailureResponseDto.setReturnValue("N/A");
@@ -93,13 +93,13 @@ public class StudentController {
             StudentEntity student = new StudentEntity();
             student.setAdmissionNo(studentRegistrationDto.getAdmissionNo());
             student.setStudentName(studentRegistrationDto.getStudentName());
-            student.setGenderId(studentRegistrationDto.getGenderId());
+            student.setGenderId(studentRegistrationDto.getGenderCode());
             student.setClassId(studentRegistrationDto.getClassId());
             student.setStudentDob(studentRegistrationDto.getStudentDob());
             student.setProfPicName(studentRegistrationDto.getProfPicName());
-            student.setStudentResidenceId(studentResidenceRepository.findByStudentResidenceCode(studentRegistrationDto.getStudentResidenceId()).get(0).getStudentResidenceId());
+            student.setStudentResidenceId(studentResidenceRepository.findByStudentResidenceCode(studentRegistrationDto.getStudentResidenceCode()).get(0).getStudentResidenceId());
             student.setAdmissionDate(dtf.format(now));
-            student.setGenderId(genderRepository.findByGenderCode(studentRegistrationDto.getGenderId()).get(0).getGenderId());
+            student.setGenderId(genderRepository.findByGenderCode(studentRegistrationDto.getGenderCode()).get(0).getGenderId());
 
             StudentEntity dbSavedStudent = studentRepository.save(student);
 
@@ -107,14 +107,13 @@ public class StudentController {
 
             prepareStudentFeeComponent(dbSavedStudent.getStudentId());
 
-            UserSessionActivitiesEntity userSessionActivity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(studentRegistrationDto.getRegistrationSessionId(),sessionActivitiesRepository.findBySessionActivityCode(SessionActivitiesConfig.REGISTER_A_STUDENT_SESSION_ACTIVITY).get(0).getSessionActivityId() , dtf.format(now),0));
-            studentRegistrationRepository.save(new StudentRegistrationEntity(studentRegistrationDto.getRegistrationSessionId(),userSessionActivity.getUserSessionActivityId(),dbSavedStudent.getStudentId(),dtf.format(now)));
+            UserSessionActivitiesEntity userSessionActivity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(studentRegistrationDto.getRegistrationSessionId(), sessionActivitiesRepository.findBySessionActivityCode(SessionActivitiesConfig.REGISTER_A_STUDENT_SESSION_ACTIVITY).get(0).getSessionActivityId(), dtf.format(now), 0));
+            studentRegistrationRepository.save(new StudentRegistrationEntity(studentRegistrationDto.getRegistrationSessionId(), userSessionActivity.getUserSessionActivityId(), dbSavedStudent.getStudentId(), dtf.format(now)));
 
             successFailureResponseDto.setSuccessStatus(true);
             successFailureResponseDto.setResponseMessage("Student successfully registered");
             successFailureResponseDto.setReturnValue(String.valueOf(dbSavedStudent.getStudentId()));
         }
-
 
 
         return successFailureResponseDto;
@@ -126,16 +125,16 @@ public class StudentController {
         LocalDateTime now = LocalDateTime.now();
 
         int currentTermTermBalance = getCurrentFeeStructureCurrentTermFee(UtilityClass.getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId"), UtilityClass.getAStudentClassDetails(studentId).getInt("AcademicClassLevelId"), studentResidenceId);
-        int annualBalance = UtilityClass.getAStudentAnnualBalanceFromTermBalance(studentId,currentTermTermBalance,studentResidenceId);
+        int annualBalance = UtilityClass.getAStudentAnnualBalanceFromTermBalance(studentId, currentTermTermBalance, studentResidenceId);
 
-        return feeStatementRepository.save(new FeeStatementEntity(studentId,0,0,currentTermTermBalance,annualBalance,0));
+        return feeStatementRepository.save(new FeeStatementEntity(studentId, 0, 0, currentTermTermBalance, annualBalance, 0));
 
     }
 
     public void prepareStudentFeeComponent(int studentId) {
         List<ClassFeeStructureComponentEntity> classFeeComponentList = classFeeStructureComponentRepository.findAll();
-        for(int i=0;i<classFeeComponentList.size();i++) {
-            studentFeeComponentRepository.save(new StudentFeeComponentEntity(studentId,classFeeComponentList.get(i).getClassFeeStructureComponentId(),0));
+        for (int i = 0; i < classFeeComponentList.size(); i++) {
+            studentFeeComponentRepository.save(new StudentFeeComponentEntity(studentId, classFeeComponentList.get(i).getClassFeeStructureComponentId(), 0));
         }
     }
 
@@ -151,7 +150,7 @@ public class StudentController {
                 .build();
 
         try {
-            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_fee_structure_for_particular_student_for_particular_term",formBody);
+            String responseString = customOkHttp.okHttpPostPassingParams(EndPoints.WAONDO_NODE_BASE_URL + "/get_fee_structure_for_particular_student_for_particular_term", formBody);
             JSONObject object = new JSONObject(responseString);
             JSONArray jsonArray = object.getJSONArray("results");
             JSONObject dataObject = jsonArray.getJSONObject(0);
@@ -169,13 +168,13 @@ public class StudentController {
 
         List<StudentEntity> dbStudentsList = studentRepository.getAllNoneAdminStudents();
 
-        for(int i = 0; i < dbStudentsList.size(); i++) {
+        for (int i = 0; i < dbStudentsList.size(); i++) {
             int studentId = dbStudentsList.get(i).getStudentId();
             JSONObject classDetailsObject = UtilityClass.getAStudentClassDetails(studentId);
             JSONObject residenceObject = UtilityClass.getAStudentResidenceDetails(studentId);
             String residenceDetails = residenceObject.getString("StudentResidenceDescription");
-            String classDetails = classDetailsObject.getString("AcademicClassLevelName") +" "+classDetailsObject.getString("ClassStreamName");
-            studentsList.add(new StudentsListDto(studentId,dbStudentsList.get(i).getAdmissionNo(),dbStudentsList.get(i).getStudentName(),genderRepository.findByGenderId(dbStudentsList.get(i).getGenderId()).get(0).getGenderDescription(),classDetails,residenceDetails));
+            String classDetails = classDetailsObject.getString("AcademicClassLevelName") + " " + classDetailsObject.getString("ClassStreamName");
+            studentsList.add(new StudentsListDto(studentId, dbStudentsList.get(i).getAdmissionNo(), dbStudentsList.get(i).getStudentName(), genderRepository.findByGenderId(dbStudentsList.get(i).getGenderId()).get(0).getGenderDescription(), classDetails, residenceDetails));
         }
 
         return studentsList;
@@ -199,7 +198,7 @@ public class StudentController {
         feeStatementResponseDto.setAdmissionNumber(studentPersonalDetails.getAdmissionNo());
         feeStatementResponseDto.setStudentName(studentPersonalDetails.getStudentName());
         feeStatementResponseDto.setGender(genderRepository.findByGenderId(studentPersonalDetails.getGenderId()).get(0).getGenderCode() == 1 ? "Male" : "Female");
-        feeStatementResponseDto.setClassDetails(classDetails.getString("AcademicClassLevelName") +" "+classDetails.getString("ClassStreamName"));
+        feeStatementResponseDto.setClassDetails(classDetails.getString("AcademicClassLevelName") + " " + classDetails.getString("ClassStreamName"));
         feeStatementResponseDto.setResidenceDetails(residenceDetails.getString("StudentResidenceDescription"));
         feeStatementResponseDto.setTermBalance(feeStatementEntity.getCurrentTermBalance());
         feeStatementResponseDto.setAnnualBalance(feeStatementEntity.getAnnualBalance());
@@ -208,26 +207,32 @@ public class StudentController {
         List<InstallmentsResponseDto> installmentsResponseDtoArrayList = new ArrayList<>();
 
 
-        for(int i = 0;i<feeInstallmentsList.size();i++) {
+        for (int i = 0; i < feeInstallmentsList.size(); i++) {
 
-                String installmentDate = feeInstallmentsList.get(i).getInstallmentDate().replaceAll(" .+$", "");
-                installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),feeInstallmentsList.get(i).getInstallmentAmount(),installmentDate,feeInstallmentsList.get(i).getIsCarryForward(),feeInstallmentsList.get(i).getSessionLogId(),feeInstallmentsList.get(i).getUserSessionActivityId(),feeInstallmentsList.get(i).getInstallmentYear(),UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"),getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
+            String installmentDate = feeInstallmentsList.get(i).getInstallmentDate().replaceAll(" .+$", "");
+            installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),
+                    feeInstallmentsList.get(i).getInstallmentAmount(),
+                    installmentDate, feeInstallmentsList.get(i).getIsCarryForward(),
+                    feeInstallmentsList.get(i).getSessionLogId(),
+                    feeInstallmentsList.get(i).getUserSessionActivityId(),
+                    feeInstallmentsList.get(i).getInstallmentYear(),
+                    UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"),
+                    getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
 
         }
 
         feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);
 
 
-
         JSONArray feeComponentsArray = UtilityClass.getAStudentFeeComponents(studentId);
         List<FeeComponentsResponseDto> feeComponentsResponseDtoList = new ArrayList<>();
 
-        for(int i = 0;i<feeComponentsArray.length();i++) {
+        for (int i = 0; i < feeComponentsArray.length(); i++) {
 
             String feeComponentDescription = feeComponentsArray.getJSONObject(i).getString("FeeComponentDescription");
             double componentFeeAmount = feeComponentsArray.getJSONObject(i).getDouble("ComponentFeeAmount");
 
-            feeComponentsResponseDtoList.add(new FeeComponentsResponseDto(feeComponentDescription,componentFeeAmount));
+            feeComponentsResponseDtoList.add(new FeeComponentsResponseDto(feeComponentDescription, componentFeeAmount));
 
         }
 
@@ -238,16 +243,15 @@ public class StudentController {
     }
 
 
-
     @PostMapping("/get_a_student_personal_details")
     public StudentPersonalDetailsResponseDto getAStudentPersonalDetails(@Valid StudentRequestByAdmissionNoDto studentRequestByAdmissionNoDto) {
         List<StudentEntity> studentEntityList = studentRepository.findByAdmissionNo(studentRequestByAdmissionNoDto.getAdmissionNumber());
 
         StudentPersonalDetailsResponseDto studentPersonalDetailsResponseDto = new StudentPersonalDetailsResponseDto();
 
-        if(studentEntityList.size() > 0) {
+        if (studentEntityList.size() > 0) {
             StudentEntity studentEntity = studentEntityList.get(0);
-            studentPersonalDetailsResponseDto = new StudentPersonalDetailsResponseDto(true,studentEntity.getStudentId(),studentEntity.getAdmissionNo(),studentEntity.getStudentName(),genderRepository.findByGenderId(studentEntity.getGenderId()).get(0).getGenderCode(),studentEntity.getStudentDob());
+            studentPersonalDetailsResponseDto = new StudentPersonalDetailsResponseDto(true, studentEntity.getStudentId(), studentEntity.getAdmissionNo(), studentEntity.getStudentName(), genderRepository.findByGenderId(studentEntity.getGenderId()).get(0).getGenderCode(), studentEntity.getStudentDob());
         } else {
             studentPersonalDetailsResponseDto.setStudentDetailsAvailable(false);
         }

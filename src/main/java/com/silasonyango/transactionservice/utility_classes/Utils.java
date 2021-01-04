@@ -255,4 +255,8 @@ public class Utils {
         }
         return result;
     }
+
+    public static String formatToUsableDateFormat(String dateString) {
+        return dateString.replace("T", " ").substring(0, 10);
+    }
 }

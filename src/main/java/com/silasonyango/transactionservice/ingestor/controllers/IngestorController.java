@@ -28,6 +28,7 @@ import com.silasonyango.transactionservice.services.retrofit.waondo_node.academi
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.academic_class_management.AcademicClassService;
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.fee_management.fee_structure.ClassFeeStructureServiceModel;
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.fee_management.fee_structure.FeeStructureService;
+import com.silasonyango.transactionservice.utility_classes.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -72,7 +73,7 @@ public class IngestorController {
     InstallmentRepository installmentRepository;
 
     @PostMapping("/ingest")
-    public void ingest() {
+    public boolean ingest() {
         List<IngStudentModel> allStudents = getAllStudents();
 
         for (IngStudentModel ingestedStudent : allStudents) {
@@ -80,9 +81,9 @@ public class IngestorController {
             SuccessFailureResponseDto successFailureResponseDto = studentController.createAStudent(new StudentRegistrationDto(
                     ingestedStudent.getAdmissionNo(),
                     ingestedStudent.getStudentName(),
-                    determineGenderId(ingestedStudent.getStudentGender()),
+                    determineGenderCode(ingestedStudent.getStudentGender()),
                     "2021-01-01",
-                    determineStudentResidenceId(ingestedStudent.getStudentType()),
+                    determineStudentResidenceCode(ingestedStudent.getStudentType()),
                     determineClassId(ingestedStudent.getClassId(), ingestedStudent.getCompletedSchool()),
                     "2021-01-01",
                     ingestedStudent.getStudentGender().equals("Male") ? "male_student.png" : "female_student.png",
@@ -120,7 +121,7 @@ public class IngestorController {
 
         }
         System.out.println("Done");
-        System.out.println();
+        return true;
     }
 
     public List<IngStudentModel> getAllStudents() {
@@ -135,14 +136,12 @@ public class IngestorController {
         return null;
     }
 
-    public int determineGenderId(String genderDescription) {
-        GenderEntity gender = genderRepository.findByGenderCode(genderDescription.equals("Male") ? 1 : 2).get(0);
-        return gender.getGenderId();
+    public int determineGenderCode(String genderDescription) {
+        return genderDescription.equals("Male") ? 1 : 2;
     }
 
-    public int determineStudentResidenceId(String residenceDescription) {
-        StudentResidenceEntity studentResidence = studentResidenceRepository.findByStudentResidenceCode(residenceDescription.equals("Border") ? 1 : 2).get(0);
-        return studentResidence.getStudentResidenceId();
+    public int determineStudentResidenceCode(String residenceDescription) {
+        return residenceDescription.equals("Border") ? 1 : 2;
     }
 
     public int determineClassId(int ingestedClassId, int completedSchool) {
@@ -224,7 +223,7 @@ public class IngestorController {
     }
 
     public IngFeeStatement fetchAStudentFeeStatement(String admissionNumber) {
-        IngestorService ingestorService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL + "/").create(IngestorService.class);
+        IngestorService ingestorService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_INGESTOR_BASE_URL + "/").create(IngestorService.class);
         Call<IngFeeStatement> callSync = ingestorService.fetchAStudentFeeStatement(admissionNumber);
         try {
             Response<IngFeeStatement> response = callSync.execute();
@@ -236,7 +235,7 @@ public class IngestorController {
     }
 
     public List<IngInstallmentModel> fetchAStudentInstallments(String admissionNumber) {
-        IngestorService ingestorService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL + "/").create(IngestorService.class);
+        IngestorService ingestorService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_INGESTOR_BASE_URL + "/").create(IngestorService.class);
         Call<List<IngInstallmentModel>> callSync = ingestorService.fetchAStudentInstallments(admissionNumber);
         try {
             Response<List<IngInstallmentModel>> response = callSync.execute();
@@ -245,5 +244,49 @@ public class IngestorController {
         }
 
         return null;
+    }
+
+    @PostMapping("/ingest_installments")
+    public boolean ingestInstallments() {
+        List<StudentEntity> allStudents = studentRepository.findAll();
+
+        for (StudentEntity studentEntity : allStudents) {
+            List<IngInstallmentModel> ingestedInstallments = fetchAStudentInstallments(studentEntity.getAdmissionNo());
+            List<InstallmentsEntity> savedInstallments = new ArrayList<>();
+            if (ingestedInstallments != null && ingestedInstallments.size() > 0) {
+                for (IngInstallmentModel ingInstallmentModel : ingestedInstallments) {
+                    savedInstallments.add(new InstallmentsEntity(
+                            studentEntity.getStudentId(),
+                            ingInstallmentModel.getInstallmentAmount(),
+                            Utils.formatToUsableDateFormat(ingInstallmentModel.getInstallmentDate()),
+                            0,
+                            sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),
+                            userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(),
+                            ingInstallmentModel.getInstallmentDate().substring(0,4),
+                            1
+                    ));
+                }
+                installmentRepository.saveAll(savedInstallments);
+            }
+        }
+        return true;
+    }
+
+    @PostMapping("/correct_statements")
+    public boolean correctFeeStatements() {
+        List<StudentEntity> allStudents = studentRepository.findAll();
+
+        for (StudentEntity studentEntity : allStudents) {
+            IngFeeStatement ingStudentFeeStatement = fetchAStudentFeeStatement(studentEntity.getAdmissionNo());
+            if (ingStudentFeeStatement != null) {
+                FeeStatementEntity savedStudentFeeStatement = feeStatementRepository.findFeeStatementByStudentId(studentEntity.getStudentId()).get(0);
+                savedStudentFeeStatement.setCurrentYearTotal(ingStudentFeeStatement.getTotal());
+                savedStudentFeeStatement.setCurrentTermBalance(ingStudentFeeStatement.getTermBalance());
+                savedStudentFeeStatement.setAnnualBalance(ingStudentFeeStatement.getAnnualBalance());
+                feeStatementRepository.save(savedStudentFeeStatement);
+            }
+        }
+
+        return true;
     }
 }

@@ -4,20 +4,20 @@ public class StudentRegistrationDto {
     private int studentId;
     private String admissionNo;
     private String studentName;
-    private int genderId;
+    private int genderCode;
     private String studentDob;
-    private int studentResidenceId;
+    private int studentResidenceCode;
     private int classId;
     private String admissionDate;
     private String profPicName;
     private int registrationSessionId;
 
-    public StudentRegistrationDto(String admissionNo, String studentName, int genderId, String studentDob, int studentResidenceId, int classId, String admissionDate, String profPicName, int registrationSessionId) {
+    public StudentRegistrationDto(String admissionNo, String studentName, int genderCode, String studentDob, int studentResidenceCode, int classId, String admissionDate, String profPicName, int registrationSessionId) {
         this.admissionNo = admissionNo;
         this.studentName = studentName;
-        this.genderId = genderId;
+        this.genderCode = genderCode;
         this.studentDob = studentDob;
-        this.studentResidenceId = studentResidenceId;
+        this.studentResidenceCode = studentResidenceCode;
         this.classId = classId;
         this.admissionDate = admissionDate;
         this.profPicName = profPicName;
@@ -48,12 +48,12 @@ public class StudentRegistrationDto {
         this.studentName = studentName;
     }
 
-    public int getGenderId() {
-        return genderId;
+    public int getGenderCode() {
+        return genderCode;
     }
 
-    public void setGenderId(int genderId) {
-        this.genderId = genderId;
+    public void setGenderCode(int genderCode) {
+        this.genderCode = genderCode;
     }
 
     public String getStudentDob() {
@@ -64,12 +64,12 @@ public class StudentRegistrationDto {
         this.studentDob = studentDob;
     }
 
-    public int getStudentResidenceId() {
-        return studentResidenceId;
+    public int getStudentResidenceCode() {
+        return studentResidenceCode;
     }
 
-    public void setStudentResidenceId(int studentResidenceId) {
-        this.studentResidenceId = studentResidenceId;
+    public void setStudentResidenceCode(int studentResidenceCode) {
+        this.studentResidenceCode = studentResidenceCode;
     }
 
     public int getClassId() {
