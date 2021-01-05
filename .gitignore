@@ -18,6 +18,8 @@ target/
 *.iws
 *.iml
 *.ipr
+src/main/resources/application.properties
+src/main/java/com/silasonyango/transactionservice/common/config/EndPoints.java
 
 ### NetBeans ###
 /nbproject/private/
@@ -29,5 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-src/main/resources/application.properties
-src/main/java/com/silasonyango/transactionservice/common/config/EndPoints.java
