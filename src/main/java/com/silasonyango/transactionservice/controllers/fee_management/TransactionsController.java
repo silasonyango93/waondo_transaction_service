@@ -11,6 +11,7 @@ import com.silasonyango.transactionservice.services.retrofit.waondo_node.fee_man
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.fee_management.transactions.TransactionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import retrofit2.Call;
@@ -24,7 +25,7 @@ import java.util.List;
 public class TransactionsController {
 
     @PostMapping("/transactions_by_date")
-    public List<TransactionsResponseDto> fetchTransactionsByDate(@Valid TransactionByDateRequestDto transactionByDateRequestDto) {
+    public List<TransactionsResponseDto> fetchTransactionsByDate(@RequestBody TransactionByDateRequestDto transactionByDateRequestDto) {
         TransactionsService transactionsService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL+"/").create(TransactionsService.class);
         Call<List<TransactionsResponseDto>> callSync = transactionsService.fetchTransactionsByDate(transactionByDateRequestDto.getTransactionDate());
         try {
@@ -36,7 +37,7 @@ public class TransactionsController {
     }
 
     @PostMapping("/transactions_by_date_range")
-    public List<TransactionsResponseDto> fetchTransactionsByDateRange(@Valid TransactionsByDateRangeRequestDto transactionsByDateRangeRequestDto) {
+    public List<TransactionsResponseDto> fetchTransactionsByDateRange(@RequestBody TransactionsByDateRangeRequestDto transactionsByDateRangeRequestDto) {
         TransactionsService transactionsService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL+"/").create(TransactionsService.class);
         Call<List<TransactionsResponseDto>> callSync = transactionsService.fetchTransactionsByDateRange(transactionsByDateRangeRequestDto.getTransactionsStartDate(),transactionsByDateRangeRequestDto.getTransactionsEndDate());
         try {
