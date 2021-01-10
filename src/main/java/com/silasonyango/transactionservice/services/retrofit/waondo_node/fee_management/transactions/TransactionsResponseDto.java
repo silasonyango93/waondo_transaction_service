@@ -10,6 +10,15 @@ public class TransactionsResponseDto {
     @SerializedName("StudentId")
     private int studentId;
 
+    @SerializedName("AdmissionNo")
+    private String admissionNo;
+
+    @SerializedName("AcademicClassLevelName")
+    private String academicClassLevelName;
+
+    @SerializedName("ClassStreamName")
+    private String classStreamName;
+
     @SerializedName("TransactionDescription")
     private String transactionDescription;
 
@@ -156,5 +165,29 @@ public class TransactionsResponseDto {
 
     public void setCarryForwardAmount(double carryForwardAmount) {
         this.carryForwardAmount = carryForwardAmount;
+    }
+
+    public String getAdmissionNo() {
+        return admissionNo;
+    }
+
+    public void setAdmissionNo(String admissionNo) {
+        this.admissionNo = admissionNo;
+    }
+
+    public String getAcademicClassLevelName() {
+        return academicClassLevelName;
+    }
+
+    public void setAcademicClassLevelName(String academicClassLevelName) {
+        this.academicClassLevelName = academicClassLevelName;
+    }
+
+    public String getClassStreamName() {
+        return classStreamName;
+    }
+
+    public void setClassStreamName(String classStreamName) {
+        this.classStreamName = classStreamName;
     }
 }
