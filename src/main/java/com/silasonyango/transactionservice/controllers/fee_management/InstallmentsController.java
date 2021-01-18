@@ -258,7 +258,15 @@ public class InstallmentsController {
 
         for (int i = 0; i < feeInstallmentsList.size(); i++) {
             String installmentDate = feeInstallmentsList.get(i).getInstallmentDate().replaceAll(" .+$", "");
-            installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(), feeInstallmentsList.get(i).getInstallmentAmount(), installmentDate, feeInstallmentsList.get(i).getIsCarryForward(), feeInstallmentsList.get(i).getSessionLogId(), feeInstallmentsList.get(i).getUserSessionActivityId(), feeInstallmentsList.get(i).getInstallmentYear(), UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"), getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
+            installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),
+                    feeInstallmentsList.get(i).getInstallmentAmount(),
+                    installmentDate,
+                    feeInstallmentsList.get(i).getIsCarryForward(),
+                    feeInstallmentsList.get(i).getSessionLogId(),
+                    feeInstallmentsList.get(i).getUserSessionActivityId(),
+                    feeInstallmentsList.get(i).getInstallmentYear(),
+                    UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"),
+                    getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
         }
 
         feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);

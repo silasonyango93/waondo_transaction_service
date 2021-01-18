@@ -289,4 +289,10 @@ public class IngestorController {
 
         return true;
     }
+
+    @PostMapping("/register_installments_as_transactions")
+    public void registerInstallmentsAsTransactions() {
+        List<InstallmentsEntity> installmentsEntityList = installmentRepository.findAll();
+        for () {}
+    }
 }
