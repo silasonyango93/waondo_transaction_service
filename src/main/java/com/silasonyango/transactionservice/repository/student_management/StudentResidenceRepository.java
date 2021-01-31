@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface StudentResidenceRepository extends JpaRepository<StudentResidenceEntity, Long> {
     public List<StudentResidenceEntity> findByStudentResidenceCode(@Param("StudentResidenceCode") int studentResidenceCode);
+
+    public StudentResidenceEntity findByStudentResidenceId(@Param("StudentResidenceId") int studentResidenceId);
 }

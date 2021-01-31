@@ -200,7 +200,7 @@ public class ChangeStudentResidenceController {
     }
 
     public int getAdminInstallmentId() {
-        return installmentRepository.findInstallmentByIsAdminInstallment(1).getInstallmentId();
+        return installmentRepository.findInstallmentByIsAdminInstallment(1).get(0).getInstallmentId();
     }
 
     public int getAdminCarryForwardId() {

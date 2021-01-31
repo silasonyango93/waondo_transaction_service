@@ -7,6 +7,7 @@ import com.silasonyango.transactionservice.dtos.student_management.StudentRegist
 import com.silasonyango.transactionservice.entity_classes.academic_classes.ClassStreamsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
+import com.silasonyango.transactionservice.entity_classes.fee_management.TransactionsEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.entity_classes.student_management.StudentResidenceEntity;
 import com.silasonyango.transactionservice.entity_classes.system_initialization.gender.GenderEntity;
@@ -16,8 +17,7 @@ import com.silasonyango.transactionservice.ingestor.models.IngStudentModel;
 import com.silasonyango.transactionservice.ingestor.services.IngestorService;
 import com.silasonyango.transactionservice.repository.academic_classes.ClassStreamsRepository;
 import com.silasonyango.transactionservice.repository.academic_classes.ClassesRepository;
-import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
-import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
+import com.silasonyango.transactionservice.repository.fee_management.*;
 import com.silasonyango.transactionservice.repository.session_management.SessionLogsRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
@@ -28,6 +28,9 @@ import com.silasonyango.transactionservice.services.retrofit.waondo_node.academi
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.academic_class_management.AcademicClassService;
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.fee_management.fee_structure.ClassFeeStructureServiceModel;
 import com.silasonyango.transactionservice.services.retrofit.waondo_node.fee_management.fee_structure.FeeStructureService;
+import com.silasonyango.transactionservice.services.retrofit.waondo_node.students.StudentsListResponseDto;
+import com.silasonyango.transactionservice.services.retrofit.waondo_node.students.StudentsService;
+import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import com.silasonyango.transactionservice.utility_classes.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -58,10 +61,19 @@ public class IngestorController {
     ClassStreamsRepository classStreamsRepository;
 
     @Autowired
+    CarryForwardsRepository carryForwardsRepository;
+
+    @Autowired
     SessionLogsRepository sessionLogsRepository;
 
     @Autowired
     StudentRepository studentRepository;
+
+    @Autowired
+    FeeCorrectionsRepository feeCorrectionsRepository;
+
+    @Autowired
+    TransactionDescriptionsRepository transactionDescriptionsRepository;
 
     @Autowired
     FeeStatementRepository feeStatementRepository;
@@ -71,6 +83,9 @@ public class IngestorController {
 
     @Autowired
     InstallmentRepository installmentRepository;
+
+    @Autowired
+    TransactionsRepository transactionsRepository;
 
     @PostMapping("/ingest")
     public boolean ingest() {
@@ -111,7 +126,7 @@ public class IngestorController {
                             0,
                             sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),
                             userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(),
-                            ingInstallmentModel.getInstallmentDate().substring(0,4),
+                            ingInstallmentModel.getInstallmentDate().substring(0, 4),
                             1
                     ));
                 }
@@ -262,7 +277,7 @@ public class IngestorController {
                             0,
                             sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),
                             userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(),
-                            ingInstallmentModel.getInstallmentDate().substring(0,4),
+                            ingInstallmentModel.getInstallmentDate().substring(0, 4),
                             1
                     ));
                 }
@@ -288,5 +303,90 @@ public class IngestorController {
         }
 
         return true;
+    }
+
+    @PostMapping("/transition_fee_to_second_term")
+    public boolean transitionFeeToSecondTerm() {
+        List<StudentsListResponseDto> studentsList = fetchAllStudentsNotCompletedSchool();
+        for (StudentsListResponseDto currentStudent : studentsList) {
+            if (isStudentABoarder(currentStudent.getStudentResidenceId())) {
+                updateABoarderFee(currentStudent.getStudentId());
+            } else {
+                updateADayScholarFee(currentStudent.getStudentId());
+            }
+        }
+        return true;
+    }
+
+
+    public List<StudentsListResponseDto> fetchAllStudentsNotCompletedSchool() {
+        StudentsService studentsService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL + "/").create(StudentsService.class);
+        Call<List<StudentsListResponseDto>> callSync = studentsService.getAllStudentsNotCompletedSchool();
+        try {
+            Response<List<StudentsListResponseDto>> response = callSync.execute();
+            return response.body();
+        } catch (Exception ex) {
+        }
+
+        return null;
+    }
+
+
+    public boolean isStudentABoarder(int studentResidenceId) {
+        return studentResidenceRepository.findByStudentResidenceId(studentResidenceId).getStudentResidenceCode() == 1;
+    }
+
+    public void updateABoarderFee(int studentId) {
+        FeeStatementEntity feeStatement = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
+        int previousTermBalance = feeStatement.getCurrentTermBalance();
+        int previousAnnualBalance = feeStatement.getAnnualBalance();
+        int previousTotal = feeStatement.getCurrentYearTotal();
+        int currentTermBalance = feeStatement.getCurrentTermBalance();
+        currentTermBalance = currentTermBalance + 11000;
+        feeStatement.setCurrentTermBalance(currentTermBalance);
+        int annualBalance = currentTermBalance + 7150;
+        feeStatement.setAnnualBalance(annualBalance);
+        feeStatementRepository.save(feeStatement);
+        transactionsRepository.save(new TransactionsEntity(sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),
+                userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(),
+                transactionDescriptionsRepository.findByTransactionDescriptionCode(3).get(0).getTransactionDescriptionId(),
+                studentId,
+                installmentRepository.findInstallmentByIsAdminInstallment(1).get(0).getInstallmentId(),
+                carryForwardsRepository.findByIsAdminCarryForward(1).get(0).getCarryFowardId(),
+                feeCorrectionsRepository.findByIsAdminFeeCorrection(1).get(0).getFeeCorrectionId(),
+                previousTermBalance,
+                previousAnnualBalance,
+                previousTotal,
+                currentTermBalance,
+                annualBalance,
+                previousTotal,
+                UtilityClass.getNow()));
+    }
+
+    public void updateADayScholarFee(int studentId) {
+        FeeStatementEntity feeStatement = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
+        int previousTermBalance = feeStatement.getCurrentTermBalance();
+        int previousAnnualBalance = feeStatement.getAnnualBalance();
+        int previousTotal = feeStatement.getCurrentYearTotal();
+        int currentTermBalance = feeStatement.getCurrentTermBalance();
+        currentTermBalance = currentTermBalance + 3600;
+        feeStatement.setCurrentTermBalance(currentTermBalance);
+        int annualBalance = currentTermBalance + 2400;
+        feeStatement.setAnnualBalance(annualBalance);
+        feeStatementRepository.save(feeStatement);
+        transactionsRepository.save(new TransactionsEntity(sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),
+                userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(),
+                transactionDescriptionsRepository.findByTransactionDescriptionCode(3).get(0).getTransactionDescriptionId(),
+                studentId,
+                installmentRepository.findInstallmentByIsAdminInstallment(1).get(0).getInstallmentId(),
+                carryForwardsRepository.findByIsAdminCarryForward(1).get(0).getCarryFowardId(),
+                feeCorrectionsRepository.findByIsAdminFeeCorrection(1).get(0).getFeeCorrectionId(),
+                previousTermBalance,
+                previousAnnualBalance,
+                previousTotal,
+                currentTermBalance,
+                annualBalance,
+                previousTotal,
+                UtilityClass.getNow()));
     }
 }

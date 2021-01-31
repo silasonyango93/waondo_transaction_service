@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface InstallmentRepository extends JpaRepository<InstallmentsEntity, Long> {
     public List<InstallmentsEntity> findInstallmentsByStudentId(@Param("StudentId") int studentId);
-    public InstallmentsEntity findInstallmentByIsAdminInstallment(@Param("IsAdminInstallment") int isAdminInstallment);
+    public List<InstallmentsEntity> findInstallmentByIsAdminInstallment(@Param("IsAdminInstallment") int isAdminInstallment);
 }
