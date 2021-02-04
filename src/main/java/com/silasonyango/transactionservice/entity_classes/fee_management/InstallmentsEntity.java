@@ -33,6 +33,9 @@ public class InstallmentsEntity implements java.io.Serializable{
     @Column(name = "IsAdminInstallment")
     private int isAdminInstallment;
 
+    @Column(name = "HasBeenSoftDeleted")
+    private int hasBeenSoftDeleted;
+
     public InstallmentsEntity() {}
 
     public InstallmentsEntity(int studentId, int installmentAmount, String installmentDate, int isCarryForward, int sessionLogId, int userSessionActivityId, String installmentYear, int isAdminInstallment) {
@@ -116,5 +119,13 @@ public class InstallmentsEntity implements java.io.Serializable{
 
     public void setIsAdminInstallment(int isAdminInstallment) {
         this.isAdminInstallment = isAdminInstallment;
+    }
+
+    public int getHasBeenSoftDeleted() {
+        return hasBeenSoftDeleted;
+    }
+
+    public void setHasBeenSoftDeleted(int hasBeenSoftDeleted) {
+        this.hasBeenSoftDeleted = hasBeenSoftDeleted;
     }
 }

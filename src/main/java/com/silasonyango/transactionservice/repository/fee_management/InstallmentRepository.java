@@ -9,4 +9,5 @@ import java.util.List;
 public interface InstallmentRepository extends JpaRepository<InstallmentsEntity, Long> {
     public List<InstallmentsEntity> findInstallmentsByStudentId(@Param("StudentId") int studentId);
     public List<InstallmentsEntity> findInstallmentByIsAdminInstallment(@Param("IsAdminInstallment") int isAdminInstallment);
+    public InstallmentsEntity findInstallmentByInstallmentId(@Param("InstallmentId") int installmentId);
 }

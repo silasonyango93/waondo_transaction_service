@@ -20,6 +20,7 @@ import com.silasonyango.transactionservice.entity_classes.user_management.Access
 import com.silasonyango.transactionservice.entity_classes.user_management.RolesEntity;
 import com.silasonyango.transactionservice.entity_classes.user_management.UsersEntity;
 import com.silasonyango.transactionservice.repository.academic_classes.*;
+import com.silasonyango.transactionservice.repository.correction_management.CorrectionDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.CarryForwardsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.FeeCorrectionsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
@@ -30,7 +31,6 @@ import com.silasonyango.transactionservice.repository.session_management.UserSes
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentResidenceRepository;
 import com.silasonyango.transactionservice.repository.student_residence.ResidenceSwapTypeRepository;
-import com.silasonyango.transactionservice.repository.system_initialization.correction_descriptions.CorrectionDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.system_configuration.SystemConfigurationRepository;
 import com.silasonyango.transactionservice.repository.user_management.AccessPrivilegesRepository;
@@ -266,7 +266,7 @@ public class SystemInitialization {
     public void configureAdminFeeCorrection() {
         int sessionLogId = sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId();
         int userSessionActivityId = userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId();
-        int correctionDescriptionId = correctionDescriptionsRepository.findByCorrectionDescriptionCode(0).get(0).getCorrectionDescriptionId();
+        int correctionDescriptionId = correctionDescriptionsRepository.findByCorrectionDescriptionCode(0).getCorrectionDescriptionId();
         int studentId = studentRepository.findByIsAnAdminStudent(1).get(0).getStudentId();
         feeCorrectionsRepository.save(new FeeCorrectionsEntity(sessionLogId, userSessionActivityId, correctionDescriptionId, studentId, 0, 0, 0, 0, 0, 0, UtilityClass.getNow(), 1));
         assertSystemSuccessfullyInitialized();
