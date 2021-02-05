@@ -1,8 +1,23 @@
 package com.silasonyango.transactionservice.entity_classes.fee_management;
 
+import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
+
 import javax.persistence.*;
 @javax.persistence.Entity
 @Table(name = "installments")
+
+@javax.persistence.SqlResultSetMapping(
+        name = "installments", entities =
+@javax.persistence.EntityResult(entityClass = InstallmentsEntity.class)
+)
+
+
+@NamedNativeQueries({
+        @NamedNativeQuery(name="InstallmentsEntity.findInstallmentsNotSoftDeleted",
+                query="SELECT * FROM installments WHERE installments.StudentId = ? AND installments.HasBeenSoftDeleted = 0",
+                resultSetMapping = "installments" )
+})
+
 public class InstallmentsEntity implements java.io.Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

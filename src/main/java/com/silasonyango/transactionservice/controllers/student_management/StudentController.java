@@ -190,7 +190,7 @@ public class StudentController {
         JSONObject classDetails = UtilityClass.getAStudentClassDetails(studentId);
         JSONObject residenceDetails = UtilityClass.getAStudentResidenceDetails(studentId);
         FeeStatementEntity feeStatementEntity = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
-        List<InstallmentsEntity> feeInstallmentsList = installmentRepository.findInstallmentsByStudentId(studentId);
+        List<InstallmentsEntity> feeInstallmentsList = installmentRepository.findInstallmentsNotSoftDeleted(studentId);
 
 
         feeStatementResponseDto.setStudentId(studentId);

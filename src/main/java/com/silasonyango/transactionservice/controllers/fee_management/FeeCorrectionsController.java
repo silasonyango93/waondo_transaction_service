@@ -90,6 +90,8 @@ public class FeeCorrectionsController {
         FeeCorrectionsEntity feeCorrectionsEntity = feeCorrectionsRepository.save(new FeeCorrectionsEntity(
                 installmentDeletionRequestDto.getSessionLogId(),
                 userSessionActivitiesEntity.getUserSessionActivityId(),
+//todo: fix correction description
+//                correctionDescriptionsRepository.findByCorrectionDescriptionCode(CorrectionDescriptionsConfig.DELETE_FEE_INSTALLMENT).getCorrectionDescriptionId(),
                 10,
                 installmentToBeSoftDeleted.getStudentId(),
                 previousTermBalance,
