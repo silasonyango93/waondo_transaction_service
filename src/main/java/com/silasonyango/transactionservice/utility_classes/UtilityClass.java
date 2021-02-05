@@ -115,7 +115,7 @@ public class UtilityClass {
         for (int i = 0;i<feeStructureBreakDownArray.length();i++) {
             if(getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId") != feeStructureBreakDownArray.getJSONObject(i).getInt("TermIterationId")) {
 
-                if(getTermDetailsByDate(dtf.format(now)).getInt("TermIterationId") < feeStructureBreakDownArray.getJSONObject(i).getInt("TermIterationId")) {
+                if(getTermDetailsByDate(dtf.format(now)).getInt("TermIterationCode") < feeStructureBreakDownArray.getJSONObject(i).getInt("TermIterationCode")) {
                     annualBalance = annualBalance + feeStructureBreakDownArray.getJSONObject(i).getInt("FeeAmount");
                 }
 

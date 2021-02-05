@@ -1,8 +1,23 @@
 package com.silasonyango.transactionservice.entity_classes.fee_management;
 
+import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
+
 import javax.persistence.*;
 @javax.persistence.Entity
 @Table(name = "installments")
+
+@javax.persistence.SqlResultSetMapping(
+        name = "installments", entities =
+@javax.persistence.EntityResult(entityClass = InstallmentsEntity.class)
+)
+
+
+@NamedNativeQueries({
+        @NamedNativeQuery(name="InstallmentsEntity.findInstallmentsNotSoftDeleted",
+                query="SELECT * FROM installments WHERE installments.StudentId = ? AND installments.HasBeenSoftDeleted = 0",
+                resultSetMapping = "installments" )
+})
+
 public class InstallmentsEntity implements java.io.Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +47,9 @@ public class InstallmentsEntity implements java.io.Serializable{
 
     @Column(name = "IsAdminInstallment")
     private int isAdminInstallment;
+
+    @Column(name = "HasBeenSoftDeleted")
+    private int hasBeenSoftDeleted;
 
     public InstallmentsEntity() {}
 
@@ -116,5 +134,13 @@ public class InstallmentsEntity implements java.io.Serializable{
 
     public void setIsAdminInstallment(int isAdminInstallment) {
         this.isAdminInstallment = isAdminInstallment;
+    }
+
+    public int getHasBeenSoftDeleted() {
+        return hasBeenSoftDeleted;
+    }
+
+    public void setHasBeenSoftDeleted(int hasBeenSoftDeleted) {
+        this.hasBeenSoftDeleted = hasBeenSoftDeleted;
     }
 }
