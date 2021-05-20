@@ -1,9 +1,12 @@
 package com.silasonyango.transactionservice.controllers.calendar;
 
+import com.silasonyango.transactionservice.common.config.EndPoints;
 import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
 import com.silasonyango.transactionservice.common.config.TransactionDescriptionsConfig;
 import com.silasonyango.transactionservice.daos.calendar.ActualTermsDao;
 import com.silasonyango.transactionservice.dtos.calendar.RequestTermByTermId;
+import com.silasonyango.transactionservice.dtos.fee_management.ManualFeeTransitionRequestDto;
+import com.silasonyango.transactionservice.dtos.student_management.StudentRegistrationDto;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.LotsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
@@ -23,6 +26,9 @@ import com.silasonyango.transactionservice.repository.fee_management.*;
 import com.silasonyango.transactionservice.repository.session_management.SessionLogsRepository;
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
+import com.silasonyango.transactionservice.services.retrofit.RetrofitClientInstance;
+import com.silasonyango.transactionservice.services.retrofit.waondo_node.students.StudentsListResponseDto;
+import com.silasonyango.transactionservice.services.retrofit.waondo_node.students.StudentsService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,8 +37,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import retrofit2.Call;
+import retrofit2.Response;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -198,7 +207,7 @@ public class ActualTermsController {
 
 
     public void transitionFee(String year,String carryForwardInstallmentDate,String carryForwardInstallmentYear) {
-        List<StudentEntity> students = studentRepository.findAll();
+        List<StudentEntity> students = fetchAllStudentsNotCompletedSchool();
 
         for (int i = 0; i < students.size(); i++) {
 
@@ -213,9 +222,9 @@ public class ActualTermsController {
 
                 for (int j = 0;j < feeStructureBreakDownArray.length();j++) {
 
-                    if(feeStructureBreakDownArray.getJSONObject(i).getInt("TermIterationId") == probableNextTermIterationId) {
+                    if(feeStructureBreakDownArray.getJSONObject(j).getInt("TermIterationId") == probableNextTermIterationId) {
 
-                        updateFeeStatements(students.get(i).getStudentId(),feeStructureBreakDownArray.getJSONObject(i).getInt("FeeAmount"),students.get(i).getStudentResidenceId(),carryForwardInstallmentDate,carryForwardInstallmentYear);
+                        updateFeeStatements(students.get(i).getStudentId(),feeStructureBreakDownArray.getJSONObject(j).getInt("FeeAmount"),students.get(i).getStudentResidenceId(),carryForwardInstallmentDate,carryForwardInstallmentYear);
 
                     }
 
@@ -227,9 +236,9 @@ public class ActualTermsController {
 
                 for (int j = 0;j < feeStructureBreakDownArray.length();j++) {
 
-                    if(feeStructureBreakDownArray.getJSONObject(i).getInt("TermIterationId") == topTermIteration.getTermIterationId()) {
+                    if(feeStructureBreakDownArray.getJSONObject(j).getInt("TermIterationId") == topTermIteration.getTermIterationId()) {
 
-                        updateFeeStatements(students.get(i).getStudentId(),feeStructureBreakDownArray.getJSONObject(i).getInt("FeeAmount"),students.get(i).getStudentResidenceId(),carryForwardInstallmentDate,carryForwardInstallmentYear);
+                        updateFeeStatements(students.get(i).getStudentId(),feeStructureBreakDownArray.getJSONObject(j).getInt("FeeAmount"),students.get(i).getStudentResidenceId(),carryForwardInstallmentDate,carryForwardInstallmentYear);
 
                     }
 
@@ -264,7 +273,7 @@ public class ActualTermsController {
     public void processCarryForward(int studentId,int previousTermBalance,int previousAnnualBalance,int previousTotal,int nextTermBalance,int nextAnnualBalance,int nextTotal,String carryForwardInstallmentDate,String carryForwardInstallmentYear) {
 
        CarryForwardsEntity dbSavedCarryForward = carryForwardsRepository.save(new CarryForwardsEntity(studentId,previousTermBalance,UtilityClass.getNow(),0));
-       InstallmentsEntity dbSavedInstallment = installmentRepository.save(new InstallmentsEntity(studentId,previousTermBalance * -1,carryForwardInstallmentDate,1,0, userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(),carryForwardInstallmentYear,0));
+       InstallmentsEntity dbSavedInstallment = installmentRepository.save(new InstallmentsEntity(studentId,previousTermBalance * -1,carryForwardInstallmentDate,1,sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(), userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(),carryForwardInstallmentYear,0));
 
         transactionsRepository.save(new TransactionsEntity(sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),userSessionActivitiesRepository.findByIsAdminUserSessionActivity(1).get(0).getUserSessionActivityId(), transactionDescriptionsRepository.findByTransactionDescriptionCode(isItEndOfTheYear() ? 4 : 3).get(0).getTransactionDescriptionId(),studentId,dbSavedInstallment.getInstallmentId(),dbSavedCarryForward.getCarryFowardId(),feeCorrectionsRepository.findByIsAdminFeeCorrection(1).get(0).getFeeCorrectionId(),previousTermBalance,previousAnnualBalance,previousTotal,nextTermBalance,nextAnnualBalance,nextTotal,UtilityClass.getNow()));
 
@@ -275,6 +284,15 @@ public class ActualTermsController {
         int probableNextTermIterationId = UtilityClass.getTermDetailsByDate(UtilityClass.getToday()).getInt("TermIterationId") + 1;
 
         return actualTermsDao.findActualTermByTermIterationIdAndYear(probableNextTermIterationId,UtilityClass.getCurrentYear()).size() == 0;
+    }
+
+
+    @PostMapping("/manual_fee_transition")
+    public boolean manualFeeTransition(@Valid ManualFeeTransitionRequestDto manualFeeTransitionRequestDto) {
+
+        transitionFee(manualFeeTransitionRequestDto.getYear(),manualFeeTransitionRequestDto.getCarryForwardInstallmentDate(),manualFeeTransitionRequestDto.getCarryForwardInstallmentYear());
+
+        return true;
     }
 
 
@@ -306,6 +324,37 @@ public class ActualTermsController {
         }
 
         return weeksAreCreated;
+    }
+
+
+    public List<StudentEntity> fetchAllStudentsNotCompletedSchool() {
+        StudentsService studentsService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL + "/").create(StudentsService.class);
+        Call<List<StudentsListResponseDto>> callSync = studentsService.getAllStudentsNotCompletedSchool();
+        try {
+            Response<List<StudentsListResponseDto>> response = callSync.execute();
+//            if (response != null && response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+//
+//            }
+            List<StudentEntity> studentsEntityList = new ArrayList<>();
+            for (StudentsListResponseDto currentDto : response.body()) {
+                studentsEntityList.add(new StudentEntity(
+                        currentDto.getStudentId(),
+                        currentDto.getAdmissionNo(),
+                        currentDto.getStudentName(),
+                        currentDto.getGenderId(),
+                        currentDto.getStudentDOB(),
+                        currentDto.getStudentResidenceId(),
+                        currentDto.getClassId(),
+                        currentDto.getAdmissionDate(),
+                        currentDto.getProfPicName(),
+                        currentDto.getIsAnAdminStudent()
+                ));
+            }
+            return studentsEntityList;
+        } catch (Exception ex) {
+        }
+
+        return null;
     }
 
 
