@@ -372,6 +372,35 @@ public class ActualTermsController {
         return true;
     }
 
+    @PostMapping("/manual_fee_transition_correction")
+    public boolean correctManualFeeTransition() {
+
+        List<StudentEntity> studentsNotCompletedSchool = fetchAllStudentsNotCompletedSchool();
+
+        for (StudentEntity currentStudent : studentsNotCompletedSchool) {
+            if (currentStudent.getStudentResidenceId() == 9) {
+                FeeStatementEntity boarderStatement = feeStatementRepository.findFeeStatementByStudentId(currentStudent.getStudentId()).get(0);
+                double currentTermBalance = boarderStatement.getCurrentTermBalance();
+                currentTermBalance = currentTermBalance - 20000;
+                double currentAnnualBalance = currentTermBalance + 10000 + 7150;
+                boarderStatement.setCurrentTermBalance((int)currentTermBalance);
+                boarderStatement.setAnnualBalance((int)currentAnnualBalance);
+                feeStatementRepository.save(boarderStatement);
+            }
+            if(currentStudent.getStudentResidenceId() == 10) {
+                FeeStatementEntity dayScholarStatement = feeStatementRepository.findFeeStatementByStudentId(currentStudent.getStudentId()).get(0);
+                double currentTermBalance = dayScholarStatement.getCurrentTermBalance();
+                currentTermBalance = currentTermBalance - 6000;
+                double currentAnnualBalance = currentTermBalance + 3600 + 2400;
+                dayScholarStatement.setCurrentTermBalance((int)currentTermBalance);
+                dayScholarStatement.setAnnualBalance((int)currentAnnualBalance);
+                feeStatementRepository.save(dayScholarStatement);
+            }
+        }
+
+        return true;
+    }
+
 
     @PostMapping("/create_a_terms_weeks")
     public boolean createATermsWeeks(@Valid RequestTermByTermId requestTermByTermId) {
