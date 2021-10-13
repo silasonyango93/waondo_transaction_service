@@ -62,6 +62,19 @@ public class StudentEntity implements java.io.Serializable{
         this.isAnAdminStudent = isAnAdminStudent;
     }
 
+    public StudentEntity(int studentId, String admissionNo, String studentName, int genderId, String studentDob, int studentResidenceId, int classId, String admissionDate, String profPicName, int isAnAdminStudent) {
+        this.studentId = studentId;
+        this.admissionNo = admissionNo;
+        this.studentName = studentName;
+        this.genderId = genderId;
+        this.studentDob = studentDob;
+        this.studentResidenceId = studentResidenceId;
+        this.classId = classId;
+        this.admissionDate = admissionDate;
+        this.profPicName = profPicName;
+        this.isAnAdminStudent = isAnAdminStudent;
+    }
+
     public int getStudentId() {
         return studentId;
     }

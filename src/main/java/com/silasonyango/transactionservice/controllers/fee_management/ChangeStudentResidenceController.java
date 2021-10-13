@@ -90,7 +90,7 @@ public class ChangeStudentResidenceController {
             FeeStatementResponseDto feeStatementResponseDto = installmentsController.getAStudentFeeStatementForCurrentYear(studentRequestByStudentIdDto.getStudentId());
             confirmResidenceSwapResponse.setCurrentTermBalance((double) feeStatementResponseDto.getTermBalance());
             confirmResidenceSwapResponse.setCurrentAnnualBalance((double) feeStatementResponseDto.getAnnualBalance());
-            confirmResidenceSwapResponse.setChangeExtraCharge(confirmResidenceSwapResponse.getProposedResidenceCode() == 1 ? UtilityConfigs.CHANGE_TO_BOARDING_EXTRA_CHARGE : 0.0);
+            confirmResidenceSwapResponse.setChangeExtraCharge(0.0);
 
             double currentTermFee = 0.0;
             double replacementTermFee = 0.0;
@@ -123,7 +123,6 @@ public class ChangeStudentResidenceController {
 
                 tempTermBalance = tempTermBalance - currentTermFee;
                 tempTermBalance = tempTermBalance + replacementTermFee;
-                tempTermBalance = tempTermBalance + UtilityConfigs.CHANGE_TO_BOARDING_EXTRA_CHARGE;
                 confirmResidenceSwapResponse.setExpectedTermBalance(tempTermBalance);
                 confirmResidenceSwapResponse.setExpectedAnnualBalance((double) UtilityClass.getAStudentAnnualBalanceFromTermBalance(studentRequestByStudentIdDto.getStudentId(), (int) confirmResidenceSwapResponse.getExpectedTermBalance(), studentResidenceRepository.findByStudentResidenceCode(confirmResidenceSwapResponse.getProposedResidenceCode()).get(0).getStudentResidenceId()));
             } else {
