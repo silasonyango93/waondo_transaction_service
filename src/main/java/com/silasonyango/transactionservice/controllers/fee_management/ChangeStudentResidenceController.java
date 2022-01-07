@@ -77,10 +77,14 @@ public class ChangeStudentResidenceController {
         if (currentTermObject == null) {
             confirmResidenceSwapResponse.setPeriodEligible(false);
             confirmResidenceSwapResponse.setEligibilityMessage("The change residence module does not work over the holidays. Kindly wait till the begining of the next term");
-        } else if (currentTermObject != null && currentWeekObject != null && currentWeekObject.getInt("WeekIterationCode") > 5) {
-            confirmResidenceSwapResponse.setPeriodEligible(false);
-            confirmResidenceSwapResponse.setEligibilityMessage("You cannot change a student's residence more than 5 weeks into the term");
-        } else {
+        }
+
+//        else if (currentTermObject != null && currentWeekObject != null && currentWeekObject.getInt("WeekIterationCode") > 5) {
+//            confirmResidenceSwapResponse.setPeriodEligible(false);
+//            confirmResidenceSwapResponse.setEligibilityMessage("You cannot change a student's residence more than 5 weeks into the term");
+//        }
+
+        else {
             JSONObject studentResidenceDetails = UtilityClass.getAStudentResidenceDetails(studentRequestByStudentIdDto.getStudentId());
             confirmResidenceSwapResponse.setAdmissionNumber(studentRequestByStudentIdDto.getAdmissionNo());
             confirmResidenceSwapResponse.setPeriodEligible(true);

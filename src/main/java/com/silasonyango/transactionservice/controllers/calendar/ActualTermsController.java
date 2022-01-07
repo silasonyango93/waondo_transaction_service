@@ -304,7 +304,7 @@ public class ActualTermsController {
                 double nextAnnualBalance = nextTermBalance + 7150;
                 boarderStatement.setCurrentTermBalance((int) nextTermBalance);
                 boarderStatement.setAnnualBalance((int) nextAnnualBalance);
-                boarderStatement.setCurrentYearTotal((int)carryForwardAmount);
+                //boarderStatement.setCurrentYearTotal((int)carryForwardAmount);
                 feeStatementRepository.save(boarderStatement);
                 CarryForwardsEntity carryForwardsEntity = carryForwardsRepository.save(new CarryForwardsEntity(
                         currentStudent.getStudentId(),
@@ -341,7 +341,7 @@ public class ActualTermsController {
                 double nextAnnualBalance = nextTermBalance + 2400;
                 dayScholarStatement.setCurrentTermBalance((int) nextTermBalance);
                 dayScholarStatement.setAnnualBalance((int) nextAnnualBalance);
-                dayScholarStatement.setCurrentYearTotal((int)carryForwardAmount);
+                //dayScholarStatement.setCurrentYearTotal((int)carryForwardAmount);
                 feeStatementRepository.save(dayScholarStatement);
 
                 CarryForwardsEntity carryForwardsEntity = carryForwardsRepository.save(new CarryForwardsEntity(

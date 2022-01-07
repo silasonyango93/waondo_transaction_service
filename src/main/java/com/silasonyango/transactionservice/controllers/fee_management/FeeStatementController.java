@@ -1,20 +1,26 @@
 package com.silasonyango.transactionservice.controllers.fee_management;
 
+import com.lowagie.text.DocumentException;
 import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.ClassFeeBalanceRequestDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceListDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceRequestDto;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
+import com.silasonyango.transactionservice.services.pdf.FeeStatementPdfService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -22,6 +28,9 @@ import java.util.List;
 public class FeeStatementController {
     @Autowired
     FeeStatementRepository feeStatementRepository;
+
+    @Autowired
+    FeeStatementPdfService feeStatementPdfService;
 
     @PostMapping("/create_fee_statement")
     public SuccessFailureResponseDto createAFeeStatement(@Valid FeeStatementEntity feeStatementEntity) {
@@ -59,5 +68,20 @@ public class FeeStatementController {
         }
 
         return feeBalanceListDtoList;
+    }
+
+
+    @GetMapping("/export/pdf")
+    public void exportToPDF(HttpServletResponse response, @RequestParam("studentId") int studentId) throws DocumentException, IOException, URISyntaxException {
+        response.setContentType("application/pdf");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
+        response.setHeader(headerKey, headerValue);
+
+        feeStatementPdfService.export(response,studentId);
+
     }
 }
