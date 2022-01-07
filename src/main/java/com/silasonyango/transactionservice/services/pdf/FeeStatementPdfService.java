@@ -6,7 +6,11 @@ import com.lowagie.text.Image;
 import com.lowagie.text.alignment.HorizontalAlignment;
 import com.lowagie.text.alignment.VerticalAlignment;
 import com.lowagie.text.pdf.*;
+import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
+import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsResponseDto;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
+import com.silasonyango.transactionservice.services.fee_statement.FeeStatementService;
+import com.silasonyango.transactionservice.utility_classes.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +20,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 @Service
 public class FeeStatementPdfService {
@@ -23,7 +28,10 @@ public class FeeStatementPdfService {
     @Autowired
     StudentRepository studentRepository;
 
-    private void createFeeStatementTable(PdfPTable table) {
+    @Autowired
+    FeeStatementService feeStatementService;
+
+    private void createFeeStatementTable(PdfPTable table, FeeStatementResponseDto feeStatementResponseDto) {
         PdfPCell cell = new PdfPCell();
         cell.setPaddingLeft(5);
         cell.setPaddingTop(10);
@@ -35,7 +43,7 @@ public class FeeStatementPdfService {
         font.setColor(new Color(54,54,54,255));
 
         Font dataFont = FontFactory.getFont(FontFactory.HELVETICA);
-        font.setColor(new Color(71,71,71,255));
+        dataFont.setColor(new Color(71,71,71,255));
 
         PdfPCell dataCell = new PdfPCell();
         dataCell.setPaddingLeft(5);
@@ -68,28 +76,28 @@ public class FeeStatementPdfService {
 
 
         //Table body
-        dataCell.setPhrase(new Phrase("8032", dataFont));
+        dataCell.setPhrase(new Phrase(feeStatementResponseDto.getAdmissionNumber(), dataFont));
         table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase("4Y", dataFont));
+        dataCell.setPhrase(new Phrase(feeStatementResponseDto.getClassDetails(), dataFont));
         table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase("Boarder", dataFont));
+        dataCell.setPhrase(new Phrase(feeStatementResponseDto.getResidenceDetails(), dataFont));
         table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase("KES 65,000", dataFont));
+        dataCell.setPhrase(new Phrase(Utils.addCommaSeperatorsToAmountAttachedToCurrency("KES" + feeStatementResponseDto.getCurrentyearTotal()), dataFont));
         table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase("KES 5,000", dataFont));
+        dataCell.setPhrase(new Phrase(Utils.addCommaSeperatorsToAmountAttachedToCurrency("KES" + feeStatementResponseDto.getTermBalance()), dataFont));
         table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase("KES 8,000", dataFont));
+        dataCell.setPhrase(new Phrase(Utils.addCommaSeperatorsToAmountAttachedToCurrency("KES" + feeStatementResponseDto.getAnnualBalance()), dataFont));
         table.addCell(dataCell);
 
     }
 
 
-    private void createTransactionsTable(PdfPTable table) {
+    private void createTransactionsTable(PdfPTable table, FeeStatementResponseDto feeStatementResponseDto) {
         PdfPCell cell = new PdfPCell();
         cell.setPaddingLeft(5);
         cell.setPaddingTop(10);
@@ -101,7 +109,7 @@ public class FeeStatementPdfService {
         font.setColor(new Color(54,54,54,255));
 
         Font dataFont = FontFactory.getFont(FontFactory.HELVETICA);
-        font.setColor(new Color(71,71,71,255));
+        dataFont.setColor(new Color(71,71,71,255));
 
         PdfPCell dataCell = new PdfPCell();
         dataCell.setPaddingLeft(5);
@@ -133,67 +141,40 @@ public class FeeStatementPdfService {
         table.addCell(cell);
 
 
+        List<InstallmentsResponseDto> installmentsResponseDtoList = feeStatementResponseDto.getInstallmentsResponseArray();
+
         //Table body
-        dataCell.setPhrase(new Phrase("1", dataFont));
-        table.addCell(dataCell);
+        int counter = 1;
+        for (InstallmentsResponseDto installmentsResponseDto : installmentsResponseDtoList) {
+            dataCell.setPhrase(new Phrase(String.valueOf(counter), dataFont));
+            table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase("KES 30,000", dataFont));
-        table.addCell(dataCell);
+            dataCell.setPhrase(new Phrase(Utils.addCommaSeperatorsToAmountAttachedToCurrency("KES" + installmentsResponseDto.getInstallmentAmount()), dataFont));
+            table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase("2018-01-05", dataFont));
-        table.addCell(dataCell);
+            dataCell.setPhrase(new Phrase(installmentsResponseDto.getInstallmentDate(), dataFont));
+            table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase("No", dataFont));
-        table.addCell(dataCell);
+            dataCell.setPhrase(new Phrase(installmentsResponseDto.getIsCarryForward() == 1 ? "Yes" : "No", dataFont));
+            table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase("Term One", dataFont));
-        table.addCell(dataCell);
+            dataCell.setPhrase(new Phrase(installmentsResponseDto.getTermDetails(), dataFont));
+            table.addCell(dataCell);
 
-        dataCell.setPhrase(new Phrase("Mr Dalmas Akoko", dataFont));
-        table.addCell(dataCell);
+            dataCell.setPhrase(new Phrase(installmentsResponseDto.getBursarName(), dataFont));
+            table.addCell(dataCell);
 
+            counter++;
+        }
 
-        dataCell.setPhrase(new Phrase("2", dataFont));
-        table.addCell(dataCell);
-
-        dataCell.setPhrase(new Phrase("KES 30,000", dataFont));
-        table.addCell(dataCell);
-
-        dataCell.setPhrase(new Phrase("2018-01-05", dataFont));
-        table.addCell(dataCell);
-
-        dataCell.setPhrase(new Phrase("No", dataFont));
-        table.addCell(dataCell);
-
-        dataCell.setPhrase(new Phrase("Term One", dataFont));
-        table.addCell(dataCell);
-
-        dataCell.setPhrase(new Phrase("Mr Dalmas Akoko", dataFont));
-        table.addCell(dataCell);
-
-
-        dataCell.setPhrase(new Phrase("3", dataFont));
-        table.addCell(dataCell);
-
-        dataCell.setPhrase(new Phrase("KES 30,000", dataFont));
-        table.addCell(dataCell);
-
-        dataCell.setPhrase(new Phrase("2018-01-05", dataFont));
-        table.addCell(dataCell);
-
-        dataCell.setPhrase(new Phrase("No", dataFont));
-        table.addCell(dataCell);
-
-        dataCell.setPhrase(new Phrase("Term One", dataFont));
-        table.addCell(dataCell);
-
-        dataCell.setPhrase(new Phrase("Mr Dalmas Akoko", dataFont));
-        table.addCell(dataCell);
 
     }
 
 
     public void export(HttpServletResponse response, int studentId) throws DocumentException, IOException, URISyntaxException {
+
+        FeeStatementResponseDto feeStatementResponseDto = feeStatementService.getAStudentFeeStatementSinceJoining(studentId);
+
         Document document = new Document(PageSize.A4);
         PdfWriter.getInstance(document, response.getOutputStream());
 
@@ -261,8 +242,8 @@ public class FeeStatementPdfService {
         tableTransactions.setSpacingBefore(16);
         tableTransactions.setHorizontalAlignment(HorizontalAlignment.LEFT.getId());
 
-        createFeeStatementTable(tableStatement);
-        createTransactionsTable(tableTransactions);
+        createFeeStatementTable(tableStatement,feeStatementResponseDto);
+        createTransactionsTable(tableTransactions,feeStatementResponseDto);
 
         document.add(tableStatement);
         document.add(pInstallmentsTitle);
