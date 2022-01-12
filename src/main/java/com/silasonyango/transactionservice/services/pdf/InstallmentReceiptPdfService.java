@@ -5,7 +5,9 @@ import com.lowagie.text.Font;
 import com.lowagie.text.Image;
 import com.lowagie.text.alignment.HorizontalAlignment;
 import com.lowagie.text.alignment.VerticalAlignment;
-import com.lowagie.text.pdf.*;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsResponseDto;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
@@ -23,13 +25,14 @@ import java.nio.file.Paths;
 import java.util.List;
 
 @Service
-public class FeeStatementPdfService {
+public class InstallmentReceiptPdfService {
 
     @Autowired
     StudentRepository studentRepository;
 
     @Autowired
     FeeStatementService feeStatementService;
+
 
     private void createFeeStatementTable(PdfPTable table, FeeStatementResponseDto feeStatementResponseDto) {
         PdfPCell cell = new PdfPCell();
@@ -39,10 +42,10 @@ public class FeeStatementPdfService {
         cell.setBorderColor(new Color(219,219,219,255));
         cell.setVerticalAlignment(VerticalAlignment.CENTER.getId());
 
-        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+        com.lowagie.text.Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
         font.setColor(new Color(54,54,54,255));
 
-        Font dataFont = FontFactory.getFont(FontFactory.HELVETICA);
+        com.lowagie.text.Font dataFont = FontFactory.getFont(FontFactory.HELVETICA);
         dataFont.setColor(new Color(71,71,71,255));
 
         PdfPCell dataCell = new PdfPCell();
@@ -105,10 +108,10 @@ public class FeeStatementPdfService {
         cell.setBorderColor(new Color(219,219,219,255));
         cell.setVerticalAlignment(VerticalAlignment.CENTER.getId());
 
-        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+        com.lowagie.text.Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
         font.setColor(new Color(54,54,54,255));
 
-        Font dataFont = FontFactory.getFont(FontFactory.HELVETICA);
+        com.lowagie.text.Font dataFont = FontFactory.getFont(FontFactory.HELVETICA);
         dataFont.setColor(new Color(71,71,71,255));
 
         PdfPCell dataCell = new PdfPCell();
@@ -173,27 +176,27 @@ public class FeeStatementPdfService {
 
     public void export(HttpServletResponse response, int studentId) throws DocumentException, IOException, URISyntaxException {
 
-        FeeStatementResponseDto feeStatementResponseDto = feeStatementService.getAStudentFeeStatementSinceJoining(studentId);
+        FeeStatementResponseDto feeStatementResponseDto = feeStatementService.getAStudentFeeStatementForCurrentYear(studentId);
 
         Document document = new Document(PageSize.A4);
         PdfWriter.getInstance(document, response.getOutputStream());
 
         document.open();
 
-        //Path path = Paths.get(ClassLoader.getSystemResource("waondo.png").toURI());
-        Image imgSchoolLogo = Image.getInstance("http://waondonode.livelihoodzone.xyz/web_display_image?imageID=4c8c5443079d45bde6ec337b74774a0d");
+        Path path = Paths.get(ClassLoader.getSystemResource("waondo.png").toURI());
+        com.lowagie.text.Image imgSchoolLogo = Image.getInstance(path.toAbsolutePath().toString());
         imgSchoolLogo.setSpacingBefore(10);
         imgSchoolLogo.setAlignment(Paragraph.ALIGN_CENTER);
         imgSchoolLogo.scaleToFit(120,120);
 
-        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+        com.lowagie.text.Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
         font.setSize(18);
         font.setColor(new Color(74,74,74,255));
 
-        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+        com.lowagie.text.Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
         font.setColor(new Color(54,54,54,255));
 
-        Font fontMotto = FontFactory.getFont(FontFactory.HELVETICA);
+        com.lowagie.text.Font fontMotto = FontFactory.getFont(FontFactory.HELVETICA);
         fontMotto.setSize(18);
         fontMotto.setColor(new Color(93,93,93,255));
 

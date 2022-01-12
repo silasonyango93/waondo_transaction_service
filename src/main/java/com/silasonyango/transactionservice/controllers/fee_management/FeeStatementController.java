@@ -7,6 +7,7 @@ import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceListDto
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceRequestDto;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
+import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.services.pdf.FeeStatementPdfService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
@@ -31,6 +32,9 @@ public class FeeStatementController {
 
     @Autowired
     FeeStatementPdfService feeStatementPdfService;
+
+    @Autowired
+    StudentRepository studentRepository;
 
     @PostMapping("/create_fee_statement")
     public SuccessFailureResponseDto createAFeeStatement(@Valid FeeStatementEntity feeStatementEntity) {
@@ -74,11 +78,13 @@ public class FeeStatementController {
     @GetMapping("/export/pdf")
     public void exportToPDF(HttpServletResponse response, @RequestParam("studentId") int studentId) throws DocumentException, IOException, URISyntaxException {
         response.setContentType("application/pdf");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
         String currentDateTime = dateFormatter.format(new Date());
 
+        String fileName = studentRepository.findByStudentId(studentId).get(0).getStudentName() + " " + currentDateTime + " Fee Statement";
+
         String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=users_" + currentDateTime + ".pdf";
+        String headerValue = "attachment; filename=" + fileName + ".pdf";
         response.setHeader(headerKey, headerValue);
 
         feeStatementPdfService.export(response,studentId);

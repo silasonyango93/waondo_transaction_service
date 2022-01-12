@@ -1,5 +1,6 @@
 package com.silasonyango.transactionservice.controllers.fee_management;
 
+import com.lowagie.text.DocumentException;
 import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
 import com.silasonyango.transactionservice.common.config.TransactionDescriptionsConfig;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeComponentsResponseDto;
@@ -17,16 +18,21 @@ import com.silasonyango.transactionservice.repository.session_management.Session
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
+import com.silasonyango.transactionservice.services.pdf.InstallmentReceiptPdfService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -67,6 +73,9 @@ public class InstallmentsController {
 
     @Autowired
     SessionActivitiesRepository sessionActivitiesRepository;
+
+    @Autowired
+    InstallmentReceiptPdfService installmentReceiptPdfService;
 
     @PostMapping("/add_installment")
     public FeeStatementResponseDto addInstallment(@Valid InstallmentsDto installmentsDto) {
@@ -298,6 +307,23 @@ public class InstallmentsController {
 
             studentFeeComponentRepository.save(new StudentFeeComponentEntity(studentFeeComponentId, studentId, classFeeStructureComponentId, componentFeeAmount));
         }
+    }
+
+
+    @GetMapping("/export/pdf")
+    public void exportToPDF(HttpServletResponse response, @RequestParam("studentId") int studentId) throws DocumentException, IOException, URISyntaxException {
+        response.setContentType("application/pdf");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDateTime = dateFormatter.format(new Date());
+
+        String fileName = studentRepository.findByStudentId(studentId).get(0).getStudentName() + " " + currentDateTime + " Installment Receipt";
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=" + fileName + ".pdf";
+        response.setHeader(headerKey, headerValue);
+
+        installmentReceiptPdfService.export(response,studentId);
+
     }
 
 }
