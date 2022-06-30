@@ -298,10 +298,10 @@ public class ActualTermsController {
                 FeeStatementEntity boarderStatement = feeStatementRepository.findFeeStatementByStudentId(currentStudent.getStudentId()).get(0);
                 double currentTermBalance = boarderStatement.getCurrentTermBalance();
                 double currentAnnualBalance = boarderStatement.getAnnualBalance();
-                double termThreeBoardingFee = 7150;
+                double termOneBoardingFee = 18000;
                 carryForwardAmount = currentTermBalance * -1;
-                double nextTermBalance = currentTermBalance + termThreeBoardingFee;
-                double nextAnnualBalance = nextTermBalance;
+                double nextTermBalance = currentTermBalance + termOneBoardingFee;
+                double nextAnnualBalance = 35150 - carryForwardAmount;
                 boarderStatement.setCurrentTermBalance((int) nextTermBalance);
                 boarderStatement.setAnnualBalance((int) nextAnnualBalance);
                 //boarderStatement.setCurrentYearTotal((int)carryForwardAmount);
@@ -335,10 +335,10 @@ public class ActualTermsController {
                 FeeStatementEntity dayScholarStatement = feeStatementRepository.findFeeStatementByStudentId(currentStudent.getStudentId()).get(0);
                 double currentTermBalance = dayScholarStatement.getCurrentTermBalance();
                 double currentAnnualBalance = dayScholarStatement.getAnnualBalance();
-                double termThreeDayScholarFee = 2400;
+                double termOneDayScholarFee = 6000;
                 carryForwardAmount = currentTermBalance * -1;
-                double nextTermBalance = currentTermBalance + termThreeDayScholarFee;
-                double nextAnnualBalance = nextTermBalance;
+                double nextTermBalance = currentTermBalance + termOneDayScholarFee;
+                double nextAnnualBalance = 12000 - carryForwardAmount;
                 dayScholarStatement.setCurrentTermBalance((int) nextTermBalance);
                 dayScholarStatement.setAnnualBalance((int) nextAnnualBalance);
                 //dayScholarStatement.setCurrentYearTotal((int)carryForwardAmount);

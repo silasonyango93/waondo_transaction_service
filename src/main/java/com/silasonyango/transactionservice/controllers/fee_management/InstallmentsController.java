@@ -23,6 +23,7 @@ import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -78,6 +79,7 @@ public class InstallmentsController {
     InstallmentReceiptPdfService installmentReceiptPdfService;
 
     @PostMapping("/add_installment")
+    @Transactional
     public FeeStatementResponseDto addInstallment(@Valid InstallmentsDto installmentsDto) {
 
         int previousTermBalance = 0;
@@ -91,7 +93,7 @@ public class InstallmentsController {
 
         UserSessionActivitiesEntity userSessionActivitiesEntity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(installmentsDto.getSessionLogId(), sessionActivitiesRepository.findBySessionActivityCode(SessionActivitiesConfig.REGISTER_FEE_INSTALLMENT_SESSION_ACTIVITY).get(0).getSessionActivityId(), UtilityClass.getNow(), 0));
 
-        InstallmentsEntity dbInstallment = installmentRepository.save(new InstallmentsEntity(installmentsDto.getStudentId(), installmentsDto.getInstallmentAmount(), UtilityClass.getNow(), 0, installmentsDto.getSessionLogId(), userSessionActivitiesEntity.getUserSessionActivityId(), UtilityClass.getCurrentYear(), 0));
+
 
         FeeStatementEntity dbFeeStatement = feeStatementRepository.findFeeStatementByStudentId(installmentsDto.getStudentId()).get(0);
 
@@ -101,9 +103,12 @@ public class InstallmentsController {
         dbFeeStatement.setAnnualBalance(UtilityClass.getAStudentAnnualBalanceFromTermBalance(dbFeeStatement.getStudentId(), dbFeeStatement.getCurrentTermBalance(), UtilityClass.getAStudentResidenceDetails(dbFeeStatement.getStudentId()).getInt("StudentResidenceId")));
         dbFeeStatement.setStudentWorth(getNextStudentWorth(dbFeeStatement.getStudentId()));
 
-        registerTransaction(installmentsDto.getSessionLogId(), userSessionActivitiesEntity.getUserSessionActivityId(), installmentsDto.getStudentId(), dbInstallment.getInstallmentId(), previousTermBalance, previousAnnualBalance, previousTotal, dbFeeStatement.getCurrentTermBalance(), dbFeeStatement.getAnnualBalance(), dbFeeStatement.getCurrentYearTotal());
 
         feeStatementRepository.save(dbFeeStatement);
+
+        InstallmentsEntity dbInstallment = installmentRepository.save(new InstallmentsEntity(installmentsDto.getStudentId(), installmentsDto.getInstallmentAmount(), UtilityClass.getNow(), 0, installmentsDto.getSessionLogId(), userSessionActivitiesEntity.getUserSessionActivityId(), UtilityClass.getCurrentYear(), 0));
+
+        registerTransaction(installmentsDto.getSessionLogId(), userSessionActivitiesEntity.getUserSessionActivityId(), installmentsDto.getStudentId(), dbInstallment.getInstallmentId(), previousTermBalance, previousAnnualBalance, previousTotal, dbFeeStatement.getCurrentTermBalance(), dbFeeStatement.getAnnualBalance(), dbFeeStatement.getCurrentYearTotal());
 
         updateAStudentFeeComponents(dbFeeStatement.getStudentId(), dbFeeStatement.getCurrentYearTotal());
 
