@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   namespace: uat
@@ -12,6 +12,9 @@ spec:
       http:
         paths:
           - path: /
+            pathType: ImplementationSpecific
             backend:
-              serviceName: waondo-transaction-service
-              servicePort: 8080
+              service:
+                name: waondo-transaction-service
+                port:
+                  number: 8080
