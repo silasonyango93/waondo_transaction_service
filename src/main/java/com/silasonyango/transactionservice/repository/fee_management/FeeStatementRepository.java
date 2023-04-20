@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface FeeStatementRepository extends JpaRepository<FeeStatementEntity, Long> {
     public List<FeeStatementEntity> findFeeStatementByStudentId(@Param("StudentId") int studentId);
+
+    void deleteByStudentId(@Param("StudentId") int studentId);
 }

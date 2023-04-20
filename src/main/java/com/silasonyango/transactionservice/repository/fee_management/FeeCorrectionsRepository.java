@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface FeeCorrectionsRepository extends JpaRepository<FeeCorrectionsEntity, Long> {
     public List<FeeCorrectionsEntity> findByIsAdminFeeCorrection(@Param("IsAdminFeeCorrection") int isAdminFeeCorrection);
+
+    void deleteByStudentId(@Param("StudentId") int studentId);
 }

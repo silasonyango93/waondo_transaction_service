@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface CarryForwardsRepository extends JpaRepository<CarryForwardsEntity, Long> {
     public List<CarryForwardsEntity> findByIsAdminCarryForward(@Param("IsAdminCarryForward") int isAdminCarryForward);
+
+    void deleteByStudentId(@Param("StudentId") int studentId);
 }
