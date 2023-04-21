@@ -25,7 +25,7 @@ import java.util.List;
 public class TransactionsController {
 
     @PostMapping("/transactions_by_date")
-    public List<TransactionsResponseDto> fetchTransactionsByDate(@RequestBody TransactionByDateRequestDto transactionByDateRequestDto) {
+    public List<TransactionsResponseDto> fetchTransactionsByDate(@y TransactionByDateRequestDto transactionByDateRequestDto) {
         TransactionsService transactionsService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL+"/").create(TransactionsService.class);
         Call<List<TransactionsResponseDto>> callSync = transactionsService.fetchTransactionsByDate(transactionByDateRequestDto.getTransactionDate());
         try {
@@ -37,7 +37,7 @@ public class TransactionsController {
     }
 
     @PostMapping("/transactions_by_date_range")
-    public List<TransactionsResponseDto> fetchTransactionsByDateRange(@RequestBody TransactionsByDateRangeRequestDto transactionsByDateRangeRequestDto) {
+    public List<TransactionsResponseDto> fetchTransactionsByDateRange(@y TransactionsByDateRangeRequestDto transactionsByDateRangeRequestDto) {
         TransactionsService transactionsService = RetrofitClientInstance.getRetrofitInstance(EndPoints.WAONDO_NODE_BASE_URL+"/").create(TransactionsService.class);
         Call<List<TransactionsResponseDto>> callSync = transactionsService.fetchTransactionsByDateRange(transactionsByDateRangeRequestDto.getTransactionsStartDate(),transactionsByDateRangeRequestDto.getTransactionsEndDate());
         try {

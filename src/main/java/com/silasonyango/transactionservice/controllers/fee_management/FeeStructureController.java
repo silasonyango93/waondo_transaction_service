@@ -122,7 +122,7 @@ public class FeeStructureController {
 
 
     @PostMapping("/edit_a_fee_structure")
-    public boolean editAFeeStructure(@RequestBody EditFeeStructureBreakdownRequestModel editFeeStructureBreakdownRequestModel) {
+    public boolean editAFeeStructure(@y EditFeeStructureBreakdownRequestModel editFeeStructureBreakdownRequestModel) {
         for (BreakDownEditRequestModel requestedChange : editFeeStructureBreakdownRequestModel.getRequestedChanges()) {
             ClassFeeStructureBreakDownEntity breakDownToBeChanged = classFeeStructureBreakDownRepository.findByAcademicLevelFeeStructureBreakDownId(requestedChange.getClassFeeStructureBreakDownId());
             breakDownToBeChanged.setFeeAmount((int) requestedChange.getFeeAmount());
