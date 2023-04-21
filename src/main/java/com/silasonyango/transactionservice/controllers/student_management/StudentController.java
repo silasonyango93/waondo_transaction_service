@@ -24,6 +24,7 @@ import com.silasonyango.transactionservice.repository.student_management.Student
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentResidenceRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
+import com.silasonyango.transactionservice.services.student.StudentsService;
 import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import okhttp3.FormBody;
@@ -75,6 +76,9 @@ public class StudentController {
 
     @Autowired
     InstallmentRepository installmentRepository;
+
+    @Autowired
+    StudentsService studentsService;
 
     @PostMapping("/create_student")
     public SuccessFailureResponseDto createAStudent(@Valid StudentRegistrationDto studentRegistrationDto) {
@@ -268,5 +272,15 @@ public class StudentController {
         studentEntity.setGenderId(genderRepository.findByGenderCode(updateStudentBasicDetailsRequestDto.getGenderCode()).get(0).getGenderId());
 
         return studentRepository.save(studentEntity) instanceof StudentEntity;
+    }
+
+    @PostMapping("/delete")
+    public boolean deleteAStudent(@org.springframework.web.bind.annotation.RequestBody StudentRequestByAdmissionNoDto studentRequestByAdmissionNoDto) {
+        List<StudentEntity> studentEntityList = studentRepository.findByAdmissionNo(studentRequestByAdmissionNoDto.getAdmissionNumber());
+        if (studentEntityList.isEmpty()) {
+            return false;
+        }
+        StudentEntity studentEntity = studentEntityList.get(0);
+        return studentsService.deleteStudentByStudentId(studentEntity.getStudentId());
     }
 }

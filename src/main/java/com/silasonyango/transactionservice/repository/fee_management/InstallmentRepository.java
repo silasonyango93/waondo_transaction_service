@@ -11,4 +11,6 @@ public interface InstallmentRepository extends JpaRepository<InstallmentsEntity,
     public List<InstallmentsEntity> findInstallmentByIsAdminInstallment(@Param("IsAdminInstallment") int isAdminInstallment);
     public InstallmentsEntity findInstallmentByInstallmentId(@Param("InstallmentId") int installmentId);
     public List<InstallmentsEntity> findInstallmentsNotSoftDeleted(int studentId);
+
+    void deleteByStudentId(@Param("StudentId") int studentId);
 }

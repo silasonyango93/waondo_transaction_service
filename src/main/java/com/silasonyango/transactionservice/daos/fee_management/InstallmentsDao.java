@@ -47,6 +47,11 @@ public class InstallmentsDao implements InstallmentRepository {
     }
 
     @Override
+    public void deleteByStudentId(int studentId) {
+
+    }
+
+    @Override
     public List<InstallmentsEntity> findAll() {
         return null;
     }

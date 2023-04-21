@@ -34,4 +34,13 @@ public class FeeStatementService {
     public FeeStatementResponseDto getAStudentFeeStatementForCurrentYear(int studentId) {
         return installmentsController.getAStudentFeeStatementForCurrentYear(studentId);
     }
+
+    public boolean deleteFeeStatementsByStudentId(int studentId) {
+        try {
+            feeStatementRepository.deleteByStudentId(studentId);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
