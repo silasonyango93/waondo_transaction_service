@@ -6,8 +6,10 @@ import com.silasonyango.transactionservice.repository.student_management.Student
 import com.silasonyango.transactionservice.repository.student_residence.ResidenceSwapRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class StudentsService {
 
     @Autowired
@@ -33,6 +35,9 @@ public class StudentsService {
 
     @Autowired
     CarryForwardsRepository carryForwardsRepository;
+
+    @Autowired
+    InstallmentRepository installmentRepository;
 
     public boolean deleteStudentByStudentId(int studentId) {
         try {
@@ -60,9 +65,13 @@ public class StudentsService {
             if (!carryForwardsRepository.findByStudentId(studentId).isEmpty()) {
                 carryForwardsRepository.deleteByStudentId(studentId);
             }
+            if (!installmentRepository.findInstallmentsByStudentId(studentId).isEmpty()) {
+                installmentRepository.deleteByStudentId(studentId);
+            }
             studentRepository.deleteByStudentId(studentId);
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
