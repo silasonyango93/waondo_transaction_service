@@ -298,10 +298,10 @@ public class ActualTermsController {
                 }
                 double currentTermBalance = boarderStatement.getCurrentTermBalance();
                 double currentAnnualBalance = boarderStatement.getAnnualBalance();
-                double termTwoBoardingFee = 12000;
+                double termThreeBoardingFee = 8000;
                 carryForwardAmount = currentTermBalance * -1;
-                double nextTermBalance = currentTermBalance + termTwoBoardingFee;
-                double nextAnnualBalance = nextTermBalance + 8000;
+                double nextTermBalance = currentTermBalance + termThreeBoardingFee;
+                double nextAnnualBalance = nextTermBalance;
                 boarderStatement.setCurrentTermBalance((int) nextTermBalance);
                 boarderStatement.setAnnualBalance((int) nextAnnualBalance);
                 //boarderStatement.setCurrentYearTotal((int)carryForwardAmount);
@@ -341,10 +341,10 @@ public class ActualTermsController {
                 }
                 double currentTermBalance = dayScholarStatement.getCurrentTermBalance();
                 double currentAnnualBalance = dayScholarStatement.getAnnualBalance();
-                double termTwoDayScholarFee = 3600;
+                double termThreeDayScholarFee = 2400;
                 carryForwardAmount = currentTermBalance * -1;
-                double nextTermBalance = currentTermBalance + termTwoDayScholarFee;
-                double nextAnnualBalance = nextTermBalance + 2400;
+                double nextTermBalance = currentTermBalance + termThreeDayScholarFee;
+                double nextAnnualBalance = nextTermBalance;
                 dayScholarStatement.setCurrentTermBalance((int) nextTermBalance);
                 dayScholarStatement.setAnnualBalance((int) nextAnnualBalance);
                 //dayScholarStatement.setCurrentYearTotal((int)carryForwardAmount);
