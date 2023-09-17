@@ -1,12 +1,9 @@
 package com.silasonyango.transactionservice.controllers.calendar;
 
 import com.silasonyango.transactionservice.common.config.EndPoints;
-import com.silasonyango.transactionservice.common.config.SessionActivitiesConfig;
 import com.silasonyango.transactionservice.common.config.TransactionDescriptionsConfig;
-import com.silasonyango.transactionservice.daos.calendar.ActualTermsDao;
+import com.silasonyango.transactionservice.dtos.daos.calendar.ActualTermsDao;
 import com.silasonyango.transactionservice.dtos.calendar.RequestTermByTermId;
-import com.silasonyango.transactionservice.dtos.fee_management.ManualFeeTransitionRequestDto;
-import com.silasonyango.transactionservice.dtos.student_management.StudentRegistrationDto;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.AcademicClassLevelsEntity;
 import com.silasonyango.transactionservice.entity_classes.academic_classes.LotsEntity;
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
@@ -33,7 +30,6 @@ import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

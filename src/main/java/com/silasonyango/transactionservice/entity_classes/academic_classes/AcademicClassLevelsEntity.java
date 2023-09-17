@@ -1,6 +1,7 @@
 package com.silasonyango.transactionservice.entity_classes.academic_classes;
 
 import javax.persistence.*;
+import java.util.List;
 
 @javax.persistence.Entity
 @Table(name = "academic_class_levels")
@@ -18,6 +19,9 @@ public class AcademicClassLevelsEntity implements java.io.Serializable{
 
     @Column(name = "IsAdminClassLevel")
     private int isAdminClassLevel;
+
+    @OneToMany(mappedBy = "academicClassLevelId",fetch = FetchType.LAZY)
+    private List<LotsEntity> lotsEntities;
 
 
     public AcademicClassLevelsEntity() {
@@ -59,5 +63,13 @@ public class AcademicClassLevelsEntity implements java.io.Serializable{
 
     public void setIsAdminClassLevel(int isAdminClassLevel) {
         this.isAdminClassLevel = isAdminClassLevel;
+    }
+
+    public List<LotsEntity> getLotsEntities() {
+        return lotsEntities;
+    }
+
+    public void setLotsEntities(List<LotsEntity> lotsEntities) {
+        this.lotsEntities = lotsEntities;
     }
 }

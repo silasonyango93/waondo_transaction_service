@@ -1,6 +1,7 @@
 package com.silasonyango.transactionservice.entity_classes.academic_classes;
 
 import javax.persistence.*;
+import java.util.List;
 
 @javax.persistence.Entity
 @Table(name = "lots")
@@ -24,6 +25,9 @@ public class LotsEntity implements java.io.Serializable{
 
     @Column(name = "hasCompletedSchool")
     private int hasCompletedSchool = 0;
+
+    @OneToMany(mappedBy = "lotId",fetch = FetchType.LAZY)
+    private List<ClassesEntity> classesEntities;
 
     public LotsEntity() {
     }
@@ -81,5 +85,13 @@ public class LotsEntity implements java.io.Serializable{
 
     public void setHasCompletedSchool(int hasCompletedSchool) {
         this.hasCompletedSchool = hasCompletedSchool;
+    }
+
+    public List<ClassesEntity> getClassesEntities() {
+        return classesEntities;
+    }
+
+    public void setClassesEntities(List<ClassesEntity> classesEntities) {
+        this.classesEntities = classesEntities;
     }
 }

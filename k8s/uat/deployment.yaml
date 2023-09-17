@@ -15,7 +15,7 @@ spec:
       name: waondo-transaction-service
       labels:
         name: waondo-transaction-service
-        app: waondo-transaction-service
+        app: waondo-transaction-servicew  
     spec:
       containers:
         - name: waondo-transaction-service

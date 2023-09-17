@@ -1,6 +1,10 @@
 package com.silasonyango.transactionservice.entity_classes.academic_classes;
 
+import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
+import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
+
 import javax.persistence.*;
+import java.util.List;
 
 @javax.persistence.Entity
 @Table(name = "classes")
@@ -21,6 +25,9 @@ public class ClassesEntity implements java.io.Serializable{
 
     @Column(name = "IsAdminClass")
     private int IsAdminClass;
+
+    @OneToMany(mappedBy = "classId",fetch = FetchType.LAZY)
+    private List<StudentEntity> studentEntities;
 
     public ClassesEntity() {
     }
@@ -70,5 +77,13 @@ public class ClassesEntity implements java.io.Serializable{
 
     public void setIsAdminClass(int isAdminClass) {
         IsAdminClass = isAdminClass;
+    }
+
+    public List<StudentEntity> getStudentEntities() {
+        return studentEntities;
+    }
+
+    public void setStudentEntities(List<StudentEntity> studentEntities) {
+        this.studentEntities = studentEntities;
     }
 }

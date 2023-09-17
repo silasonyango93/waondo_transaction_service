@@ -5,9 +5,13 @@ import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureRespo
 import com.silasonyango.transactionservice.dtos.fee_management.ClassFeeBalanceRequestDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceListDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceRequestDto;
+import com.silasonyango.transactionservice.entity_classes.academic_classes.ClassesEntity;
+import com.silasonyango.transactionservice.entity_classes.academic_classes.LotDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
+import com.silasonyango.transactionservice.repository.academic_classes.LotDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
+import com.silasonyango.transactionservice.services.fee_statement.FeeStatementService;
 import com.silasonyango.transactionservice.services.pdf.FeeStatementPdfService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
@@ -35,6 +39,9 @@ public class FeeStatementController {
 
     @Autowired
     StudentRepository studentRepository;
+
+    @Autowired
+    FeeStatementService feeStatementService;
 
     @PostMapping("/create_fee_statement")
     public SuccessFailureResponseDto createAFeeStatement(@Valid FeeStatementEntity feeStatementEntity) {
@@ -89,5 +96,11 @@ public class FeeStatementController {
 
         feeStatementPdfService.export(response,studentId);
 
+    }
+
+
+    @GetMapping(value = "/fee-balances-per-class/{classId}")
+    public ClassesEntity testGet(@PathVariable int classId) {
+        return feeStatementService.fetchStudentFeeBalancesPerClassStream(classId);
     }
 }
