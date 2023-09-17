@@ -1,5 +1,7 @@
 package com.silasonyango.transactionservice.services.excel.students;
 
+import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
+import com.silasonyango.transactionservice.utility_classes.Utils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.silasonyango.transactionservice.common.config.UtilityConfigs.PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME;
+
 @Service
 public class StudentFeeBalancesPerClassStreamExcelService {
 
@@ -18,12 +22,11 @@ public class StudentFeeBalancesPerClassStreamExcelService {
         XSSFSheet sheet = workbook.getSheet(sheetName);
         Row titleRow = sheet.createRow(rowNum);
         Row tableHeaderRow = sheet.createRow(rowNum + 3);
-        sheet.setColumnWidth(0,4000);
-        sheet.setColumnWidth(1,15000);
-        sheet.setColumnWidth(2,15000);
-        sheet.setColumnWidth(3,15000);
-        sheet.setColumnWidth(4,15000);
-        sheet.setColumnWidth(5,15000);
+        sheet.setColumnWidth(0, 2000);
+        sheet.setColumnWidth(1, 4000);
+        sheet.setColumnWidth(2, 10000);
+        sheet.setColumnWidth(3, 7000);
+        sheet.setColumnWidth(4, 7000);
 
         CellStyle titleStyle = workbook.createCellStyle();
         XSSFFont titleFont = workbook.createFont();
@@ -39,7 +42,7 @@ public class StudentFeeBalancesPerClassStreamExcelService {
 
         createCell(titleRow, 0, sheetTitle.toUpperCase(), titleStyle);
         createCell(tableHeaderRow, 0, "#", tableHeaderStyle);
-        createCell(tableHeaderRow, 1, "Admission Number", tableHeaderStyle);
+        createCell(tableHeaderRow, 1, "Adm No.", tableHeaderStyle);
         createCell(tableHeaderRow, 2, "Name", tableHeaderStyle);
         createCell(tableHeaderRow, 3, "Term Balance", tableHeaderStyle);
         createCell(tableHeaderRow, 4, "Annual Balance", tableHeaderStyle);
@@ -55,50 +58,44 @@ public class StudentFeeBalancesPerClassStreamExcelService {
             cell.setCellValue((Double) value);
         } else if (value instanceof Boolean) {
             cell.setCellValue((Boolean) value);
-        }else {
+        } else {
             cell.setCellValue((String) value);
         }
         cell.setCellStyle(style);
     }
 
-//    private XSSFWorkbook writeDataLines(List<SubLocationEntity> subLocationEntityList, int rowCount, XSSFWorkbook workbook, String sheetName) {
-//
-//        CellStyle style = workbook.createCellStyle();
-//        XSSFFont font = workbook.createFont();
-//        font.setFontHeight(14);
-//        style.setFont(font);
-//        style.setAlignment(HorizontalAlignment.LEFT);
-//
-//
-//        XSSFSheet sheet = workbook.getSheet(sheetName);
-//
-//
-//        for (SubLocationEntity subLocationEntity : subLocationEntityList) {
-//            Row subLocationRow = sheet.createRow(rowCount++);
-//            createCell(subLocationRow, 0, subLocationEntity.getSubLocationName(), style);
-//            createCell(subLocationRow, 1, getWard(subLocationEntity).getWardName(), style);
-//            createCell(subLocationRow, 2, getSubCounty(getWard(subLocationEntity)).getSubCountyName(), style);
-//        }
-//
-//
-//
-//        return workbook;
-//    }
-//
-//
-//    public XSSFWorkbook processData(CountySampledSubLocationsObject countySampledSubLocationsObject, XSSFWorkbook workbook) {
-//
-//
-//        String sheetName = "Sampled Sub-Locations";
-//
-//        XSSFSheet sheet = workbook.getSheet(sheetName);
-//
-//        List<LivelihoodZoneSampledSubLocationsObject> livelihoodZoneSampledSubLocationsObjectList = countySampledSubLocationsObject.getLivelihoodZoneSampledSubLocationsObjectList();
-//
-//        for (LivelihoodZoneSampledSubLocationsObject livelihoodZoneSampledSubLocationsObject : livelihoodZoneSampledSubLocationsObjectList) {
-//            workbook = writeHeaderLine(sheet.getLastRowNum() + 4,livelihoodZoneSampledSubLocationsObject.getLivelihoodZoneName(),workbook, sheetName);
-//            workbook = writeDataLines(livelihoodZoneSampledSubLocationsObject.getSampledSubLocations(), sheet.getLastRowNum() + 1,workbook, sheetName);
-//        }
-//        return workbook;
-//    }
+    private XSSFWorkbook writeDataLines(List<StudentEntity> studentEntityList, int rowCount, XSSFWorkbook workbook, String sheetName) {
+
+        CellStyle style = workbook.createCellStyle();
+        XSSFFont font = workbook.createFont();
+        font.setFontHeight(14);
+        style.setFont(font);
+        style.setAlignment(HorizontalAlignment.LEFT);
+
+        XSSFSheet sheet = workbook.getSheet(sheetName);
+
+        int counter = 1;
+        for (StudentEntity studentEntity : studentEntityList) {
+            Row sheetRow = sheet.createRow(rowCount++);
+            createCell(sheetRow, 0, counter, style);
+            createCell(sheetRow, 1, studentEntity.getAdmissionNo(), style);
+            createCell(sheetRow, 2, studentEntity.getStudentName().toUpperCase(), style);
+            createCell(sheetRow, 3, Utils.formatToCommaSeperatedValue(studentEntity.getFeeStatementEntities()
+                    .get(0).getCurrentTermBalance()), style);
+            createCell(sheetRow, 4, Utils.formatToCommaSeperatedValue(studentEntity.getFeeStatementEntities()
+                    .get(0).getAnnualBalance()), style);
+            counter++;
+        }
+
+
+        return workbook;
+    }
+
+
+    public XSSFWorkbook processData(XSSFWorkbook workbook, String sheetTitle, List<StudentEntity> studentEntityList) {
+        XSSFSheet sheet = workbook.getSheet(PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
+        workbook = writeHeaderLine(sheet.getLastRowNum() + 2, sheetTitle, workbook, PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
+        workbook = writeDataLines(studentEntityList, sheet.getLastRowNum() + 1, workbook, PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
+        return workbook;
+    }
 }
