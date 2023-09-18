@@ -5,12 +5,19 @@ import com.silasonyango.transactionservice.repository.student_management.Student
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.student_residence.ResidenceSwapRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
 public class StudentsService {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     TransactionsRepository transactionsRepository;
@@ -74,5 +81,23 @@ public class StudentsService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public List<Map<String, Object>> fetchStudentsOfAParticularLot(int lotId) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId WHERE lots.LotId = %s;", lotId);
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public List<Map<String, Object>> fetchStudentsOfAParticularClassStream(int classId) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId WHERE classes.ClassId = %s;", classId);
+        return jdbcTemplate.queryForList(sql);
     }
 }

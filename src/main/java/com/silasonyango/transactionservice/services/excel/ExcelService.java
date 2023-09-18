@@ -2,7 +2,9 @@ package com.silasonyango.transactionservice.services.excel;
 
 import com.silasonyango.transactionservice.services.excel.students.StudentFeeBalancesPerClassStreamExcelService;
 import com.silasonyango.transactionservice.services.excel.students.StudentFeeBalancesPerLotExcelService;
+import com.silasonyango.transactionservice.services.excel.students.StudentsPerLotExcelExportService;
 import com.silasonyango.transactionservice.services.fee_statement.FeeStatementService;
+import com.silasonyango.transactionservice.services.student.StudentsService;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,8 +13,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.silasonyango.transactionservice.common.config.UtilityConfigs.PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME;
-import static com.silasonyango.transactionservice.common.config.UtilityConfigs.PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME;
+import static com.silasonyango.transactionservice.common.config.UtilityConfigs.*;
 
 @Service
 public class ExcelService {
@@ -24,7 +25,13 @@ public class ExcelService {
     StudentFeeBalancesPerLotExcelService studentFeeBalancesPerLotExcelService;
 
     @Autowired
+    StudentsPerLotExcelExportService studentsPerLotExcelExportService;
+
+    @Autowired
     FeeStatementService feeStatementService;
+
+    @Autowired
+    StudentsService studentsService;
 
     private XSSFWorkbook workbook;
 
@@ -40,6 +47,11 @@ public class ExcelService {
                 workbook.createSheet(PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME);
                 workbook = studentFeeBalancesPerLotExcelService.processData(workbook, sheetTitle,
                         feeStatementService.fetchStudentFeeBalancesForASpecificLot(fetchKey));
+                break;
+            case STUDENTS_PER_LOT:
+                workbook.createSheet(STUDENTS_PER_LOT_EXCEL_SHEET_NAME);
+                workbook = studentsPerLotExcelExportService.processData(workbook, sheetTitle
+                        , studentsService.fetchStudentsOfAParticularLot(fetchKey));
                 break;
 
         }
@@ -57,6 +69,15 @@ public class ExcelService {
     public void exportFeeBalancesPerLotExcel(HttpServletResponse response, int lotId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
         processData(lotId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_LOT);
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+    }
+
+    public void processStudentsPerLotExcelExport(HttpServletResponse response, int lotId, String sheetTitle) throws IOException {
+        this.workbook = new XSSFWorkbook();
+        processData(lotId, sheetTitle, ExcelServiceEnum.STUDENTS_PER_LOT);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
