@@ -2,6 +2,7 @@ package com.silasonyango.transactionservice.services.excel;
 
 import com.silasonyango.transactionservice.services.excel.students.StudentFeeBalancesPerClassStreamExcelService;
 import com.silasonyango.transactionservice.services.excel.students.StudentFeeBalancesPerLotExcelService;
+import com.silasonyango.transactionservice.services.excel.students.StudentsPerClassStreamExcelExportService;
 import com.silasonyango.transactionservice.services.excel.students.StudentsPerLotExcelExportService;
 import com.silasonyango.transactionservice.services.fee_statement.FeeStatementService;
 import com.silasonyango.transactionservice.services.student.StudentsService;
@@ -26,6 +27,9 @@ public class ExcelService {
 
     @Autowired
     StudentsPerLotExcelExportService studentsPerLotExcelExportService;
+
+    @Autowired
+    StudentsPerClassStreamExcelExportService studentsPerClassStreamExcelExportService;
 
     @Autowired
     FeeStatementService feeStatementService;
@@ -53,6 +57,11 @@ public class ExcelService {
                 workbook = studentsPerLotExcelExportService.processData(workbook, sheetTitle
                         , studentsService.fetchStudentsOfAParticularLot(fetchKey));
                 break;
+            case STUDENT_PER_CLASS_STREAM:
+                workbook.createSheet(STUDENTS_PER_CLASS_STREAM_EXCEL_SHEET_NAME);
+                workbook = studentsPerClassStreamExcelExportService.processData(workbook, sheetTitle
+                        , studentsService.fetchStudentsOfAParticularClassStream(fetchKey));
+                break;
 
         }
     }
@@ -78,6 +87,15 @@ public class ExcelService {
     public void processStudentsPerLotExcelExport(HttpServletResponse response, int lotId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
         processData(lotId, sheetTitle, ExcelServiceEnum.STUDENTS_PER_LOT);
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+    }
+
+    public void processStudentsPerClassStreamExcelExport(HttpServletResponse response, int classId, String sheetTitle) throws IOException {
+        this.workbook = new XSSFWorkbook();
+        processData(classId, sheetTitle, ExcelServiceEnum.STUDENT_PER_CLASS_STREAM);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();

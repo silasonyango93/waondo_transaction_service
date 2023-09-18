@@ -9,4 +9,5 @@ public class UtilityConfigs {
     public static String PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME = "Class Fee Balances";
 
     public static String STUDENTS_PER_LOT_EXCEL_SHEET_NAME = "Students Per Class";
+    public static String STUDENTS_PER_CLASS_STREAM_EXCEL_SHEET_NAME = "Students Per Stream";
 }
