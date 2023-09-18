@@ -169,4 +169,21 @@ public class FeeStatementController {
             e.printStackTrace();
         }
     }
+
+    @GetMapping("/excel/fee-balances-per-class-stream-with-term-threshold")
+    public void exportFeeBalancesPerClassStramWithTermThresholdExcel(HttpServletResponse response
+            , @RequestParam("classId") int classId, @RequestParam("termBalanceThresholdAmount") int termBalanceThresholdAmount) throws IOException {
+        try {
+            Map<String, Object> fullClassNameMap = academicClassesService.fetchClassByItsFullName(classId);
+            String fileName = String.format("FORM %s%s STUDENTS WITH FEE BALANCES OF KES %s AND ABOVE.", fullClassNameMap.get("AcademicClassLevelName")
+                    , fullClassNameMap.get("ClassStreamName"), termBalanceThresholdAmount);
+            response.setContentType("application/octet-stream");
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=" + fileName + ".xlsx";
+            response.setHeader(headerKey, headerValue);
+            excelService.exportFeeBalancesPerClassStreamWithTermThresholdExcel(response, classId, fileName, termBalanceThresholdAmount);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

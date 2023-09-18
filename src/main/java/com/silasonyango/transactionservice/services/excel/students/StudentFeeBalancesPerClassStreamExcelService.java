@@ -12,6 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.silasonyango.transactionservice.common.config.UtilityConfigs.PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME;
 
@@ -64,7 +65,7 @@ public class StudentFeeBalancesPerClassStreamExcelService {
         cell.setCellStyle(style);
     }
 
-    private XSSFWorkbook writeDataLines(List<StudentEntity> studentEntityList, int rowCount, XSSFWorkbook workbook, String sheetName) {
+    private XSSFWorkbook writeDataLines(List<Map<String, Object>> dataList, int rowCount, XSSFWorkbook workbook, String sheetName) {
 
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
@@ -75,15 +76,15 @@ public class StudentFeeBalancesPerClassStreamExcelService {
         XSSFSheet sheet = workbook.getSheet(sheetName);
 
         int counter = 1;
-        for (StudentEntity studentEntity : studentEntityList) {
+        for (Map<String, Object> map : dataList) {
             Row sheetRow = sheet.createRow(rowCount++);
             createCell(sheetRow, 0, counter, style);
-            createCell(sheetRow, 1, studentEntity.getAdmissionNo(), style);
-            createCell(sheetRow, 2, studentEntity.getStudentName().toUpperCase(), style);
-            createCell(sheetRow, 3, Utils.formatToCommaSeperatedValue(studentEntity.getFeeStatementEntities()
-                    .get(0).getCurrentTermBalance()), style);
-            createCell(sheetRow, 4, Utils.formatToCommaSeperatedValue(studentEntity.getFeeStatementEntities()
-                    .get(0).getAnnualBalance()), style);
+            createCell(sheetRow, 1, map.get("AdmissionNo"), style);
+            createCell(sheetRow, 2, map.get("StudentName").toString().toUpperCase(), style);
+            createCell(sheetRow, 3,
+                    Utils.formatToCommaSeperatedValue(Double.parseDouble(String.valueOf(map.get("CurrentTermBalance")))), style);
+            createCell(sheetRow, 4, Utils.formatToCommaSeperatedValue(Double
+                    .parseDouble(String.valueOf(map.get("AnnualBalance")))), style);
             counter++;
         }
 
@@ -92,10 +93,10 @@ public class StudentFeeBalancesPerClassStreamExcelService {
     }
 
 
-    public XSSFWorkbook processData(XSSFWorkbook workbook, String sheetTitle, List<StudentEntity> studentEntityList) {
+    public XSSFWorkbook processData(XSSFWorkbook workbook, String sheetTitle, List<Map<String, Object>> dataList) {
         XSSFSheet sheet = workbook.getSheet(PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
         workbook = writeHeaderLine(sheet.getLastRowNum() + 2, sheetTitle, workbook, PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
-        workbook = writeDataLines(studentEntityList, sheet.getLastRowNum() + 1, workbook, PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
+        workbook = writeDataLines(dataList, sheet.getLastRowNum() + 1, workbook, PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
         return workbook;
     }
 }

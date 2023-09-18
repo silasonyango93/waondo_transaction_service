@@ -46,7 +46,7 @@ public class ExcelService {
                 workbook.createSheet(PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
                 workbook = studentFeeBalancesPerClassStreamExcelService
                         .processData(workbook, sheetTitle, feeStatementService
-                                .fetchStudentFeeBalancesPerClassStream(fetchKey).getStudentEntities());
+                                .fetchStudentFeeBalancesPerClassStream(fetchKey));
                 break;
             case FEE_BALANCES_PER_LOT:
                 workbook.createSheet(PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME);
@@ -64,10 +64,16 @@ public class ExcelService {
                         , studentsService.fetchStudentsOfAParticularClassStream(fetchKey));
                 break;
             case LOT_FEE_BALANCE_WITH_TERM_BALANCE_THRESHOLD:
-                workbook.createSheet(LOT_FEE_BALANCE_WITH_TERM_THRESHOLD_EXCEL_SHEET_NAME);
+                workbook.createSheet(PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME);
                 workbook = studentFeeBalancesPerLotExcelService.processData(workbook, sheetTitle,
                         feeStatementService
                                 .fetchFeeBalancesForASpecificLotWithTermBalanceGreaterThanOrEqualProvidedAmount(fetchKey, thresholdAmount));
+                break;
+            case CLASS_STREAM_FEE_BALANCE_WITH_TERM_BALANCE_THRESHOLD:
+                workbook.createSheet(PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
+                workbook = studentFeeBalancesPerClassStreamExcelService
+                        .processData(workbook, sheetTitle, feeStatementService
+                                .fetchFeeBalancesForASpecificClassWithTermBalanceGreaterThanOrEqualProvidedAmount(fetchKey, thresholdAmount));
                 break;
 
         }
@@ -121,6 +127,15 @@ public class ExcelService {
     public void exportFeeBalancesPerLotWithTermThresholdExcel(HttpServletResponse response, int lotId, String sheetTitle, int thresholdAmount) throws IOException {
         this.workbook = new XSSFWorkbook();
         processData(lotId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_LOT, false, thresholdAmount);
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+    }
+
+    public void exportFeeBalancesPerClassStreamWithTermThresholdExcel(HttpServletResponse response, int lotId, String sheetTitle, int thresholdAmount) throws IOException {
+        this.workbook = new XSSFWorkbook();
+        processData(lotId, sheetTitle, ExcelServiceEnum.CLASS_STREAM_FEE_BALANCE_WITH_TERM_BALANCE_THRESHOLD, false, thresholdAmount);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();

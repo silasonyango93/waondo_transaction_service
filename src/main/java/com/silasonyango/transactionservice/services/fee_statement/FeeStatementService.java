@@ -57,9 +57,14 @@ public class FeeStatementService {
         }
     }
 
-    public ClassesEntity fetchStudentFeeBalancesPerClassStream(int classId) {
-        return classesRepository
-                .fetchStudentFeeBalancesPerClassStream(classId);
+    public List<Map<String, Object>> fetchStudentFeeBalancesPerClassStream(int classId) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN fee_statements ON fee_statements.StudentId = students.StudentId " +
+                "WHERE classes.ClassId = %s;", classId);
+        return jdbcTemplate.queryForList(sql);
     }
 
     public List<Map<String, Object>> fetchStudentFeeBalancesForASpecificLot(int lotId) {
