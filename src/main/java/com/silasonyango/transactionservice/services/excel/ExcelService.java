@@ -39,7 +39,8 @@ public class ExcelService {
 
     private XSSFWorkbook workbook;
 
-    public void processData(int fetchKey, String sheetTitle, ExcelServiceEnum excelServiceEnum) {
+    public void processData(int fetchKey, String sheetTitle, ExcelServiceEnum excelServiceEnum
+            , boolean hasABlankSucceedingColumnToBeFilled) {
         switch (excelServiceEnum) {
             case FEE_BALANCES_PER_CLASS:
                 workbook.createSheet(PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
@@ -55,7 +56,7 @@ public class ExcelService {
             case STUDENTS_PER_LOT:
                 workbook.createSheet(STUDENTS_PER_LOT_EXCEL_SHEET_NAME);
                 workbook = studentsPerLotExcelExportService.processData(workbook, sheetTitle
-                        , studentsService.fetchStudentsOfAParticularLot(fetchKey));
+                        , studentsService.fetchStudentsOfAParticularLot(fetchKey), hasABlankSucceedingColumnToBeFilled);
                 break;
             case STUDENT_PER_CLASS_STREAM:
                 workbook.createSheet(STUDENTS_PER_CLASS_STREAM_EXCEL_SHEET_NAME);
@@ -68,7 +69,7 @@ public class ExcelService {
 
     public void exportFeeBalancesPerClassExcel(HttpServletResponse response, int classId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(classId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_CLASS);
+        processData(classId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_CLASS, false);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -77,7 +78,7 @@ public class ExcelService {
 
     public void exportFeeBalancesPerLotExcel(HttpServletResponse response, int lotId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(lotId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_LOT);
+        processData(lotId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_LOT, false);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -86,7 +87,7 @@ public class ExcelService {
 
     public void processStudentsPerLotExcelExport(HttpServletResponse response, int lotId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(lotId, sheetTitle, ExcelServiceEnum.STUDENTS_PER_LOT);
+        processData(lotId, sheetTitle, ExcelServiceEnum.STUDENTS_PER_LOT, false);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -95,7 +96,16 @@ public class ExcelService {
 
     public void processStudentsPerClassStreamExcelExport(HttpServletResponse response, int classId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(classId, sheetTitle, ExcelServiceEnum.STUDENT_PER_CLASS_STREAM);
+        processData(classId, sheetTitle, ExcelServiceEnum.STUDENT_PER_CLASS_STREAM, false);
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+    }
+
+    public void processStudentsPerLotWithPhoneNoColumnExcelExport(HttpServletResponse response, int lotId, String sheetTitle) throws IOException {
+        this.workbook = new XSSFWorkbook();
+        processData(lotId, sheetTitle, ExcelServiceEnum.STUDENTS_PER_LOT, true);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();

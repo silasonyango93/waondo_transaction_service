@@ -305,9 +305,7 @@ public class StudentController {
             String headerKey = "Content-Disposition";
             String headerValue = "attachment; filename=" + fileName + ".xlsx";
             response.setHeader(headerKey, headerValue);
-
             excelService.processStudentsPerLotExcelExport(response, lotId, fileName);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -323,9 +321,22 @@ public class StudentController {
             String headerKey = "Content-Disposition";
             String headerValue = "attachment; filename=" + fileName + ".xlsx";
             response.setHeader(headerKey, headerValue);
-
             excelService.processStudentsPerClassStreamExcelExport(response, classId, fileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    @GetMapping("/excel/students-per-lot-with-phone-number/{lotId}")
+    public void exportStudentsPerLotWithPhoneNumberExcel(HttpServletResponse response, @PathVariable int lotId) throws IOException {
+        try {
+            Map<String, Object> fullLotNameMap = academicClassesService.fetchLotByItsFullName(lotId);
+            String fileName = String.format("FORM %s PARENTS PHONE NUMBERS FORM.", fullLotNameMap.get("AcademicClassLevelName"));
+            response.setContentType("application/octet-stream");
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=" + fileName + ".xlsx";
+            response.setHeader(headerKey, headerValue);
+            excelService.processStudentsPerLotWithPhoneNoColumnExcelExport(response, lotId, fileName);
         } catch (Exception e) {
             e.printStackTrace();
         }

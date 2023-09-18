@@ -16,7 +16,8 @@ import static com.silasonyango.transactionservice.common.config.UtilityConfigs.S
 
 @Service
 public class StudentsPerLotExcelExportService {
-    private XSSFWorkbook writeHeaderLine(int rowNum, String sheetTitle, XSSFWorkbook workbook, String sheetName) {
+    private XSSFWorkbook writeHeaderLine(int rowNum, String sheetTitle, XSSFWorkbook workbook, String sheetName
+            , boolean hasABlankSucceedingColumnToBeFilled) {
         XSSFSheet sheet = workbook.getSheet(sheetName);
         Row titleRow = sheet.createRow(rowNum);
         Row tableHeaderRow = sheet.createRow(rowNum + 3);
@@ -25,6 +26,9 @@ public class StudentsPerLotExcelExportService {
         sheet.setColumnWidth(2, 10000);
         sheet.setColumnWidth(3, 4000);
         sheet.setColumnWidth(4, 4000);
+        if (hasABlankSucceedingColumnToBeFilled) {
+            sheet.setColumnWidth(5, 10000);
+        }
 
         CellStyle titleStyle = workbook.createCellStyle();
         XSSFFont titleFont = workbook.createFont();
@@ -44,6 +48,9 @@ public class StudentsPerLotExcelExportService {
         createCell(tableHeaderRow, 2, "Name", tableHeaderStyle);
         createCell(tableHeaderRow, 3, "Gender", tableHeaderStyle);
         createCell(tableHeaderRow, 4, "Stream", tableHeaderStyle);
+        if (hasABlankSucceedingColumnToBeFilled) {
+            createCell(tableHeaderRow, 5, "Parent Phone No.", tableHeaderStyle);
+        }
         return workbook;
     }
 
@@ -62,7 +69,8 @@ public class StudentsPerLotExcelExportService {
         cell.setCellStyle(style);
     }
 
-    private XSSFWorkbook writeDataLines(List<Map<String, Object>> dataList, int rowCount, XSSFWorkbook workbook, String sheetName) {
+    private XSSFWorkbook writeDataLines(List<Map<String, Object>> dataList, int rowCount, XSSFWorkbook workbook
+            , String sheetName, boolean hasABlankSucceedingColumnToBeFilled) {
 
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
@@ -81,6 +89,9 @@ public class StudentsPerLotExcelExportService {
             createCell(sheetRow, 3, map.get("GenderDescription").toString().toUpperCase(), style);
             createCell(sheetRow, 4, String.format("%s%s", map.get("AcademicClassLevelName")
                     , map.get("ClassStreamName")), style);
+            if (hasABlankSucceedingColumnToBeFilled) {
+                createCell(sheetRow, 5, "0", style);
+            }
             counter++;
         }
 
@@ -89,10 +100,13 @@ public class StudentsPerLotExcelExportService {
     }
 
 
-    public XSSFWorkbook processData(XSSFWorkbook workbook, String sheetTitle, List<Map<String, Object>> dataList) {
+    public XSSFWorkbook processData(XSSFWorkbook workbook, String sheetTitle, List<Map<String, Object>> dataList
+            , boolean hasABlankSucceedingColumnToBeFilled) {
         XSSFSheet sheet = workbook.getSheet(STUDENTS_PER_LOT_EXCEL_SHEET_NAME);
-        workbook = writeHeaderLine(sheet.getLastRowNum() + 2, sheetTitle, workbook, STUDENTS_PER_LOT_EXCEL_SHEET_NAME);
-        workbook = writeDataLines(dataList, sheet.getLastRowNum() + 1, workbook, STUDENTS_PER_LOT_EXCEL_SHEET_NAME);
+        workbook = writeHeaderLine(sheet.getLastRowNum() + 2, sheetTitle, workbook
+                , STUDENTS_PER_LOT_EXCEL_SHEET_NAME, hasABlankSucceedingColumnToBeFilled);
+        workbook = writeDataLines(dataList, sheet.getLastRowNum() + 1, workbook
+                , STUDENTS_PER_LOT_EXCEL_SHEET_NAME, hasABlankSucceedingColumnToBeFilled);
         return workbook;
     }
 }
