@@ -24,6 +24,8 @@ import com.silasonyango.transactionservice.repository.student_management.Student
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentResidenceRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
+import com.silasonyango.transactionservice.services.academic_classes.AcademicClassesService;
+import com.silasonyango.transactionservice.services.excel.ExcelService;
 import com.silasonyango.transactionservice.services.student.StudentsService;
 import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
@@ -32,15 +34,16 @@ import okhttp3.RequestBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.silasonyango.transactionservice.utility_classes.UtilityClass.getTermDetailsByDate;
 
@@ -79,6 +82,12 @@ public class StudentController {
 
     @Autowired
     StudentsService studentsService;
+
+    @Autowired
+    AcademicClassesService academicClassesService;
+
+    @Autowired
+    ExcelService excelService;
 
     @PostMapping("/create_student")
     public SuccessFailureResponseDto createAStudent(@Valid StudentRegistrationDto studentRegistrationDto) {
@@ -284,5 +293,52 @@ public class StudentController {
         }
         StudentEntity studentEntity = studentEntityList.get(0);
         return studentsService.deleteStudentByStudentId(studentEntity.getStudentId());
+    }
+
+
+    @GetMapping("/excel/students-per-lot/{lotId}")
+    public void exportStudentsPerLotExcel(HttpServletResponse response, @PathVariable int lotId) throws IOException {
+        try {
+            Map<String, Object> fullLotNameMap = academicClassesService.fetchLotByItsFullName(lotId);
+            String fileName = String.format("FORM %s STUDENTS.", fullLotNameMap.get("AcademicClassLevelName"));
+            response.setContentType("application/octet-stream");
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=" + fileName + ".xlsx";
+            response.setHeader(headerKey, headerValue);
+            excelService.processStudentsPerLotExcelExport(response, lotId, fileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/excel/students-per-class-stream/{classId}")
+    public void exportStudentsPerClassStreamExcel(HttpServletResponse response, @PathVariable int classId) throws IOException {
+        try {
+            Map<String, Object> fullClassNameMap = academicClassesService.fetchClassByItsFullName(classId);
+            String fileName = String.format("FORM %s%s STUDENTS.", fullClassNameMap.get("AcademicClassLevelName")
+                    , fullClassNameMap.get("ClassStreamName"));
+            response.setContentType("application/octet-stream");
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=" + fileName + ".xlsx";
+            response.setHeader(headerKey, headerValue);
+            excelService.processStudentsPerClassStreamExcelExport(response, classId, fileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/excel/students-per-lot-with-phone-number/{lotId}")
+    public void exportStudentsPerLotWithPhoneNumberExcel(HttpServletResponse response, @PathVariable int lotId) throws IOException {
+        try {
+            Map<String, Object> fullLotNameMap = academicClassesService.fetchLotByItsFullName(lotId);
+            String fileName = String.format("FORM %s PARENTS PHONE NUMBERS FORM.", fullLotNameMap.get("AcademicClassLevelName"));
+            response.setContentType("application/octet-stream");
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=" + fileName + ".xlsx";
+            response.setHeader(headerKey, headerValue);
+            excelService.processStudentsPerLotWithPhoneNoColumnExcelExport(response, lotId, fileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

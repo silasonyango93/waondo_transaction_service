@@ -1,6 +1,10 @@
 package com.silasonyango.transactionservice.entity_classes.student_management;
 
+import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
+
 import javax.persistence.*;
+import java.util.List;
+
 @javax.persistence.Entity
 @Table(name = "students")
 
@@ -46,6 +50,9 @@ public class StudentEntity implements java.io.Serializable{
 
     @Column(name = "IsAnAdminStudent")
     private int isAnAdminStudent;
+
+    @OneToMany(mappedBy = "studentId",fetch = FetchType.LAZY)
+    private List<FeeStatementEntity> feeStatementEntities;
 
     public StudentEntity() {
     }
@@ -153,5 +160,13 @@ public class StudentEntity implements java.io.Serializable{
 
     public void setIsAnAdminStudent(int isAnAdminStudent) {
         this.isAnAdminStudent = isAnAdminStudent;
+    }
+
+    public List<FeeStatementEntity> getFeeStatementEntities() {
+        return feeStatementEntities;
+    }
+
+    public void setFeeStatementEntities(List<FeeStatementEntity> feeStatementEntities) {
+        this.feeStatementEntities = feeStatementEntities;
     }
 }

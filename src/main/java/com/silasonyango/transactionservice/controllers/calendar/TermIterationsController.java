@@ -1,10 +1,9 @@
 package com.silasonyango.transactionservice.controllers.calendar;
 
-import com.silasonyango.transactionservice.daos.calendar.TermIterationsDao;
+import com.silasonyango.transactionservice.dtos.daos.calendar.TermIterationsDao;
 import com.silasonyango.transactionservice.entity_classes.calendar.TermIterationsEntity;
 import com.silasonyango.transactionservice.repository.calendar.TermIterationsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

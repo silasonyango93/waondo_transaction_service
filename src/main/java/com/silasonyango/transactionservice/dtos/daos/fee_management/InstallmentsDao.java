@@ -1,4 +1,4 @@
-package com.silasonyango.transactionservice.daos.fee_management;
+package com.silasonyango.transactionservice.dtos.daos.fee_management;
 
 import com.silasonyango.transactionservice.entity_classes.calendar.ActualTermsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;

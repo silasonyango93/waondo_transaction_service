@@ -1,6 +1,8 @@
 package com.silasonyango.transactionservice.entity_classes.academic_classes;
 
 import javax.persistence.*;
+import java.util.List;
+
 @javax.persistence.Entity
 @Table(name = "lot_descriptions")
 public class LotDescriptionsEntity implements java.io.Serializable{
@@ -14,6 +16,9 @@ public class LotDescriptionsEntity implements java.io.Serializable{
 
     @Column(name = "IsAdminLotDescription")
     private int isAdminLotDescription;
+
+    @OneToMany(mappedBy = "lotDescriptionId",fetch = FetchType.LAZY)
+    private List<LotsEntity> lotsEntities;
 
     public LotDescriptionsEntity() {
     }
@@ -45,5 +50,13 @@ public class LotDescriptionsEntity implements java.io.Serializable{
 
     public void setIsAdminLotDescription(int isAdminLotDescription) {
         this.isAdminLotDescription = isAdminLotDescription;
+    }
+
+    public List<LotsEntity> getLotsEntities() {
+        return lotsEntities;
+    }
+
+    public void setLotsEntities(List<LotsEntity> lotsEntities) {
+        this.lotsEntities = lotsEntities;
     }
 }
