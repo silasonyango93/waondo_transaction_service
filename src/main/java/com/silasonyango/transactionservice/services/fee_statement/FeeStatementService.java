@@ -12,12 +12,17 @@ import com.silasonyango.transactionservice.repository.academic_classes.LotDescri
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class FeeStatementService {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     FeeStatementRepository feeStatementRepository;
@@ -55,5 +60,15 @@ public class FeeStatementService {
     public ClassesEntity fetchStudentFeeBalancesPerClassStream(int classId) {
         return classesRepository
                 .fetchStudentFeeBalancesPerClassStream(classId);
+    }
+
+    public List<Map<String, Object>> fetchStudentFeeBalancesForASpecificLot(int lotId) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN fee_statements ON fee_statements.StudentId = students.StudentId " +
+                "WHERE lots.LotId = %s;", lotId);
+        return jdbcTemplate.queryForList(sql);
     }
 }

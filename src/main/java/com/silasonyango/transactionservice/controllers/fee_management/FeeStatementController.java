@@ -116,7 +116,7 @@ public class FeeStatementController {
 
 
     @GetMapping("/excel/fee-balances-per-class/{classId}")
-    public void exportToExcel(HttpServletResponse response, @PathVariable int classId) throws IOException {
+    public void exportFeeBalancesPerClassExcel(HttpServletResponse response, @PathVariable int classId) throws IOException {
         try {
 
             Map<String, Object> fullClassNameMap = academicClassesService.fetchClassByItsFullName(classId);
@@ -127,7 +127,25 @@ public class FeeStatementController {
             String headerValue = "attachment; filename=" + fileName + ".xlsx";
             response.setHeader(headerKey, headerValue);
 
-            excelService.export(response, classId, fileName);
+            excelService.exportFeeBalancesPerClassExcel(response, classId, fileName);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @GetMapping("/excel/fee-balances-per-lot/{lotId}")
+    public void exportFeeBalancesPerLotExcel(HttpServletResponse response, @PathVariable int lotId) throws IOException {
+        try {
+            Map<String, Object> fullLotNameMap = academicClassesService.fetchLotByItsFullName(lotId);
+            String fileName = String.format("FORM %s STUDENT FEE BALANCES.", fullLotNameMap.get("AcademicClassLevelName"));
+            response.setContentType("application/octet-stream");
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=" + fileName + ".xlsx";
+            response.setHeader(headerKey, headerValue);
+
+            excelService.exportFeeBalancesPerLotExcel(response, lotId, fileName);
 
         } catch (Exception e) {
             e.printStackTrace();
