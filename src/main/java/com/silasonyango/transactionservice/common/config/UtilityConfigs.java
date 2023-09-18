@@ -10,4 +10,5 @@ public class UtilityConfigs {
 
     public static String STUDENTS_PER_LOT_EXCEL_SHEET_NAME = "Students Per Class";
     public static String STUDENTS_PER_CLASS_STREAM_EXCEL_SHEET_NAME = "Students Per Stream";
+    public static String LOT_FEE_BALANCE_WITH_TERM_THRESHOLD_EXCEL_SHEET_NAME = "Lot Balance Term Threshold";
 }

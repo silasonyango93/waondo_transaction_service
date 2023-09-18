@@ -71,4 +71,26 @@ public class FeeStatementService {
                 "WHERE lots.LotId = %s;", lotId);
         return jdbcTemplate.queryForList(sql);
     }
+
+    public List<Map<String, Object>> fetchFeeBalancesForASpecificLotWithTermBalanceGreaterThanOrEqualProvidedAmount(
+            int lotId, int thresholdTermBalance) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN fee_statements ON fee_statements.StudentId = students.StudentId " +
+                "WHERE lots.LotId = %s AND fee_statements.CurrentTermBalance >= %s;", lotId, thresholdTermBalance);
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public List<Map<String, Object>> fetchFeeBalancesForASpecificClassWithTermBalanceGreaterThanOrEqualProvidedAmount(
+            int classId, int thresholdTermBalance) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN fee_statements ON fee_statements.StudentId = students.StudentId " +
+                "WHERE classes.ClassId = %s AND fee_statements.CurrentTermBalance >= %s;", classId, thresholdTermBalance);
+        return jdbcTemplate.queryForList(sql);
+    }
 }
