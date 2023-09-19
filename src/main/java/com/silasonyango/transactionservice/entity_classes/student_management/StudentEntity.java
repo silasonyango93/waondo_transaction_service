@@ -51,6 +51,9 @@ public class StudentEntity implements java.io.Serializable{
     @Column(name = "IsAnAdminStudent")
     private int isAnAdminStudent;
 
+    @Column(name = "ParentPhoneNumber")
+    private String parentPhoneNumber;
+
     @OneToMany(mappedBy = "studentId",fetch = FetchType.LAZY)
     private List<FeeStatementEntity> feeStatementEntities;
 
@@ -160,6 +163,14 @@ public class StudentEntity implements java.io.Serializable{
 
     public void setIsAnAdminStudent(int isAnAdminStudent) {
         this.isAnAdminStudent = isAnAdminStudent;
+    }
+
+    public String getParentPhoneNumber() {
+        return parentPhoneNumber;
+    }
+
+    public void setParentPhoneNumber(String parentPhoneNumber) {
+        this.parentPhoneNumber = parentPhoneNumber;
     }
 
     public List<FeeStatementEntity> getFeeStatementEntities() {

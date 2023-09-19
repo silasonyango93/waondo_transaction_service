@@ -48,8 +48,15 @@ public class Utils {
             DecimalFormat formatter = new DecimalFormat("#,###.00");
             return formatter.format(amount);
         }
+    }
 
-
+    public static String formatIntegerToCommaSeperatedValue(int amount) {
+        if(amount == 0){
+            return "00.00";
+        }else {
+            DecimalFormat formatter = new DecimalFormat("#,###.00");
+            return formatter.format(amount);
+        }
     }
 
     public static String formatMonetaryValue(Number value, String currency) {
