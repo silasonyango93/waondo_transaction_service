@@ -135,7 +135,7 @@ public class ExcelService {
 
     public void exportFeeBalancesPerLotWithTermThresholdExcel(HttpServletResponse response, int lotId, String sheetTitle, int thresholdAmount) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(lotId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_LOT, false, thresholdAmount);
+        processData(lotId, sheetTitle, ExcelServiceEnum.LOT_FEE_BALANCE_WITH_TERM_BALANCE_THRESHOLD, false, thresholdAmount);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
