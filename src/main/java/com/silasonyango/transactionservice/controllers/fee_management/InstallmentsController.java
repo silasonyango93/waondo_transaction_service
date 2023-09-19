@@ -18,6 +18,7 @@ import com.silasonyango.transactionservice.repository.session_management.Session
 import com.silasonyango.transactionservice.repository.session_management.UserSessionActivitiesRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
+import com.silasonyango.transactionservice.services.excel.ExcelService;
 import com.silasonyango.transactionservice.services.pdf.InstallmentReceiptPdfService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
@@ -32,10 +33,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static com.silasonyango.transactionservice.utility_classes.UtilityClass.getTermDetailsByDate;
 
@@ -77,6 +75,9 @@ public class InstallmentsController {
 
     @Autowired
     InstallmentReceiptPdfService installmentReceiptPdfService;
+
+    @Autowired
+    ExcelService excelService;
 
     @PostMapping("/add_installment")
     @Transactional
@@ -329,6 +330,20 @@ public class InstallmentsController {
 
         installmentReceiptPdfService.export(response,studentId);
 
+    }
+
+    @GetMapping("/excel/fee-installments-made-today")
+    public void exportFeeInstallmentsMadeToday(HttpServletResponse response) throws IOException {
+        try {
+            String fileName = String.format("FEE INSTALLMENTS MADE TODAY (%s)", new SimpleDateFormat("E, MMM dd yyyy").format(new Date()));
+            response.setContentType("application/octet-stream");
+            String headerKey = "Content-Disposition";
+            String headerValue = "attachment; filename=" + fileName + ".xlsx";
+            response.setHeader(headerKey, headerValue);
+            excelService.exportInstallmentsMadeTodayExcel(response, fileName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

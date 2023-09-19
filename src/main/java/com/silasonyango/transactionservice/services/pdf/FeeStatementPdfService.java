@@ -9,7 +9,7 @@ import com.lowagie.text.pdf.*;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
 import com.silasonyango.transactionservice.dtos.fee_management.InstallmentsResponseDto;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
-import com.silasonyango.transactionservice.services.fee_statement.FeeStatementService;
+import com.silasonyango.transactionservice.services.fee_management.FeeStatementService;
 import com.silasonyango.transactionservice.utility_classes.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,8 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Service

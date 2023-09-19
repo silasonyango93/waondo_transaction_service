@@ -1,14 +1,9 @@
-package com.silasonyango.transactionservice.services.fee_statement;
+package com.silasonyango.transactionservice.services.fee_management;
 
 import com.silasonyango.transactionservice.controllers.fee_management.InstallmentsController;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeStatementResponseDto;
-import com.silasonyango.transactionservice.entity_classes.academic_classes.ClassesEntity;
-import com.silasonyango.transactionservice.entity_classes.academic_classes.LotDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
-import com.silasonyango.transactionservice.entity_classes.fee_management.InstallmentsEntity;
-import com.silasonyango.transactionservice.entity_classes.student_management.StudentEntity;
 import com.silasonyango.transactionservice.repository.academic_classes.ClassesRepository;
-import com.silasonyango.transactionservice.repository.academic_classes.LotDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.fee_management.InstallmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;

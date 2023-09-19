@@ -17,7 +17,8 @@ import static com.silasonyango.transactionservice.common.config.UtilityConfigs.P
 
 @Service
 public class StudentFeeBalancesPerLotExcelService {
-    private XSSFWorkbook writeHeaderLine(int rowNum, String sheetTitle, XSSFWorkbook workbook, String sheetName) {
+    private XSSFWorkbook writeHeaderLine(int rowNum, String sheetTitle, XSSFWorkbook workbook, String sheetName
+            , boolean includeFeeInstallmentColumn) {
         XSSFSheet sheet = workbook.getSheet(sheetName);
         Row titleRow = sheet.createRow(rowNum);
         Row tableHeaderRow = sheet.createRow(rowNum + 3);
@@ -27,6 +28,9 @@ public class StudentFeeBalancesPerLotExcelService {
         sheet.setColumnWidth(3, 4000);
         sheet.setColumnWidth(4, 7000);
         sheet.setColumnWidth(5, 7000);
+        if (includeFeeInstallmentColumn) {
+            sheet.setColumnWidth(6, 7000);
+        }
 
         CellStyle titleStyle = workbook.createCellStyle();
         XSSFFont titleFont = workbook.createFont();
@@ -47,6 +51,9 @@ public class StudentFeeBalancesPerLotExcelService {
         createCell(tableHeaderRow, 3, "Stream", tableHeaderStyle);
         createCell(tableHeaderRow, 4, "Term Balance", tableHeaderStyle);
         createCell(tableHeaderRow, 5, "Annual Balance", tableHeaderStyle);
+        if (includeFeeInstallmentColumn) {
+            createCell(tableHeaderRow, 6, "Today's installment", tableHeaderStyle);
+        }
         return workbook;
     }
 
@@ -65,7 +72,8 @@ public class StudentFeeBalancesPerLotExcelService {
         cell.setCellStyle(style);
     }
 
-    private XSSFWorkbook writeDataLines(List<Map<String, Object>> dataList, int rowCount, XSSFWorkbook workbook, String sheetName) {
+    private XSSFWorkbook writeDataLines(List<Map<String, Object>> dataList, int rowCount, XSSFWorkbook workbook
+            , String sheetName, boolean includeFeeInstallmentColumn) {
 
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
@@ -87,6 +95,16 @@ public class StudentFeeBalancesPerLotExcelService {
                     .parseDouble(String.valueOf(map.get("CurrentTermBalance")))), style);
             createCell(sheetRow, 5, Utils.formatToCommaSeperatedValue(Double
                     .parseDouble(String.valueOf(map.get("AnnualBalance")))), style);
+            if (includeFeeInstallmentColumn) {
+                CellStyle tableHeaderStyle = workbook.createCellStyle();
+                XSSFFont tableHeaderFont = workbook.createFont();
+                tableHeaderFont.setFontHeight(14);
+                tableHeaderFont.setBold(true);
+                tableHeaderStyle.setFont(tableHeaderFont);
+                tableHeaderStyle.setAlignment(HorizontalAlignment.LEFT);
+                createCell(sheetRow, 6, Utils.formatToCommaSeperatedValue(Double
+                        .parseDouble(String.valueOf(map.get("InstallmentAmount")))), tableHeaderStyle);
+            }
             counter++;
         }
 
@@ -96,9 +114,15 @@ public class StudentFeeBalancesPerLotExcelService {
 
 
     public XSSFWorkbook processData(XSSFWorkbook workbook, String sheetTitle, List<Map<String, Object>> dataList) {
+        boolean includeFeeInstallmentColumn = false;
+        if (!dataList.isEmpty()) {
+            includeFeeInstallmentColumn = dataList.get(0).get("InstallmentAmount") != null;
+        }
         XSSFSheet sheet = workbook.getSheet(PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME);
-        workbook = writeHeaderLine(sheet.getLastRowNum() + 2, sheetTitle, workbook, PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME);
-        workbook = writeDataLines(dataList, sheet.getLastRowNum() + 1, workbook, PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME);
+        workbook = writeHeaderLine(sheet.getLastRowNum() + 2, sheetTitle, workbook
+                , PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME, includeFeeInstallmentColumn);
+        workbook = writeDataLines(dataList, sheet.getLastRowNum() + 1, workbook
+                , PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME, includeFeeInstallmentColumn);
         return workbook;
     }
 }

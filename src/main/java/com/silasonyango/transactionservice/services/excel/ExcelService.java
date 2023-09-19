@@ -4,7 +4,8 @@ import com.silasonyango.transactionservice.services.excel.students.StudentFeeBal
 import com.silasonyango.transactionservice.services.excel.students.StudentFeeBalancesPerLotExcelService;
 import com.silasonyango.transactionservice.services.excel.students.StudentsPerClassStreamExcelExportService;
 import com.silasonyango.transactionservice.services.excel.students.StudentsPerLotExcelExportService;
-import com.silasonyango.transactionservice.services.fee_statement.FeeStatementService;
+import com.silasonyango.transactionservice.services.fee_management.FeeInstallmentsService;
+import com.silasonyango.transactionservice.services.fee_management.FeeStatementService;
 import com.silasonyango.transactionservice.services.student.StudentsService;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class ExcelService {
 
     @Autowired
     StudentsService studentsService;
+
+    @Autowired
+    FeeInstallmentsService feeInstallmentsService;
 
     private XSSFWorkbook workbook;
 
@@ -74,6 +78,11 @@ public class ExcelService {
                 workbook = studentFeeBalancesPerClassStreamExcelService
                         .processData(workbook, sheetTitle, feeStatementService
                                 .fetchFeeBalancesForASpecificClassWithTermBalanceGreaterThanOrEqualProvidedAmount(fetchKey, thresholdAmount));
+                break;
+            case FEE_INSTALLMENTS_MADE_TODAY:
+                workbook.createSheet(PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME);
+                workbook = studentFeeBalancesPerLotExcelService.processData(workbook, sheetTitle,
+                        feeInstallmentsService.fetchFeeInstallmentsMadeToday());
                 break;
 
         }
@@ -136,6 +145,16 @@ public class ExcelService {
     public void exportFeeBalancesPerClassStreamWithTermThresholdExcel(HttpServletResponse response, int lotId, String sheetTitle, int thresholdAmount) throws IOException {
         this.workbook = new XSSFWorkbook();
         processData(lotId, sheetTitle, ExcelServiceEnum.CLASS_STREAM_FEE_BALANCE_WITH_TERM_BALANCE_THRESHOLD, false, thresholdAmount);
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+    }
+
+
+    public void exportInstallmentsMadeTodayExcel(HttpServletResponse response, String sheetTitle) throws IOException {
+        this.workbook = new XSSFWorkbook();
+        processData(0, sheetTitle, ExcelServiceEnum.FEE_INSTALLMENTS_MADE_TODAY, false, 0);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();

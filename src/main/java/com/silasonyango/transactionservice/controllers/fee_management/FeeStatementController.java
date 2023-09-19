@@ -5,22 +5,18 @@ import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureRespo
 import com.silasonyango.transactionservice.dtos.fee_management.ClassFeeBalanceRequestDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceListDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceRequestDto;
-import com.silasonyango.transactionservice.entity_classes.academic_classes.ClassesEntity;
-import com.silasonyango.transactionservice.entity_classes.academic_classes.LotDescriptionsEntity;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
-import com.silasonyango.transactionservice.repository.academic_classes.LotDescriptionsRepository;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.services.academic_classes.AcademicClassesService;
 import com.silasonyango.transactionservice.services.excel.ExcelService;
-import com.silasonyango.transactionservice.services.fee_statement.FeeStatementService;
+import com.silasonyango.transactionservice.services.fee_management.FeeStatementService;
 import com.silasonyango.transactionservice.services.pdf.FeeStatementPdfService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.json.JsonObject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;

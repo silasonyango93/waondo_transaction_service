@@ -1,4 +1,4 @@
-package com.silasonyango.transactionservice.services.fee_statement;
+package com.silasonyango.transactionservice.services.fee_management;
 
 import com.silasonyango.transactionservice.repository.fee_management.FeeCorrectionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
