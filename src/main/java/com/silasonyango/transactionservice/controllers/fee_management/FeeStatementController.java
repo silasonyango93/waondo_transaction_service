@@ -10,11 +10,14 @@ import com.silasonyango.transactionservice.repository.fee_management.FeeStatemen
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
 import com.silasonyango.transactionservice.services.academic_classes.AcademicClassesService;
 import com.silasonyango.transactionservice.services.excel.ExcelService;
+import com.silasonyango.transactionservice.services.fee_management.FeeReminderService;
 import com.silasonyango.transactionservice.services.fee_management.FeeStatementService;
 import com.silasonyango.transactionservice.services.pdf.FeeStatementPdfService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +51,9 @@ public class FeeStatementController {
 
     @Autowired
     ExcelService excelService;
+
+    @Autowired
+    FeeReminderService feeReminderService;
 
     @PostMapping("/create_fee_statement")
     public SuccessFailureResponseDto createAFeeStatement(@Valid FeeStatementEntity feeStatementEntity) {
@@ -181,5 +187,16 @@ public class FeeStatementController {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @GetMapping("/sms/send-fee-reminder-with-threshold")
+    public ResponseEntity<String> sendFeeReminder(@RequestParam("lotId") int lotId
+            , @RequestParam("feeBalanceThreshold") int feeBalanceThreshold) {
+        if (feeReminderService.sendSmsFeeReminderForSpecificLot(lotId, feeBalanceThreshold)) {
+            return new ResponseEntity<String>("Fee reminder sent successfully to all concerned parties"
+                    , HttpStatus.valueOf(200));
+        }
+        return new ResponseEntity<String>("Problem encountered while sending the messages"
+                , HttpStatus.valueOf(500));
     }
 }

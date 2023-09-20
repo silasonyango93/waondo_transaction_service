@@ -2,7 +2,7 @@ package com.silasonyango.transactionservice.controllers.sms;
 
 import com.silasonyango.transactionservice.dtos.rabbitmq.RabbitMqCustomMessage;
 import com.silasonyango.transactionservice.dtos.sms.SendSmsRequestDto;
-import com.silasonyango.transactionservice.services.rabbitmq.producer.RabbitMQProducer;
+import com.silasonyango.transactionservice.services.rabbitmq.producer.FeeReminderRabbitMqProducer;
 import com.silasonyango.transactionservice.services.sms.SmsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,16 +20,16 @@ public class SmsServiceController {
     SmsService smsService;
 
     @Autowired
-    RabbitMQProducer rabbitMQProducer;
+    FeeReminderRabbitMqProducer feeReminderRabbitMqProducer;
 
     @PostMapping("/send")
     public ResponseEntity<String> sendSms(@RequestBody SendSmsRequestDto sendSmsRequestDto) {
         try {
-            rabbitMQProducer.sendMessage(new RabbitMqCustomMessage(
-                    null,
-                    sendSmsRequestDto.getSmsMessage(),
-                    null
-            ));
+//            feeReminderRabbitMqProducer.sendMessage(new RabbitMqCustomMessage(
+//                    null,
+//                    sendSmsRequestDto.getSmsMessage(),
+//                    null
+//            ));
             return new ResponseEntity<String>("Sms sent successfully", HttpStatus.valueOf(200));
         } catch (Exception e) {
             e.printStackTrace();

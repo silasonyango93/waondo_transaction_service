@@ -92,6 +92,12 @@ public class Utils {
         return stringDateFormat.format(date);
     }
 
+
+    public static String convertDateObjectToUserFriendlyDateWithTime(Date date) {
+        DateFormat stringDateFormat = new SimpleDateFormat("E, MMM dd yyyy HH:mm");
+        return stringDateFormat.format(date);
+    }
+
     public static String formatAccountNumber(String accountNumber) {
         return accountNumber != null && !accountNumber.equals("") ? accountNumber.replaceAll("....(?!$)", "$0 ") : "";
     }
