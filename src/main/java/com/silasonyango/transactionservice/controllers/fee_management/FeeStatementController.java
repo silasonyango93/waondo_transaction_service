@@ -191,8 +191,9 @@ public class FeeStatementController {
 
     @GetMapping("/sms/send-fee-reminder-with-threshold")
     public ResponseEntity<String> sendFeeReminder(@RequestParam("lotId") int lotId
-            , @RequestParam("feeBalanceThreshold") int feeBalanceThreshold) {
-        if (feeReminderService.sendSmsFeeReminderForSpecificLot(lotId, feeBalanceThreshold)) {
+            , @RequestParam("feeBalanceThreshold") int feeBalanceThreshold
+            , @RequestParam("paymentDeadlineDate") String paymentDeadlineDate) {
+        if (feeReminderService.sendSmsFeeReminderForSpecificLot(lotId, feeBalanceThreshold, paymentDeadlineDate)) {
             return new ResponseEntity<String>("Fee reminder sent successfully to all concerned parties"
                     , HttpStatus.valueOf(200));
         }

@@ -2,10 +2,13 @@ package com.silasonyango.transactionservice.services.rabbitmq.consumer.fee_remin
 
 import com.silasonyango.transactionservice.dtos.rabbitmq.FeeReminderRmqCustomMessage;
 import com.silasonyango.transactionservice.services.sms.SmsService;
+import com.silasonyango.transactionservice.utility_classes.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Date;
 
 @Component
 @Slf4j
@@ -18,6 +21,12 @@ public class FeeReminderRabbitMqConsumer {
     public void listener(FeeReminderRmqCustomMessage feeReminderRmqCustomMessage) {
         log.info(String.format("Received message with id -> %s", feeReminderRmqCustomMessage.getMessageId()));
         if (feeReminderRmqCustomMessage.getParentPhoneNumber() != null) {
+            String textMessage = String.format("FROM WAONDO SEC SCH. \n. Greetings parent/guardian. %s' current Term fee Balance " +
+                            " is KES %s as at %s. Kindly pay by %s to avoid any inconveniences. \n The Principal."
+                    , feeReminderRmqCustomMessage.getStudentName()
+                    , Utils.formatIntegerToCommaSeperatedValue(feeReminderRmqCustomMessage.getCurrentTermBalance())
+                    , Utils.convertDateObjectToUserFriendlyDateWithTime(new Date())
+                    , Utils.convertToUserFriendlyDate(feeReminderRmqCustomMessage.getPaymentDeadlineDate(), "yyyy-MM-dd"));
             smsService.sendSms(
                     feeReminderRmqCustomMessage.getParentPhoneNumber(),
                     feeReminderRmqCustomMessage.toString()

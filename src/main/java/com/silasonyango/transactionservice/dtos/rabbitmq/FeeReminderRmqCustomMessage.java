@@ -22,13 +22,16 @@ public class FeeReminderRmqCustomMessage {
     private int currentTermBalance;
     private int currentAnnualBalance;
     private String parentPhoneNumber;
+    private String paymentDeadlineDate;
 
-    public FeeReminderRmqCustomMessage(int studentId, String admissionNo, String studentName, int currentTermBalance, int currentAnnualBalance, String parentPhoneNumber) {
+    public FeeReminderRmqCustomMessage(int studentId, String admissionNo, String studentName, int currentTermBalance
+            , int currentAnnualBalance, String parentPhoneNumber, String paymentDeadlineDate) {
         this.studentId = studentId;
         this.admissionNo = admissionNo;
         this.studentName = studentName;
         this.currentTermBalance = currentTermBalance;
         this.currentAnnualBalance = currentAnnualBalance;
         this.parentPhoneNumber = parentPhoneNumber;
+        this.paymentDeadlineDate = paymentDeadlineDate;
     }
 }
