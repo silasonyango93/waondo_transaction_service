@@ -14,20 +14,21 @@ import java.util.UUID;
 @AllArgsConstructor
 @ToString
 public class FeeReminderRmqCustomMessage {
-    String messageId = UUID.randomUUID().toString();
-    String messageDate = Utils.convertDateObjectToUserFriendlyDateWithTime(new Date());
-    int studentId;
+    private String messageId = UUID.randomUUID().toString();
+    private String messageDate = Utils.convertDateObjectToUserFriendlyDateWithTime(new Date());
+    private int studentId;
+    private String admissionNo;
+    private String studentName;
+    private int currentTermBalance;
+    private int currentAnnualBalance;
+    private String parentPhoneNumber;
 
-    String admissionNo;
-    String studentName;
-    int currentTermBalance;
-    int currentAnnualBalance;
-
-    public FeeReminderRmqCustomMessage(int studentId, String admissionNo, String studentName, int currentTermBalance, int currentAnnualBalance) {
+    public FeeReminderRmqCustomMessage(int studentId, String admissionNo, String studentName, int currentTermBalance, int currentAnnualBalance, String parentPhoneNumber) {
         this.studentId = studentId;
         this.admissionNo = admissionNo;
         this.studentName = studentName;
         this.currentTermBalance = currentTermBalance;
         this.currentAnnualBalance = currentAnnualBalance;
+        this.parentPhoneNumber = parentPhoneNumber;
     }
 }
