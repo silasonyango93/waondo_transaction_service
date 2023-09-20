@@ -21,15 +21,15 @@ public class FeeReminderRabbitMqConsumer {
     public void listener(FeeReminderRmqCustomMessage feeReminderRmqCustomMessage) {
         log.info(String.format("Received message with id -> %s", feeReminderRmqCustomMessage.getMessageId()));
         if (feeReminderRmqCustomMessage.getParentPhoneNumber() != null) {
-            String textMessage = String.format("FROM WAONDO SEC SCH. \n. Greetings parent/guardian. %s' current Term fee Balance " +
-                            " is KES %s as at %s. Kindly pay by %s to avoid any inconveniences. \n The Principal."
+            String textMessage = String.format("FROM WAONDO SEC SCH.\nGreetings parent/guardian.\n%s's current term fee balance " +
+                            " is KES %s as at %s. Kindly pay by %s to avoid any inconveniences.\nThe Principal."
                     , feeReminderRmqCustomMessage.getStudentName()
                     , Utils.formatIntegerToCommaSeperatedValue(feeReminderRmqCustomMessage.getCurrentTermBalance())
                     , Utils.convertDateObjectToUserFriendlyDateWithTime(new Date())
                     , Utils.convertToUserFriendlyDate(feeReminderRmqCustomMessage.getPaymentDeadlineDate(), "yyyy-MM-dd"));
             smsService.sendSms(
                     feeReminderRmqCustomMessage.getParentPhoneNumber(),
-                    feeReminderRmqCustomMessage.toString()
+                    textMessage
             );
         }
     }

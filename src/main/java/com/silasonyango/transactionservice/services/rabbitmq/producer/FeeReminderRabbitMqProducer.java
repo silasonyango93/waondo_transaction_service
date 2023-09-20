@@ -27,6 +27,7 @@ public class FeeReminderRabbitMqProducer {
 
     public boolean sendMessage(FeeReminderRmqCustomMessage message) {
         try {
+            log.info(String.format("The message to be sent -> %s", message));
             amqpTemplate.convertAndSend(exchange, routingKey, message);
             log.info(String.format("Message with id -> %s was sent successfully", message.getMessageId()));
             return true;

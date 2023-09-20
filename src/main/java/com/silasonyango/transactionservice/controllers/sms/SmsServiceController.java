@@ -1,5 +1,6 @@
 package com.silasonyango.transactionservice.controllers.sms;
 
+import com.silasonyango.transactionservice.dtos.rabbitmq.FeeReminderRmqCustomMessage;
 import com.silasonyango.transactionservice.dtos.rabbitmq.RabbitMqCustomMessage;
 import com.silasonyango.transactionservice.dtos.sms.SendSmsRequestDto;
 import com.silasonyango.transactionservice.services.rabbitmq.producer.FeeReminderRabbitMqProducer;
@@ -25,11 +26,9 @@ public class SmsServiceController {
     @PostMapping("/send")
     public ResponseEntity<String> sendSms(@RequestBody SendSmsRequestDto sendSmsRequestDto) {
         try {
-//            feeReminderRabbitMqProducer.sendMessage(new RabbitMqCustomMessage(
-//                    null,
-//                    sendSmsRequestDto.getSmsMessage(),
-//                    null
-//            ));
+            FeeReminderRmqCustomMessage message = new FeeReminderRmqCustomMessage();
+            message.setParentPhoneNumber(null);
+            feeReminderRabbitMqProducer.sendMessage(message);
             return new ResponseEntity<String>("Sms sent successfully", HttpStatus.valueOf(200));
         } catch (Exception e) {
             e.printStackTrace();

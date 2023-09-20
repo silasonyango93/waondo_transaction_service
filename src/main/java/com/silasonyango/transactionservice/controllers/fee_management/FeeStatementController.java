@@ -14,6 +14,7 @@ import com.silasonyango.transactionservice.services.fee_management.FeeReminderSe
 import com.silasonyango.transactionservice.services.fee_management.FeeStatementService;
 import com.silasonyango.transactionservice.services.pdf.FeeStatementPdfService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
+import com.silasonyango.transactionservice.utility_classes.Utils;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -161,7 +162,7 @@ public class FeeStatementController {
         try {
             Map<String, Object> fullLotNameMap = academicClassesService.fetchLotByItsFullName(lotId);
             String fileName = String.format("FORM %s STUDENTS WITH FEE BALANCES OF KES %s AND ABOVE."
-                    , fullLotNameMap.get("AcademicClassLevelName"), termBalanceThresholdAmount);
+                    , fullLotNameMap.get("AcademicClassLevelName"), Utils.formatIntegerToCommaSeperatedValue(termBalanceThresholdAmount));
             response.setContentType("application/octet-stream");
             String headerKey = "Content-Disposition";
             String headerValue = "attachment; filename=" + fileName + ".xlsx";
@@ -178,7 +179,7 @@ public class FeeStatementController {
         try {
             Map<String, Object> fullClassNameMap = academicClassesService.fetchClassByItsFullName(classId);
             String fileName = String.format("FORM %s%s STUDENTS WITH FEE BALANCES OF KES %s AND ABOVE.", fullClassNameMap.get("AcademicClassLevelName")
-                    , fullClassNameMap.get("ClassStreamName"), termBalanceThresholdAmount);
+                    , fullClassNameMap.get("ClassStreamName"), Utils.formatIntegerToCommaSeperatedValue(termBalanceThresholdAmount));
             response.setContentType("application/octet-stream");
             String headerKey = "Content-Disposition";
             String headerValue = "attachment; filename=" + fileName + ".xlsx";
