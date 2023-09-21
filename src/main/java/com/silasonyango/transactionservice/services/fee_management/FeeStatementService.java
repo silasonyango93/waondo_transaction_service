@@ -93,4 +93,26 @@ public class FeeStatementService {
                 "WHERE classes.ClassId = %s AND fee_statements.CurrentTermBalance >= %s;", classId, thresholdTermBalance);
         return jdbcTemplate.queryForList(sql);
     }
+
+    public List<Map<String, Object>> fetchFeeBalancesForASpecificListOfStudents(List<Integer> studentIds) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN fee_statements ON fee_statements.StudentId = students.StudentId INNER JOIN gender ON students.GenderId = gender.GenderId " +
+                "WHERE students.StudentId IN %s", returnProcessedDynamicInClause(studentIds));
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public String returnProcessedDynamicInClause(List<Integer> referenceList) {
+        String result = "(";
+        for (int i = 0; i < referenceList.size(); i++) {
+            if (i != referenceList.size() - 1) {
+                result = String.format("%s'%s',", result, referenceList.get(i));
+            } else {
+                result = String.format("%s'%s');", result, referenceList.get(i));
+            }
+        }
+        return result;
+    }
 }

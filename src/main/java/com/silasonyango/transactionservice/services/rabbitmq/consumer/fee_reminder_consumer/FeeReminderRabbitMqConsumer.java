@@ -20,17 +20,29 @@ public class FeeReminderRabbitMqConsumer {
     @RabbitListener(queues = "fee_payment_reminder_sms_queue")
     public void listener(FeeReminderRmqCustomMessage feeReminderRmqCustomMessage) {
         log.info(String.format("Received message with id -> %s", feeReminderRmqCustomMessage.getMessageId()));
-        if (feeReminderRmqCustomMessage.getParentPhoneNumber() != null) {
-            String textMessage = String.format("FROM WAONDO SEC SCH.\nGreetings parent/guardian.\n%s's current term fee balance " +
-                            " is KES %s as at %s. Kindly pay by %s to avoid any inconveniences.\nThe Principal."
-                    , feeReminderRmqCustomMessage.getStudentName()
-                    , Utils.formatIntegerToCommaSeperatedValue(feeReminderRmqCustomMessage.getCurrentTermBalance())
-                    , Utils.convertDateObjectToUserFriendlyDateWithTime(new Date())
-                    , Utils.convertToUserFriendlyDate(feeReminderRmqCustomMessage.getPaymentDeadlineDate(), "yyyy-MM-dd"));
-            smsService.sendSms(
-                    feeReminderRmqCustomMessage.getParentPhoneNumber(),
-                    textMessage
-            );
+
+        switch (feeReminderRmqCustomMessage.getMessageCategory()) {
+            case FEE_REMINDER:
+                if (feeReminderRmqCustomMessage.getParentPhoneNumber() != null) {
+                    String textMessage = String.format("FROM WAONDO SEC SCH.\nGreetings parent/guardian.\n%s's current term fee balance " +
+                                    " is KES %s as at %s. Kindly pay by %s to avoid any inconveniences.\nThe Principal."
+                            , feeReminderRmqCustomMessage.getStudentName()
+                            , Utils.formatIntegerToCommaSeperatedValue(feeReminderRmqCustomMessage.getCurrentTermBalance())
+                            , Utils.convertDateObjectToUserFriendlyDateWithTime(new Date())
+                            , Utils.convertToUserFriendlyDate(feeReminderRmqCustomMessage.getPaymentDeadlineDate(), "yyyy-MM-dd"));
+                    smsService.sendSms(
+                            feeReminderRmqCustomMessage.getParentPhoneNumber(),
+                            textMessage
+                    );
+                }
+                break;
+
+            case GENERAL_ANNOUNCEMENT:
+                if (feeReminderRmqCustomMessage.getParentPhoneNumber() != null) {
+                    smsService.sendSms(feeReminderRmqCustomMessage.getParentPhoneNumber()
+                            , feeReminderRmqCustomMessage.getGeneralAnnouncement());
+                }
+                break;
         }
     }
 }

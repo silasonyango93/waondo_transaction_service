@@ -5,6 +5,7 @@ import com.silasonyango.transactionservice.dtos.api_response.SuccessFailureRespo
 import com.silasonyango.transactionservice.dtos.fee_management.ClassFeeBalanceRequestDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceListDto;
 import com.silasonyango.transactionservice.dtos.fee_management.FeeBalanceRequestDto;
+import com.silasonyango.transactionservice.dtos.fee_management.FeeReminderForListOfStudentsDto;
 import com.silasonyango.transactionservice.entity_classes.fee_management.FeeStatementEntity;
 import com.silasonyango.transactionservice.repository.fee_management.FeeStatementRepository;
 import com.silasonyango.transactionservice.repository.student_management.StudentRepository;
@@ -190,11 +191,35 @@ public class FeeStatementController {
         }
     }
 
-    @GetMapping("/sms/send-fee-reminder-with-threshold")
-    public ResponseEntity<String> sendFeeReminder(@RequestParam("lotId") int lotId
+    @GetMapping("/sms/send-fee-reminder-to-specific-lot-with-threshold")
+    public ResponseEntity<String> sendFeeReminderToSpecificLotWithThreshold(@RequestParam("lotId") int lotId
             , @RequestParam("feeBalanceThreshold") int feeBalanceThreshold
             , @RequestParam("paymentDeadlineDate") String paymentDeadlineDate) {
         if (feeReminderService.sendSmsFeeReminderForSpecificLot(lotId, feeBalanceThreshold, paymentDeadlineDate)) {
+            return new ResponseEntity<String>("Fee reminder sent successfully to all concerned parties"
+                    , HttpStatus.valueOf(200));
+        }
+        return new ResponseEntity<String>("Problem encountered while sending the messages"
+                , HttpStatus.valueOf(500));
+    }
+
+    @GetMapping("/sms/send-fee-reminder-to-specific-class-stream-with-threshold")
+    public ResponseEntity<String> sendFeeReminderToSpecificClassStreamWithThreshold(@RequestParam("classId") int classId
+            , @RequestParam("feeBalanceThreshold") int feeBalanceThreshold
+            , @RequestParam("paymentDeadlineDate") String paymentDeadlineDate) {
+        if (feeReminderService.sendSmsFeeReminderForSpecificClassStream(classId, feeBalanceThreshold, paymentDeadlineDate)) {
+            return new ResponseEntity<String>("Fee reminder sent successfully to all concerned parties"
+                    , HttpStatus.valueOf(200));
+        }
+        return new ResponseEntity<String>("Problem encountered while sending the messages"
+                , HttpStatus.valueOf(500));
+    }
+
+    @PostMapping("/sms/send-fee-reminder-to-specific-list-of-students-with-threshold")
+    public ResponseEntity<String> sendFeeReminderToSpecificListOfStudentsWithThreshold(
+            @RequestBody FeeReminderForListOfStudentsDto feeBalanceThreshold) {
+        if (feeReminderService.sendSmsFeeReminderForSpecificListOfStudents(feeBalanceThreshold.getStudentIds()
+                , feeBalanceThreshold.getDeadlineDate())) {
             return new ResponseEntity<String>("Fee reminder sent successfully to all concerned parties"
                     , HttpStatus.valueOf(200));
         }

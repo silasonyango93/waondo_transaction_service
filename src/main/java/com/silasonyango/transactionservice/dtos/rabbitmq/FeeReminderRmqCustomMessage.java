@@ -23,6 +23,8 @@ public class FeeReminderRmqCustomMessage {
     private int currentAnnualBalance;
     private String parentPhoneNumber;
     private String paymentDeadlineDate;
+    private String generalAnnouncement;
+    private RabbitMqMessageDistinctionEnum messageCategory;
 
     public FeeReminderRmqCustomMessage(int studentId, String admissionNo, String studentName, int currentTermBalance
             , int currentAnnualBalance, String parentPhoneNumber, String paymentDeadlineDate) {

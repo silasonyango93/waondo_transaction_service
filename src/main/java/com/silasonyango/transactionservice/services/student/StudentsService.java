@@ -100,4 +100,46 @@ public class StudentsService {
                 "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId WHERE classes.ClassId = %s;", classId);
         return jdbcTemplate.queryForList(sql);
     }
+
+    public List<Map<String, Object>> fetchAllStudentsInEntireSchoolNotCompletedSchool() {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId " +
+                "WHERE lots.hasCompletedSchool = 0;");
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public List<Map<String, Object>> fetchAllStudentsInEntireSchoolWhoHaveCompletedSchool() {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId " +
+                "WHERE lots.hasCompletedSchool = 1;");
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public List<Map<String, Object>> fetchStudentsFromAProvidedListOfStudentIds(List<Integer> studentIds) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId " +
+                "WHERE students.StudentId IN %s", returnProcessedDynamicInClause(studentIds));
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public String returnProcessedDynamicInClause(List<Integer> referenceList) {
+        String result = "(";
+        for (int i = 0; i < referenceList.size(); i++) {
+            if (i != referenceList.size() - 1) {
+                result = String.format("%s'%s',", result, referenceList.get(i));
+            } else {
+                result = String.format("%s'%s');", result, referenceList.get(i));
+            }
+        }
+        return result;
+    }
 }
