@@ -54,6 +54,7 @@ public class TransactionServiceApplication {
 				registry.addMapping("/ingestor/*").allowedOrigins(clientUrl);
 				registry.addMapping("/fee_corrections/*").allowedOrigins(clientUrl);
 				registry.addMapping("/statements/*/*").allowedOrigins(clientUrl);
+				registry.addMapping("/academic-classes/*/*").allowedOrigins(clientUrl);
 			}
 		};
 	}
