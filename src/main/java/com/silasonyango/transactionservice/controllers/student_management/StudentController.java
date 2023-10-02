@@ -26,6 +26,7 @@ import com.silasonyango.transactionservice.repository.student_management.Student
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
 import com.silasonyango.transactionservice.services.academic_classes.AcademicClassesService;
 import com.silasonyango.transactionservice.services.excel.ExcelService;
+import com.silasonyango.transactionservice.services.ingestor.ParentPhoneNumbersIngestorService;
 import com.silasonyango.transactionservice.services.student.StudentsService;
 import com.silasonyango.transactionservice.utility_classes.CustomOkHttp;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
@@ -34,7 +35,10 @@ import okhttp3.RequestBody;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -88,6 +92,9 @@ public class StudentController {
 
     @Autowired
     ExcelService excelService;
+
+    @Autowired
+    ParentPhoneNumbersIngestorService parentPhoneNumbersIngestorService;
 
     @PostMapping("/create_student")
     public SuccessFailureResponseDto createAStudent(@Valid StudentRegistrationDto studentRegistrationDto) {
@@ -339,6 +346,17 @@ public class StudentController {
             excelService.processStudentsPerLotWithPhoneNoColumnExcelExport(response, lotId, fileName);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @PostMapping("/parent-phone-numbers/upload")
+    public ResponseEntity<String> uploadParentPhoneNumbers(@RequestParam("file") MultipartFile file) {
+        try {
+            parentPhoneNumbersIngestorService.updateParentPhoneNumbers(file);
+            return ResponseEntity.status(HttpStatus.OK).body("Upload and update was successful");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error encountered while uploading the excel file");
         }
     }
 }
