@@ -238,6 +238,19 @@ public class FeeStatementController {
         }
     }
 
+    @GetMapping("/sms/send-fee-reminder-to-entire-school-not-completed-school-with-threshold")
+    public ResponseEntity<String> sendSmsFeeReminderToEntireSchoolNotCompletedSchoolWithThreshold(
+            @RequestParam("feeBalanceThreshold") int feeBalanceThreshold
+            , @RequestParam("paymentDeadlineDate") String paymentDeadlineDate) {
+        if (feeReminderService.sendSmsFeeReminderToEntireSchoolNotCompletedSchoolWithThreshold(
+                feeBalanceThreshold, paymentDeadlineDate)) {
+            return new ResponseEntity<String>("Fee reminder sent successfully to all concerned parties"
+                    , HttpStatus.valueOf(200));
+        }
+        return new ResponseEntity<String>("Problem encountered while sending the messages"
+                , HttpStatus.valueOf(500));
+    }
+
     @GetMapping("/sms/send-fee-reminder-to-specific-lot-with-threshold")
     public ResponseEntity<String> sendFeeReminderToSpecificLotWithThreshold(@RequestParam("lotId") int lotId
             , @RequestParam("feeBalanceThreshold") int feeBalanceThreshold

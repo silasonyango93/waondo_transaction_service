@@ -17,6 +17,37 @@ public class FeeReminderService {
     @Autowired
     FeeReminderRabbitMqProducer feeReminderRabbitMqProducer;
 
+
+    public boolean sendSmsFeeReminderToEntireSchoolNotCompletedSchoolWithThreshold(
+            int feeBalanceThreshold, String paymentDeadlineDate) {
+        try {
+            List<Map<String, Object>> studentsToBeReminded = feeStatementService
+                    .fetchFeeBalancesForEntireSchoolWithTermBalanceGreaterThanOrEqualProvidedAmount(
+                            feeBalanceThreshold
+                    );
+            for (Map<String, Object> map : studentsToBeReminded) {
+                if (map.get("ParentPhoneNumber") != null && !String.valueOf(map.get("ParentPhoneNumber")).isEmpty()) {
+                    FeeReminderRmqCustomMessage message = new FeeReminderRmqCustomMessage(
+                            Integer.parseInt(String.valueOf(map.get("StudentId"))),
+                            String.valueOf(map.get("AdmissionNo")),
+                            String.valueOf(map.get("StudentName")),
+                            Integer.parseInt(String.valueOf(map.get("CurrentTermBalance"))),
+                            Integer.parseInt(String.valueOf(map.get("AnnualBalance"))),
+                            String.valueOf(map.get("ParentPhoneNumber")),
+                            paymentDeadlineDate
+                    );
+                    message.setMessageCategory(RabbitMqMessageDistinctionEnum.FEE_REMINDER);
+                    feeReminderRabbitMqProducer.sendMessage(message);
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
     public boolean sendSmsFeeReminderForSpecificLot(int lotId, int feeBalanceThreshold, String paymentDeadlineDate) {
         try {
             List<Map<String, Object>> studentsToBeReminded = feeStatementService
