@@ -178,16 +178,16 @@ public class StudentController {
     @PostMapping("/fetch_all_students")
     public List<StudentsListDto> fetchAllStudents() {
         List<StudentsListDto> studentsList = new ArrayList<>();
-
-        List<StudentEntity> dbStudentsList = studentRepository.getAllNoneAdminStudents();
-
-        for (int i = 0; i < dbStudentsList.size(); i++) {
-            int studentId = dbStudentsList.get(i).getStudentId();
-            JSONObject classDetailsObject = UtilityClass.getAStudentClassDetails(studentId);
-            JSONObject residenceObject = UtilityClass.getAStudentResidenceDetails(studentId);
-            String residenceDetails = residenceObject.getString("StudentResidenceDescription");
-            String classDetails = classDetailsObject.getString("AcademicClassLevelName") + " " + classDetailsObject.getString("ClassStreamName");
-            studentsList.add(new StudentsListDto(studentId, dbStudentsList.get(i).getAdmissionNo(), dbStudentsList.get(i).getStudentName(), genderRepository.findByGenderId(dbStudentsList.get(i).getGenderId()).get(0).getGenderDescription(), classDetails, residenceDetails));
+        List<Map<String, Object>> studentsMapList = studentsService.fetchAllStudentsInEntireSchoolNotCompletedSchool();
+        for (Map<String, Object> map : studentsMapList) {
+            studentsList.add(new StudentsListDto(
+                    Integer.parseInt(String.valueOf(map.get("StudentId"))),
+                    String.valueOf(map.get("AdmissionNo")),
+                    String.valueOf(map.get("StudentName")),
+                    String.valueOf(map.get("GenderDescription")),
+                    String.format("%s%s", map.get("AcademicClassLevelName"), map.get("ClassStreamName")),
+                    String.format("%s", map.get("StudentResidenceDescription"))
+            ));
         }
 
         return studentsList;

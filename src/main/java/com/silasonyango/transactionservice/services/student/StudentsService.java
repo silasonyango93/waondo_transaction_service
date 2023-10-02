@@ -106,7 +106,8 @@ public class StudentsService {
                 "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
                 "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
                 "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
-                "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId " +
+                "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId INNER JOIN student_residence" +
+                " ON students.StudentResidenceId = student_residence.StudentResidenceId " +
                 "WHERE lots.hasCompletedSchool = 0;");
         return jdbcTemplate.queryForList(sql);
     }
@@ -116,7 +117,8 @@ public class StudentsService {
                 "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
                 "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
                 "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
-                "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId " +
+                "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId INNER JOIN student_residence" +
+                " ON students.StudentResidenceId = student_residence.StudentResidenceId " +
                 "WHERE lots.hasCompletedSchool = 1;");
         return jdbcTemplate.queryForList(sql);
     }
