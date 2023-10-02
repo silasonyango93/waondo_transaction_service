@@ -29,6 +29,16 @@ public class AcademicClassesController {
         }
     }
 
+    @GetMapping("/lot-details/fetch-lot-by-its-full-name")
+    public ResponseEntity<Map<String, Object>> fetchLotByItsFullName(@RequestParam("lotId") int lotId) {
+        try {
+            return new ResponseEntity<Map<String, Object>>(academicClassesService.fetchLotByItsFullName(lotId)
+                    , HttpStatus.valueOf(200));
+        } catch (Exception e) {
+            return new ResponseEntity<Map<String, Object>>(HttpStatus.valueOf(400));
+        }
+    }
+
     @GetMapping("/lots/fetch-all-lots-currently-not-completed-school-full-details")
     public ResponseEntity<List<Map<String, Object>>> fetchAllLotsCurrentlyNotCompletedSchoolByFullDetails() {
         try {
