@@ -29,4 +29,21 @@ public class AcademicClassesService {
         List<Map<String, Object>> results = jdbcTemplate.queryForList(sql);
         return results.get(0);
     }
+
+    public List<Map<String, Object>> fetchAllLotsCurrentlyNotCompletedSchoolByFullDetails() {
+        String sql = String.format("SELECT * FROM lots INNER JOIN academic_class_levels ON lots.AcademicClassLevelId " +
+                "= academic_class_levels.AcademicClassLevelId INNER JOIN lot_descriptions ON lots.LotDescriptionId " +
+                "= lot_descriptions.LotDescriptionId WHERE lots.hasCompletedSchool = 0 " +
+                "AND academic_class_levels.IsAdminClassLevel = 0;");
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public List<Map<String, Object>> fetchAllActualClassesCurrentlyNotCompletedSchoolByFullDetails() {
+        String sql = String.format("SELECT * FROM classes INNER JOIN class_streams ON classes.ClassStreamId " +
+                "= class_streams.ClassStreamId INNER JOIN lots ON classes.LotId = lots.LotId INNER JOIN lot_descriptions " +
+                "ON lots.LotDescriptionId = lot_descriptions.LotDescriptionId INNER JOIN academic_class_levels " +
+                "ON lots.AcademicClassLevelId = academic_class_levels.AcademicClassLevelId WHERE lots.hasCompletedSchool " +
+                "= 0 AND academic_class_levels.IsAdminClassLevel = 0;");
+        return jdbcTemplate.queryForList(sql);
+    }
 }
