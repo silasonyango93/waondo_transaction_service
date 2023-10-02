@@ -85,6 +85,20 @@ public class FeeStatementService {
         return jdbcTemplate.queryForList(sql);
     }
 
+    public List<Map<String, Object>> fetchFeeBalancesForEntireSchoolWithTermBalanceGreaterThanOrEqualProvidedAmount(
+            int thresholdTermBalance) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN gender ON students.GenderId = gender.GenderId INNER JOIN student_residence " +
+                "ON students.StudentResidenceId = student_residence.StudentResidenceId INNER JOIN fee_statements " +
+                "ON fee_statements.StudentId = students.StudentId " +
+                "WHERE lots.hasCompletedSchool = 0 AND academic_class_levels.IsAdminClassLevel = 0 " +
+                "AND fee_statements.CurrentTermBalance >= %s;", thresholdTermBalance);
+        return jdbcTemplate.queryForList(sql);
+    }
+
     public List<Map<String, Object>> fetchFeeBalancesForASpecificClassWithTermBalanceGreaterThanOrEqualProvidedAmount(
             int classId, int thresholdTermBalance) {
         String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +

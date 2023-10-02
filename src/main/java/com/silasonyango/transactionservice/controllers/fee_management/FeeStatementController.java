@@ -68,13 +68,23 @@ public class FeeStatementController {
 
     @PostMapping("/get_all_students_with_minimum_term_balance")
     public List<FeeBalanceListDto> getAllStudentsWithAMinimumTermBalance(@Valid FeeBalanceRequestDto feeBalanceRequestDto) {
-
-        JSONArray dataArray = UtilityClass.getAllStudentsWithAMinimumTermBalance(feeBalanceRequestDto.getMinimumFeeBalance());
-
         List<FeeBalanceListDto> feeBalanceListDtoList = new ArrayList<>();
 
-        for (int i = 0; i < dataArray.length(); i++) {
-            feeBalanceListDtoList.add(new FeeBalanceListDto(dataArray.getJSONObject(i).getInt("StudentId"), dataArray.getJSONObject(i).getString("AdmissionNo"), dataArray.getJSONObject(i).getString("StudentName"), dataArray.getJSONObject(i).getString("GenderDescription"), dataArray.getJSONObject(i).getString("AcademicClassLevelName") + " " + dataArray.getJSONObject(i).getString("ClassStreamName"), dataArray.getJSONObject(i).getString("StudentResidenceDescription"), dataArray.getJSONObject(i).getInt("CurrentYearTotal"), dataArray.getJSONObject(i).getInt("CurrentTermBalance"), dataArray.getJSONObject(i).getInt("AnnualBalance")));
+        List<Map<String, Object>> balancesMapList = feeStatementService.fetchFeeBalancesForEntireSchoolWithTermBalanceGreaterThanOrEqualProvidedAmount(
+                feeBalanceRequestDto.getMinimumFeeBalance());
+
+        for (Map<String, Object> map : balancesMapList) {
+            feeBalanceListDtoList.add(new FeeBalanceListDto(
+                    Integer.parseInt(String.valueOf(map.get("StudentId"))),
+                    String.valueOf(map.get("AdmissionNo")),
+                    String.valueOf(map.get("StudentName")),
+                    String.valueOf(map.get("GenderDescription")),
+                    String.format("%s%s", map.get("AcademicClassLevelName"), map.get("ClassStreamName")),
+                    String.format("%s", map.get("StudentResidenceDescription")),
+                    Integer.parseInt(String.valueOf(map.get("CurrentYearTotal"))),
+                    Integer.parseInt(String.valueOf(map.get("CurrentTermBalance"))),
+                    Integer.parseInt(String.valueOf(map.get("AnnualBalance")))
+            ));
         }
 
         return feeBalanceListDtoList;
@@ -87,6 +97,33 @@ public class FeeStatementController {
 
         List<Map<String, Object>> balancesMapList = feeStatementService.fetchFeeBalancesForASpecificClassWithTermBalanceGreaterThanOrEqualProvidedAmount(
                 classFeeBalanceRequestDto.getClassId(), classFeeBalanceRequestDto.getMinimumFeeBalance());
+
+        for (Map<String, Object> map : balancesMapList) {
+            feeBalanceListDtoList.add(new FeeBalanceListDto(
+                    Integer.parseInt(String.valueOf(map.get("StudentId"))),
+                    String.valueOf(map.get("AdmissionNo")),
+                    String.valueOf(map.get("StudentName")),
+                    String.valueOf(map.get("GenderDescription")),
+                    String.format("%s%s", map.get("AcademicClassLevelName"), map.get("ClassStreamName")),
+                    String.format("%s", map.get("StudentResidenceDescription")),
+                    Integer.parseInt(String.valueOf(map.get("CurrentYearTotal"))),
+                    Integer.parseInt(String.valueOf(map.get("CurrentTermBalance"))),
+                    Integer.parseInt(String.valueOf(map.get("AnnualBalance")))
+            ));
+        }
+
+        return feeBalanceListDtoList;
+    }
+
+
+    @GetMapping("/fee-balance/get_all_students_in_a_lot_with_minimum_term_balance")
+    public List<FeeBalanceListDto> getAllStudentsInALotWithAMinimumTermBalance(@RequestParam("lotId") int lotId
+            , @RequestParam("minimumFeeBalance") int minimumFeeBalance) {
+        List<FeeBalanceListDto> feeBalanceListDtoList = new ArrayList<>();
+
+        List<Map<String, Object>> balancesMapList = feeStatementService
+                .fetchFeeBalancesForASpecificLotWithTermBalanceGreaterThanOrEqualProvidedAmount(
+                        lotId, minimumFeeBalance);
 
         for (Map<String, Object> map : balancesMapList) {
             feeBalanceListDtoList.add(new FeeBalanceListDto(
