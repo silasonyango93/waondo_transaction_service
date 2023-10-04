@@ -38,6 +38,7 @@ public class TransactionServiceApplication {
 				registry.addMapping("/class-fee-structure-component/*").allowedOrigins(clientUrl);
 				registry.addMapping("/student-fee-component/*").allowedOrigins(clientUrl);
 				registry.addMapping("/installments/*").allowedOrigins(clientUrl);
+				registry.addMapping("/installments/*/*").allowedOrigins(clientUrl);
 				registry.addMapping("/actual_terms/*").allowedOrigins(clientUrl);
 				registry.addMapping("/actual_weeks/*").allowedOrigins(clientUrl);
 				registry.addMapping("/carry_forwards/*").allowedOrigins(clientUrl);

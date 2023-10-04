@@ -359,9 +359,6 @@ public class InstallmentsController {
         try {
             String fileName = String.format("FEE INSTALLMENTS MADE TODAY (%s)", new SimpleDateFormat("E, MMM dd yyyy").format(new Date()));
             response.setContentType("application/octet-stream");
-            String headerKey = "Content-Disposition";
-            String headerValue = "attachment; filename=" + fileName + ".xlsx";
-            response.setHeader(headerKey, headerValue);
             excelService.exportInstallmentsMadeTodayExcel(response, fileName);
         } catch (Exception e) {
             e.printStackTrace();
