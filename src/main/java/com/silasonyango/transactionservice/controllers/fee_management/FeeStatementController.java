@@ -212,9 +212,6 @@ public class FeeStatementController {
             String fileName = String.format("FORM %s STUDENTS WITH FEE BALANCES OF KES %s AND ABOVE."
                     , fullLotNameMap.get("AcademicClassLevelName"), Utils.formatIntegerToCommaSeperatedValue(termBalanceThresholdAmount));
             response.setContentType("application/octet-stream");
-            String headerKey = "Content-Disposition";
-            String headerValue = "attachment; filename=" + fileName + ".xlsx";
-            response.setHeader(headerKey, headerValue);
             excelService.exportFeeBalancesPerLotWithTermThresholdExcel(response, lotId, fileName, termBalanceThresholdAmount);
         } catch (Exception e) {
             e.printStackTrace();
@@ -229,9 +226,6 @@ public class FeeStatementController {
             String fileName = String.format("FORM %s%s STUDENTS WITH FEE BALANCES OF KES %s AND ABOVE.", fullClassNameMap.get("AcademicClassLevelName")
                     , fullClassNameMap.get("ClassStreamName"), Utils.formatIntegerToCommaSeperatedValue(termBalanceThresholdAmount));
             response.setContentType("application/octet-stream");
-            String headerKey = "Content-Disposition";
-            String headerValue = "attachment; filename=" + fileName + ".xlsx";
-            response.setHeader(headerKey, headerValue);
             excelService.exportFeeBalancesPerClassStreamWithTermThresholdExcel(response, classId, fileName, termBalanceThresholdAmount);
         } catch (Exception e) {
             e.printStackTrace();
