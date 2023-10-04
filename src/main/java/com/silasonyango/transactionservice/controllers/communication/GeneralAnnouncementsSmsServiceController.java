@@ -23,7 +23,7 @@ public class GeneralAnnouncementsSmsServiceController {
     @Autowired
     ParentGeneralCommunicationSmsService parentGeneralCommunicationSmsService;
 
-    @PostMapping("/send-to-all-students-not-completed-school")
+    @PostMapping("/broadcast/send-to-all-students-not-completed-school")
     public ResponseEntity<String> sendBroadcastSmsToAllStudentsNotCompletedSchool(
             @RequestBody SendSmsAnnouncementRequestDto sendSmsAnnouncementRequestDto) {
         if (parentGeneralCommunicationSmsService.sendGeneralCommunicationToParentsOfAllStudentsNotCompletedSchool(
@@ -35,7 +35,7 @@ public class GeneralAnnouncementsSmsServiceController {
         }
     }
 
-    @PostMapping("/send-to-parents-of-particular-lot")
+    @PostMapping("/broadcast/send-to-parents-of-particular-lot")
     public ResponseEntity<String> sendBroadcastSmsToParentsOfParticularLot(
             @RequestBody SendSmsAnnouncementRequestDto sendSmsAnnouncementRequestDto) {
         if (parentGeneralCommunicationSmsService.sendGeneralCommunicationToParentsOfAParticularLot(
@@ -48,7 +48,7 @@ public class GeneralAnnouncementsSmsServiceController {
         }
     }
 
-    @PostMapping("/send-to-parents-of-particular-class-stream")
+    @PostMapping("/broadcast/send-to-parents-of-particular-class-stream")
     public ResponseEntity<String> sendBroadcastSmsToParentsOfParticularClassStream(
             @RequestBody SendSmsAnnouncementRequestDto sendSmsAnnouncementRequestDto) {
 
@@ -62,7 +62,7 @@ public class GeneralAnnouncementsSmsServiceController {
         }
     }
 
-    @PostMapping("/send-to-specific-list-of-students")
+    @PostMapping("/broadcast/send-to-specific-list-of-students")
     public ResponseEntity<String> sendToSpecificListOfStudents(
             @RequestBody SendSmsAnnouncementRequestDto sendSmsAnnouncementRequestDto) {
 
