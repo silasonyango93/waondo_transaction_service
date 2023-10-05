@@ -10,6 +10,8 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,7 @@ public class StudentFeeBalancesPerLotExcelService {
         sheet.setColumnWidth(5, 7000);
         if (includeFeeInstallmentColumn) {
             sheet.setColumnWidth(6, 7000);
+            sheet.setColumnWidth(7, 7000);
         }
 
         CellStyle titleStyle = workbook.createCellStyle();
@@ -52,7 +55,8 @@ public class StudentFeeBalancesPerLotExcelService {
         createCell(tableHeaderRow, 4, "Term Balance", tableHeaderStyle);
         createCell(tableHeaderRow, 5, "Annual Balance", tableHeaderStyle);
         if (includeFeeInstallmentColumn) {
-            createCell(tableHeaderRow, 6, "Today's installment", tableHeaderStyle);
+            createCell(tableHeaderRow, 6, "Installment Amount", tableHeaderStyle);
+            createCell(tableHeaderRow, 7, "Payment Date", tableHeaderStyle);
         }
         return workbook;
     }
@@ -104,6 +108,8 @@ public class StudentFeeBalancesPerLotExcelService {
                 tableHeaderStyle.setAlignment(HorizontalAlignment.LEFT);
                 createCell(sheetRow, 6, Utils.formatToCommaSeperatedValue(Double
                         .parseDouble(String.valueOf(map.get("InstallmentAmount")))), tableHeaderStyle);
+                createCell(sheetRow, 7, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                        .format((Date) map.get("InstallmentDate")), style);
             }
             counter++;
         }
