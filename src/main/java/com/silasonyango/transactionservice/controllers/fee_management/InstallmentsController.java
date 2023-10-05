@@ -365,4 +365,32 @@ public class InstallmentsController {
         }
     }
 
+
+    @GetMapping("/excel/fee-installments-made-between-two-dates")
+    public void exportFeeInstallmentsMadeBetweenTwoDates(HttpServletResponse response
+            , @RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) throws IOException {
+        try {
+            String fileName = String.format("FEE INSTALLMENTS MADE BETWEEN %s AND %s", Utils.convertToUserFriendlyDate(
+                            startDate, "yyyy-MM-dd")
+                    , Utils.convertToUserFriendlyDate(endDate, "yyyy-MM-dd"));
+            response.setContentType("application/octet-stream");
+            excelService.exportInstallmentsMadeBetweenTwoDatesExcel(response, fileName, startDate, endDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/excel/fee-installments-made-on-a-specific-date")
+    public void exportFeeInstallmentsMadeOnASpecificDate(HttpServletResponse response
+            , @RequestParam("installmentDate") String installmentDate) throws IOException {
+        try {
+            String fileName = String.format("FEE INSTALLMENTS MADE ON %s", Utils.convertToUserFriendlyDate(
+                    installmentDate, "yyyy-MM-dd"));
+            response.setContentType("application/octet-stream");
+            excelService.exportInstallmentsMadeOnASpecificDateExcel(response, fileName, installmentDate);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }

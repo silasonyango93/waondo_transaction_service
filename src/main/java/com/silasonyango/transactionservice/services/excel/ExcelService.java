@@ -44,7 +44,7 @@ public class ExcelService {
     private XSSFWorkbook workbook;
 
     public void processData(int fetchKey, String sheetTitle, ExcelServiceEnum excelServiceEnum
-            , boolean hasABlankSucceedingColumnToBeFilled, int thresholdAmount) {
+            , boolean hasABlankSucceedingColumnToBeFilled, int thresholdAmount, String startDate, String endDate) {
         switch (excelServiceEnum) {
             case FEE_BALANCES_PER_CLASS:
                 workbook.createSheet(PER_STREAM_FEE_BALANCE_EXCEL_SHEET_NAME);
@@ -84,13 +84,23 @@ public class ExcelService {
                 workbook = studentFeeBalancesPerLotExcelService.processData(workbook, sheetTitle,
                         feeInstallmentsService.fetchFeeInstallmentsMadeToday());
                 break;
+            case FEE_INSTALLMENTS_MADE_BETWEEN_TWO_DATES:
+                workbook.createSheet(PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME);
+                workbook = studentFeeBalancesPerLotExcelService.processData(workbook, sheetTitle,
+                        feeInstallmentsService.fetchFeeInstallmentsMadeBetweenTwoDates(startDate, endDate));
+                break;
+            case FEE_INSTALLMENTS_MADE_ON_A_SPECIFIC_DATE:
+                workbook.createSheet(PER_LOT_FEE_BALANCE_EXCEL_SHEET_NAME);
+                workbook = studentFeeBalancesPerLotExcelService.processData(workbook, sheetTitle,
+                        feeInstallmentsService.fetchFeeInstallmentsMadeOnASpecificDate(startDate));
+                break;
 
         }
     }
 
     public void exportFeeBalancesPerClassExcel(HttpServletResponse response, int classId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(classId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_CLASS, false, 0);
+        processData(classId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_CLASS, false, 0, null, null);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -99,7 +109,7 @@ public class ExcelService {
 
     public void exportFeeBalancesPerLotExcel(HttpServletResponse response, int lotId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(lotId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_LOT, false, 0);
+        processData(lotId, sheetTitle, ExcelServiceEnum.FEE_BALANCES_PER_LOT, false, 0, null, null);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -108,7 +118,7 @@ public class ExcelService {
 
     public void processStudentsPerLotExcelExport(HttpServletResponse response, int lotId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(lotId, sheetTitle, ExcelServiceEnum.STUDENTS_PER_LOT, false, 0);
+        processData(lotId, sheetTitle, ExcelServiceEnum.STUDENTS_PER_LOT, false, 0, null, null);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -117,7 +127,7 @@ public class ExcelService {
 
     public void processStudentsPerClassStreamExcelExport(HttpServletResponse response, int classId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(classId, sheetTitle, ExcelServiceEnum.STUDENT_PER_CLASS_STREAM, false, 0);
+        processData(classId, sheetTitle, ExcelServiceEnum.STUDENT_PER_CLASS_STREAM, false, 0, null, null);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -126,7 +136,7 @@ public class ExcelService {
 
     public void processStudentsPerLotWithPhoneNoColumnExcelExport(HttpServletResponse response, int lotId, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(lotId, sheetTitle, ExcelServiceEnum.STUDENTS_PER_LOT, true, 0);
+        processData(lotId, sheetTitle, ExcelServiceEnum.STUDENTS_PER_LOT, true, 0, null, null);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -135,7 +145,7 @@ public class ExcelService {
 
     public void exportFeeBalancesPerLotWithTermThresholdExcel(HttpServletResponse response, int lotId, String sheetTitle, int thresholdAmount) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(lotId, sheetTitle, ExcelServiceEnum.LOT_FEE_BALANCE_WITH_TERM_BALANCE_THRESHOLD, false, thresholdAmount);
+        processData(lotId, sheetTitle, ExcelServiceEnum.LOT_FEE_BALANCE_WITH_TERM_BALANCE_THRESHOLD, false, thresholdAmount, null, null);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -144,7 +154,7 @@ public class ExcelService {
 
     public void exportFeeBalancesPerClassStreamWithTermThresholdExcel(HttpServletResponse response, int lotId, String sheetTitle, int thresholdAmount) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(lotId, sheetTitle, ExcelServiceEnum.CLASS_STREAM_FEE_BALANCE_WITH_TERM_BALANCE_THRESHOLD, false, thresholdAmount);
+        processData(lotId, sheetTitle, ExcelServiceEnum.CLASS_STREAM_FEE_BALANCE_WITH_TERM_BALANCE_THRESHOLD, false, thresholdAmount, null, null);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();
@@ -154,7 +164,29 @@ public class ExcelService {
 
     public void exportInstallmentsMadeTodayExcel(HttpServletResponse response, String sheetTitle) throws IOException {
         this.workbook = new XSSFWorkbook();
-        processData(0, sheetTitle, ExcelServiceEnum.FEE_INSTALLMENTS_MADE_TODAY, false, 0);
+        processData(0, sheetTitle, ExcelServiceEnum.FEE_INSTALLMENTS_MADE_TODAY, false, 0, null, null);
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+    }
+
+    public void exportInstallmentsMadeBetweenTwoDatesExcel(HttpServletResponse response, String sheetTitle
+            , String startDate, String endDate) throws IOException {
+        this.workbook = new XSSFWorkbook();
+        processData(0, sheetTitle, ExcelServiceEnum.FEE_INSTALLMENTS_MADE_BETWEEN_TWO_DATES
+                , false, 0, startDate, endDate);
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+    }
+
+    public void exportInstallmentsMadeOnASpecificDateExcel(HttpServletResponse response, String sheetTitle
+            , String installmentDate) throws IOException {
+        this.workbook = new XSSFWorkbook();
+        processData(0, sheetTitle, ExcelServiceEnum.FEE_INSTALLMENTS_MADE_ON_A_SPECIFIC_DATE
+                , false, 0, installmentDate, null);
         ServletOutputStream outputStream = response.getOutputStream();
         workbook.write(outputStream);
         workbook.close();

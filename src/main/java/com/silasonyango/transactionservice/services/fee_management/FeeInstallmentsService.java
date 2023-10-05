@@ -23,4 +23,27 @@ public class FeeInstallmentsService {
                 "WHERE DATE(installments.InstallmentDate) = CURDATE();");
         return jdbcTemplate.queryForList(sql);
     }
+
+    public List<Map<String, Object>> fetchFeeInstallmentsMadeBetweenTwoDates(String startDate, String endDate) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId = " +
+                "classes.ClassId INNER JOIN fee_statements ON fee_statements.StudentId = students.StudentId " +
+                "INNER JOIN installments ON installments.StudentId = students.StudentId " +
+                "WHERE DATE(installments.InstallmentDate) BETWEEN %s " +
+                "AND %s ORDER BY installments.InstallmentDate ASC;", startDate, endDate);
+        return jdbcTemplate.queryForList(sql);
+    }
+
+    public List<Map<String, Object>> fetchFeeInstallmentsMadeOnASpecificDate(String installmentDate) {
+        String sql = String.format("SELECT * FROM lot_descriptions INNER JOIN lots ON lot_descriptions.LotDescriptionId " +
+                "= lots.LotDescriptionId INNER JOIN academic_class_levels ON academic_class_levels.AcademicClassLevelId " +
+                "= lots.AcademicClassLevelId INNER JOIN classes ON lots.LotId = classes.LotId INNER JOIN class_streams " +
+                "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
+                "= classes.ClassId INNER JOIN fee_statements ON fee_statements.StudentId = students.StudentId " +
+                "INNER JOIN installments ON installments.StudentId = students.StudentId " +
+                "WHERE DATE(installments.InstallmentDate) = %s ORDER BY installments.InstallmentDate ASC;", installmentDate);
+        return jdbcTemplate.queryForList(sql);
+    }
 }
