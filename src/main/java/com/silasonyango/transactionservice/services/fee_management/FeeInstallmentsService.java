@@ -31,8 +31,8 @@ public class FeeInstallmentsService {
                 "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId = " +
                 "classes.ClassId INNER JOIN fee_statements ON fee_statements.StudentId = students.StudentId " +
                 "INNER JOIN installments ON installments.StudentId = students.StudentId " +
-                "WHERE DATE(installments.InstallmentDate) BETWEEN %s " +
-                "AND %s ORDER BY installments.InstallmentDate ASC;", startDate, endDate);
+                "WHERE DATE(installments.InstallmentDate) BETWEEN '%s' " +
+                "AND '%s' ORDER BY installments.InstallmentDate ASC;", startDate, endDate);
         return jdbcTemplate.queryForList(sql);
     }
 
@@ -43,7 +43,7 @@ public class FeeInstallmentsService {
                 "ON classes.ClassStreamId = class_streams.ClassStreamId INNER JOIN students ON students.ClassId " +
                 "= classes.ClassId INNER JOIN fee_statements ON fee_statements.StudentId = students.StudentId " +
                 "INNER JOIN installments ON installments.StudentId = students.StudentId " +
-                "WHERE DATE(installments.InstallmentDate) = %s ORDER BY installments.InstallmentDate ASC;", installmentDate);
+                "WHERE DATE(installments.InstallmentDate) = '%s' ORDER BY installments.InstallmentDate ASC;", installmentDate);
         return jdbcTemplate.queryForList(sql);
     }
 }
