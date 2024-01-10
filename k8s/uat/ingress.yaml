@@ -8,7 +8,7 @@ metadata:
 #    certmanager.k8s.io/cluster-issuer: "letsencrypt-staging"
 spec:
   rules:
-    - host: transaction.livelihoodzone.xyz
+    - host: transaction.waondosecondary.xyz
       http:
         paths:
           - path: /
