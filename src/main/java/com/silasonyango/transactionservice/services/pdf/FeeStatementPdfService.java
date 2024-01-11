@@ -179,7 +179,7 @@ public class FeeStatementPdfService {
         document.open();
 
         //Path path = Paths.get(ClassLoader.getSystemResource("waondo.png").toURI());
-        Image imgSchoolLogo = Image.getInstance("http://waondonode.livelihoodzone.xyz/web_display_image?imageID=8d0af278f3d2fe98235add73f420e313");
+        Image imgSchoolLogo = Image.getInstance("http://waondonode.waondosecondary.xyz/web_display_image?imageID=70288e63f2267ca48a914ced68b0a817");
         imgSchoolLogo.setSpacingBefore(10);
         imgSchoolLogo.setAlignment(Paragraph.ALIGN_CENTER);
         imgSchoolLogo.scaleToFit(120,120);
