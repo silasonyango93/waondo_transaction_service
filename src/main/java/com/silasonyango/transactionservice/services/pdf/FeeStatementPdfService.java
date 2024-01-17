@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -178,8 +180,9 @@ public class FeeStatementPdfService {
 
         document.open();
 
-        //Path path = Paths.get(ClassLoader.getSystemResource("waondo.png").toURI());
-        Image imgSchoolLogo = Image.getInstance("http://waondonode.waondosecondary.xyz/web_display_image?imageID=70288e63f2267ca48a914ced68b0a817");
+//        Path path = Paths.get(ClassLoader.getSystemResource("static/waondo.png").toURI());
+//        Image imgSchoolLogo = Image.getInstance(path.toString());
+        Image imgSchoolLogo = Image.getInstance("http://waondonode.waondosecondary.xyz/web_display_image?imageID=05c1ae27a599f060d6fae706218ff460");
         imgSchoolLogo.setSpacingBefore(10);
         imgSchoolLogo.setAlignment(Paragraph.ALIGN_CENTER);
         imgSchoolLogo.scaleToFit(120,120);

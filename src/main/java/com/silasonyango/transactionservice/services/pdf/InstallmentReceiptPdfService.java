@@ -183,7 +183,7 @@ public class InstallmentReceiptPdfService {
 
         document.open();
 
-        Path path = Paths.get(ClassLoader.getSystemResource("waondo.png").toURI());
+        Path path = Paths.get(ClassLoader.getSystemResource("static/waondo.png").toURI());
         com.lowagie.text.Image imgSchoolLogo = Image.getInstance(path.toAbsolutePath().toString());
         imgSchoolLogo.setSpacingBefore(10);
         imgSchoolLogo.setAlignment(Paragraph.ALIGN_CENTER);
