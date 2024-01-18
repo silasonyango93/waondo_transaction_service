@@ -1,6 +1,7 @@
 package com.silasonyango.transactionservice.services.rabbitmq.consumer.fee_reminder_consumer;
 
 import com.silasonyango.transactionservice.dtos.rabbitmq.FeeReminderRmqCustomMessage;
+import com.silasonyango.transactionservice.services.sms.AdvantaSmsService;
 import com.silasonyango.transactionservice.services.sms.SmsService;
 import com.silasonyango.transactionservice.utility_classes.Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import java.util.Date;
 public class FeeReminderRabbitMqConsumer {
 
     @Autowired
-    SmsService smsService;
+    AdvantaSmsService smsService;
 
     @RabbitListener(queues = "fee_payment_reminder_sms_queue")
     public void listener(FeeReminderRmqCustomMessage feeReminderRmqCustomMessage) {

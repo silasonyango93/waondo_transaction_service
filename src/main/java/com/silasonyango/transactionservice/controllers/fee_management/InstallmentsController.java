@@ -20,10 +20,12 @@ import com.silasonyango.transactionservice.repository.student_management.Student
 import com.silasonyango.transactionservice.repository.system_initialization.gender.GenderRepository;
 import com.silasonyango.transactionservice.services.excel.ExcelService;
 import com.silasonyango.transactionservice.services.pdf.InstallmentReceiptPdfService;
+import com.silasonyango.transactionservice.services.sms.AdvantaSmsService;
 import com.silasonyango.transactionservice.services.sms.SmsService;
 import com.silasonyango.transactionservice.services.student.StudentsService;
 import com.silasonyango.transactionservice.utility_classes.UtilityClass;
 import com.silasonyango.transactionservice.utility_classes.Utils;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,355 +44,441 @@ import static com.silasonyango.transactionservice.utility_classes.UtilityClass.g
 
 @RestController
 @RequestMapping("/installments")
+@Slf4j
 public class InstallmentsController {
-    @Autowired
-    InstallmentRepository installmentRepository;
 
-    @Autowired
-    FeeStatementRepository feeStatementRepository;
+  @Autowired
+  InstallmentRepository installmentRepository;
 
-    @Autowired
-    UserSessionActivitiesRepository userSessionActivitiesRepository;
+  @Autowired
+  FeeStatementRepository feeStatementRepository;
 
-    @Autowired
-    TransactionsRepository transactionsRepository;
+  @Autowired
+  UserSessionActivitiesRepository userSessionActivitiesRepository;
 
-    @Autowired
-    StudentRepository studentRepository;
+  @Autowired
+  TransactionsRepository transactionsRepository;
 
-    @Autowired
-    StudentFeeComponentRepository studentFeeComponentRepository;
+  @Autowired
+  StudentRepository studentRepository;
 
-    @Autowired
-    TransactionDescriptionsRepository transactionDescriptionsRepository;
+  @Autowired
+  StudentFeeComponentRepository studentFeeComponentRepository;
 
-    @Autowired
-    GenderRepository genderRepository;
+  @Autowired
+  TransactionDescriptionsRepository transactionDescriptionsRepository;
 
-    @Autowired
-    CarryForwardsRepository carryForwardsRepository;
+  @Autowired
+  GenderRepository genderRepository;
 
-    @Autowired
-    FeeCorrectionsRepository feeCorrectionsRepository;
+  @Autowired
+  CarryForwardsRepository carryForwardsRepository;
 
-    @Autowired
-    SessionActivitiesRepository sessionActivitiesRepository;
+  @Autowired
+  FeeCorrectionsRepository feeCorrectionsRepository;
 
-    @Autowired
-    InstallmentReceiptPdfService installmentReceiptPdfService;
+  @Autowired
+  SessionActivitiesRepository sessionActivitiesRepository;
 
-    @Autowired
-    ExcelService excelService;
+  @Autowired
+  InstallmentReceiptPdfService installmentReceiptPdfService;
 
-    @Autowired
-    SmsService smsService;
+  @Autowired
+  ExcelService excelService;
 
-    @PostMapping("/add_installment")
-    @Transactional
-    public FeeStatementResponseDto addInstallment(@Valid InstallmentsDto installmentsDto) {
-        try {
-            int previousTermBalance = 0;
-            int previousAnnualBalance = 0;
-            int previousTotal = 0;
+  @Autowired
+  AdvantaSmsService smsService;
 
-            FeeStatementEntity feeStatementBeforeTransaction = feeStatementRepository.findFeeStatementByStudentId(installmentsDto.getStudentId()).get(0);
-            previousTermBalance = feeStatementBeforeTransaction.getCurrentTermBalance();
-            previousAnnualBalance = feeStatementBeforeTransaction.getAnnualBalance();
-            previousTotal = feeStatementBeforeTransaction.getCurrentYearTotal();
+  @PostMapping("/add_installment")
+  @Transactional
+  public FeeStatementResponseDto addInstallment(@Valid InstallmentsDto installmentsDto) {
+    try {
+      int previousTermBalance = 0;
+      int previousAnnualBalance = 0;
+      int previousTotal = 0;
 
-            UserSessionActivitiesEntity userSessionActivitiesEntity = userSessionActivitiesRepository.save(new UserSessionActivitiesEntity(installmentsDto.getSessionLogId(), sessionActivitiesRepository.findBySessionActivityCode(SessionActivitiesConfig.REGISTER_FEE_INSTALLMENT_SESSION_ACTIVITY).get(0).getSessionActivityId(), UtilityClass.getNow(), 0));
+      FeeStatementEntity feeStatementBeforeTransaction = feeStatementRepository.findFeeStatementByStudentId(
+          installmentsDto.getStudentId()).get(0);
+      previousTermBalance = feeStatementBeforeTransaction.getCurrentTermBalance();
+      previousAnnualBalance = feeStatementBeforeTransaction.getAnnualBalance();
+      previousTotal = feeStatementBeforeTransaction.getCurrentYearTotal();
+
+      UserSessionActivitiesEntity userSessionActivitiesEntity = userSessionActivitiesRepository.save(
+          new UserSessionActivitiesEntity(installmentsDto.getSessionLogId(),
+              sessionActivitiesRepository.findBySessionActivityCode(
+                      SessionActivitiesConfig.REGISTER_FEE_INSTALLMENT_SESSION_ACTIVITY).get(0)
+                  .getSessionActivityId(), UtilityClass.getNow(), 0));
+
+      FeeStatementEntity dbFeeStatement = feeStatementRepository.findFeeStatementByStudentId(
+          installmentsDto.getStudentId()).get(0);
+
+      dbFeeStatement.setCurrentYearTotal(
+          getNextYearTotalFromInstallment(dbFeeStatement.getStudentId(),
+              installmentsDto.getInstallmentAmount()));
+      dbFeeStatement.setAlternateTotal(getNextAlternateTotal(dbFeeStatement.getStudentId()));
+      dbFeeStatement.setCurrentTermBalance(getNextTermBalance(dbFeeStatement.getStudentId(),
+          installmentsDto.getInstallmentAmount()));
+      dbFeeStatement.setAnnualBalance(
+          UtilityClass.getAStudentAnnualBalanceFromTermBalance(dbFeeStatement.getStudentId(),
+              dbFeeStatement.getCurrentTermBalance(),
+              UtilityClass.getAStudentResidenceDetails(dbFeeStatement.getStudentId())
+                  .getInt("StudentResidenceId")));
+      dbFeeStatement.setStudentWorth(getNextStudentWorth(dbFeeStatement.getStudentId()));
+
+      feeStatementRepository.save(dbFeeStatement);
+
+      InstallmentsEntity dbInstallment = installmentRepository.save(
+          new InstallmentsEntity(installmentsDto.getStudentId(),
+              installmentsDto.getInstallmentAmount(), UtilityClass.getNow(), 0,
+              installmentsDto.getSessionLogId(),
+              userSessionActivitiesEntity.getUserSessionActivityId(), UtilityClass.getCurrentYear(),
+              0));
+
+      registerTransaction(installmentsDto.getSessionLogId(),
+          userSessionActivitiesEntity.getUserSessionActivityId(), installmentsDto.getStudentId(),
+          dbInstallment.getInstallmentId(), previousTermBalance, previousAnnualBalance,
+          previousTotal, dbFeeStatement.getCurrentTermBalance(), dbFeeStatement.getAnnualBalance(),
+          dbFeeStatement.getCurrentYearTotal());
+
+      updateAStudentFeeComponents(dbFeeStatement.getStudentId(),
+          dbFeeStatement.getCurrentYearTotal());
+
+      StudentEntity studentEntity = studentRepository.findByStudentId(
+          installmentsDto.getStudentId()).get(0);
+      if (studentEntity.getParentPhoneNumber() != null && !studentEntity.getParentPhoneNumber()
+          .isEmpty()) {
+        String textMessage = String.format(
+            "Dear parent, we have received your fee payment of KES %s. %s's " +
+                "fee statement now stands as follows: Term Balance: %s, Annual Balance: %s. Much appreciation."
+            , Utils.formatIntegerToCommaSeperatedValue(installmentsDto.getInstallmentAmount())
+            , studentEntity.getStudentName()
+            , Utils.formatIntegerToCommaSeperatedValue(dbFeeStatement.getCurrentTermBalance())
+            , Utils.formatIntegerToCommaSeperatedValue(dbFeeStatement.getAnnualBalance()));
+
+        boolean isSmsSentSuccessfully = smsService.sendSms(studentEntity.getParentPhoneNumber(),
+            textMessage);
+        log.info(String.format("Fee payment sms for %s %s", studentEntity.getStudentName(),
+            isSmsSentSuccessfully ? "has been sent successfully" : "failed to reach the recipient."));
+      }
+
+      return getAStudentFeeStatementSinceJoining(dbFeeStatement.getStudentId());
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+
+  }
 
 
-            FeeStatementEntity dbFeeStatement = feeStatementRepository.findFeeStatementByStudentId(installmentsDto.getStudentId()).get(0);
+  public int getNextYearTotalFromInstallment(int studentId, int installmentAmount) {
 
-            dbFeeStatement.setCurrentYearTotal(getNextYearTotalFromInstallment(dbFeeStatement.getStudentId(), installmentsDto.getInstallmentAmount()));
-            dbFeeStatement.setAlternateTotal(getNextAlternateTotal(dbFeeStatement.getStudentId()));
-            dbFeeStatement.setCurrentTermBalance(getNextTermBalance(dbFeeStatement.getStudentId(), installmentsDto.getInstallmentAmount()));
-            dbFeeStatement.setAnnualBalance(UtilityClass.getAStudentAnnualBalanceFromTermBalance(dbFeeStatement.getStudentId(), dbFeeStatement.getCurrentTermBalance(), UtilityClass.getAStudentResidenceDetails(dbFeeStatement.getStudentId()).getInt("StudentResidenceId")));
-            dbFeeStatement.setStudentWorth(getNextStudentWorth(dbFeeStatement.getStudentId()));
+    FeeStatementEntity dbFeeStatement = feeStatementRepository.findFeeStatementByStudentId(
+        studentId).get(0);
+
+    return dbFeeStatement.getCurrentYearTotal() + installmentAmount;
+  }
 
 
-            feeStatementRepository.save(dbFeeStatement);
+  public int getNextAlternateTotal(int studentId) {
+    int alternateTotal = 0;
 
-            InstallmentsEntity dbInstallment = installmentRepository.save(new InstallmentsEntity(installmentsDto.getStudentId(), installmentsDto.getInstallmentAmount(), UtilityClass.getNow(), 0, installmentsDto.getSessionLogId(), userSessionActivitiesEntity.getUserSessionActivityId(), UtilityClass.getCurrentYear(), 0));
+    List<InstallmentsEntity> dbInstallmentsList = installmentRepository.findInstallmentsByStudentId(
+        studentId);
 
-            registerTransaction(installmentsDto.getSessionLogId(), userSessionActivitiesEntity.getUserSessionActivityId(), installmentsDto.getStudentId(), dbInstallment.getInstallmentId(), previousTermBalance, previousAnnualBalance, previousTotal, dbFeeStatement.getCurrentTermBalance(), dbFeeStatement.getAnnualBalance(), dbFeeStatement.getCurrentYearTotal());
+    for (int i = 0; i < dbInstallmentsList.size(); i++) {
 
-            updateAStudentFeeComponents(dbFeeStatement.getStudentId(), dbFeeStatement.getCurrentYearTotal());
-
-            StudentEntity studentEntity = studentRepository.findByStudentId(installmentsDto.getStudentId()).get(0);
-            if (studentEntity.getParentPhoneNumber() != null && !studentEntity.getParentPhoneNumber().isEmpty()) {
-                String textMessage = String.format("Dear parent, we have received your fee payment of KES %s. %s's " +
-                                "fee statement now stands as follows: Term Balance: %s, Annual Balance: %s. Much appreciation."
-                        , Utils.formatIntegerToCommaSeperatedValue(installmentsDto.getInstallmentAmount())
-                        , studentEntity.getStudentName()
-                        , Utils.formatIntegerToCommaSeperatedValue(dbFeeStatement.getCurrentTermBalance())
-                        , Utils.formatIntegerToCommaSeperatedValue(dbFeeStatement.getAnnualBalance()));
-
-                smsService.sendSms(studentEntity.getParentPhoneNumber(), textMessage);
-            }
-
-            return getAStudentFeeStatementSinceJoining(dbFeeStatement.getStudentId());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+      if (dbInstallmentsList.get(i).getInstallmentYear().equals(UtilityClass.getCurrentYear())) {
+        alternateTotal = alternateTotal + dbInstallmentsList.get(i).getInstallmentAmount();
+      }
 
     }
 
+    return alternateTotal;
+  }
 
-    public int getNextYearTotalFromInstallment(int studentId, int installmentAmount) {
 
-        FeeStatementEntity dbFeeStatement = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
+  public int getNextTermBalance(int studentId, int installmentAmount) {
+    FeeStatementEntity dbFeeStatement = feeStatementRepository.findFeeStatementByStudentId(
+        studentId).get(0);
 
-        return dbFeeStatement.getCurrentYearTotal() + installmentAmount;
-    }
+    return dbFeeStatement.getCurrentTermBalance() - installmentAmount;
+  }
 
 
-    public int getNextAlternateTotal(int studentId) {
-        int alternateTotal = 0;
+  public int getNextStudentWorth(int studentId) {
+    int studentWorth = 0;
+    JSONObject termObject = getTermDetailsByDate(UtilityClass.getToday());
 
-        List<InstallmentsEntity> dbInstallmentsList = installmentRepository.findInstallmentsByStudentId(studentId);
+    JSONArray installmentArray = UtilityClass.getInstallmentsForParticularStudentBetweenACertainPeriod(
+        studentId, termObject.getString("TermStartDate"), termObject.getString("TermEndDate"));
 
-        for (int i = 0; i < dbInstallmentsList.size(); i++) {
+    for (int i = 0; i < installmentArray.length(); i++) {
 
-            if (dbInstallmentsList.get(i).getInstallmentYear().equals(UtilityClass.getCurrentYear())) {
-                alternateTotal = alternateTotal + dbInstallmentsList.get(i).getInstallmentAmount();
-            }
-
-        }
-
-        return alternateTotal;
-    }
-
-
-    public int getNextTermBalance(int studentId, int installmentAmount) {
-        FeeStatementEntity dbFeeStatement = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
-
-        return dbFeeStatement.getCurrentTermBalance() - installmentAmount;
-    }
-
-
-    public int getNextStudentWorth(int studentId) {
-        int studentWorth = 0;
-        JSONObject termObject = getTermDetailsByDate(UtilityClass.getToday());
-
-        JSONArray installmentArray = UtilityClass.getInstallmentsForParticularStudentBetweenACertainPeriod(studentId, termObject.getString("TermStartDate"), termObject.getString("TermEndDate"));
-
-        for (int i = 0; i < installmentArray.length(); i++) {
-
-            studentWorth = studentWorth + installmentArray.getJSONObject(i).getInt("InstallmentAmount");
-
-        }
-
-        return studentWorth;
-    }
-
-
-    public void registerTransaction(int sessionLogId, int userSessionActivityId, int studentId, int installmentId, int previousTermBalance, int previousAnnualBalance, int previousTotal, int nextTermBalance, int nextAnnualBalance, int nextTotal) {
-
-        TransactionsEntity transaction = new TransactionsEntity();
-
-        transaction.setSessionLogId(sessionLogId);
-        transaction.setUserSessionActivityId(userSessionActivityId);
-        transaction.setTransactionDescriptionId(transactionDescriptionsRepository.findByTransactionDescriptionCode(TransactionDescriptionsConfig.REGISTER_FEE_INSTALLMENT_TRANSACTION_DESCRIPTION).get(0).getTransactionDescriptionId());
-        transaction.setStudentId(studentId);
-        transaction.setInstallmentId(installmentId);
-        transaction.setPreviousTermBalance(previousTermBalance);
-        transaction.setPreviousAnnualBalance(previousAnnualBalance);
-        transaction.setPreviousTotal(previousTotal);
-        transaction.setNextTermBalance(nextTermBalance);
-        transaction.setNextAnnualBalance(nextAnnualBalance);
-        transaction.setNextTotal(nextTotal);
-        transaction.setTransactionDate(UtilityClass.getNow());
-        transaction.setCarryFowardId(carryForwardsRepository.findByIsAdminCarryForward(1).get(0).getCarryFowardId());
-        transaction.setFeeCorrectionId(feeCorrectionsRepository.findByIsAdminFeeCorrection(1).get(0).getFeeCorrectionId());
-
-        transactionsRepository.save(transaction);
-    }
-
-
-    public FeeStatementResponseDto getAStudentFeeStatementForCurrentYear(int studentId) {
-
-        FeeStatementResponseDto feeStatementResponseDto = new FeeStatementResponseDto();
-
-        StudentEntity studentPersonalDetails = studentRepository.findByStudentId(studentId).get(0);
-        JSONObject classDetails = UtilityClass.getAStudentClassDetails(studentId);
-        JSONObject residenceDetails = UtilityClass.getAStudentResidenceDetails(studentId);
-        FeeStatementEntity feeStatementEntity = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
-        List<InstallmentsEntity> feeInstallmentsList = installmentRepository.findInstallmentsByStudentId(studentId);
-
-
-        feeStatementResponseDto.setStudentId(studentId);
-        feeStatementResponseDto.setProfPicName(studentPersonalDetails.getProfPicName());
-        feeStatementResponseDto.setAdmissionNumber(studentPersonalDetails.getAdmissionNo());
-        feeStatementResponseDto.setStudentName(studentPersonalDetails.getStudentName());
-        feeStatementResponseDto.setGender(genderRepository.findByGenderId(studentPersonalDetails.getGenderId()).get(0).getGenderCode() == 1 ? "Male" : "Female");
-        feeStatementResponseDto.setClassDetails(classDetails.getString("AcademicClassLevelName") + " " + classDetails.getString("ClassStreamName"));
-        feeStatementResponseDto.setResidenceDetails(residenceDetails.getString("StudentResidenceDescription"));
-        feeStatementResponseDto.setTermBalance(feeStatementEntity.getCurrentTermBalance());
-        feeStatementResponseDto.setAnnualBalance(feeStatementEntity.getAnnualBalance());
-        feeStatementResponseDto.setCurrentyearTotal(feeStatementEntity.getCurrentYearTotal());
-
-        List<InstallmentsResponseDto> installmentsResponseDtoArrayList = new ArrayList<>();
-
-
-        for (int i = 0; i < feeInstallmentsList.size(); i++) {
-            if (feeInstallmentsList.get(i).getInstallmentYear().matches(".*?\\b" + UtilityClass.getCurrentYear() + "\\b.*?")) {
-
-
-                String installmentDate = feeInstallmentsList.get(i).getInstallmentDate().replaceAll(" .+$", "");
-
-                installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(), feeInstallmentsList.get(i).getInstallmentAmount(), installmentDate, feeInstallmentsList.get(i).getIsCarryForward(), feeInstallmentsList.get(i).getSessionLogId(), feeInstallmentsList.get(i).getUserSessionActivityId(), feeInstallmentsList.get(i).getInstallmentYear(), UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"), getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
-
-            }
-        }
-
-        feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);
-
-
-        JSONArray feeComponentsArray = UtilityClass.getAStudentFeeComponents(studentId);
-        List<FeeComponentsResponseDto> feeComponentsResponseDtoList = new ArrayList<>();
-
-        for (int i = 0; i < feeComponentsArray.length(); i++) {
-
-            String feeComponentDescription = feeComponentsArray.getJSONObject(i).getString("FeeComponentDescription");
-            double componentFeeAmount = feeComponentsArray.getJSONObject(i).getDouble("ComponentFeeAmount");
-
-            feeComponentsResponseDtoList.add(new FeeComponentsResponseDto(feeComponentDescription, componentFeeAmount));
-
-        }
-
-        feeStatementResponseDto.setFeeComponentsResponseDtoList(feeComponentsResponseDtoList);
-        feeStatementResponseDto.setFeeStatementProcessedSuccessfully(true);
-
-        return feeStatementResponseDto;
-    }
-
-
-    public FeeStatementResponseDto getAStudentFeeStatementSinceJoining(int studentId) {
-
-        FeeStatementResponseDto feeStatementResponseDto = new FeeStatementResponseDto();
-
-        StudentEntity studentPersonalDetails = studentRepository.findByStudentId(studentId).get(0);
-        JSONObject classDetails = UtilityClass.getAStudentClassDetails(studentId);
-        JSONObject residenceDetails = UtilityClass.getAStudentResidenceDetails(studentId);
-        FeeStatementEntity feeStatementEntity = feeStatementRepository.findFeeStatementByStudentId(studentId).get(0);
-        List<InstallmentsEntity> feeInstallmentsList = installmentRepository.findInstallmentsByStudentId(studentId);
-
-
-        feeStatementResponseDto.setStudentId(studentId);
-        feeStatementResponseDto.setProfPicName(studentPersonalDetails.getProfPicName());
-        feeStatementResponseDto.setAdmissionNumber(studentPersonalDetails.getAdmissionNo());
-        feeStatementResponseDto.setStudentName(studentPersonalDetails.getStudentName());
-        feeStatementResponseDto.setGender(genderRepository.findByGenderId(studentPersonalDetails.getGenderId()).get(0).getGenderCode() == 1 ? "Male" : "Female");
-        feeStatementResponseDto.setClassDetails(classDetails.getString("AcademicClassLevelName") + " " + classDetails.getString("ClassStreamName"));
-        feeStatementResponseDto.setResidenceDetails(residenceDetails.getString("StudentResidenceDescription"));
-        feeStatementResponseDto.setTermBalance(feeStatementEntity.getCurrentTermBalance());
-        feeStatementResponseDto.setAnnualBalance(feeStatementEntity.getAnnualBalance());
-        feeStatementResponseDto.setCurrentyearTotal(feeStatementEntity.getCurrentYearTotal());
-
-        List<InstallmentsResponseDto> installmentsResponseDtoArrayList = new ArrayList<>();
-
-
-        for (int i = 0; i < feeInstallmentsList.size(); i++) {
-            String installmentDate = feeInstallmentsList.get(i).getInstallmentDate().replaceAll(" .+$", "");
-            installmentsResponseDtoArrayList.add(new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(), feeInstallmentsList.get(i).getInstallmentAmount(), installmentDate, feeInstallmentsList.get(i).getIsCarryForward(), feeInstallmentsList.get(i).getSessionLogId(), feeInstallmentsList.get(i).getUserSessionActivityId(), feeInstallmentsList.get(i).getInstallmentYear(), UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId()).getString("Name"), getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
-        }
-
-        feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);
-
-
-        JSONArray feeComponentsArray = UtilityClass.getAStudentFeeComponents(studentId);
-        List<FeeComponentsResponseDto> feeComponentsResponseDtoList = new ArrayList<>();
-
-        for (int i = 0; i < feeComponentsArray.length(); i++) {
-
-            String feeComponentDescription = feeComponentsArray.getJSONObject(i).getString("FeeComponentDescription");
-            double componentFeeAmount = feeComponentsArray.getJSONObject(i).getDouble("ComponentFeeAmount");
-
-            feeComponentsResponseDtoList.add(new FeeComponentsResponseDto(feeComponentDescription, componentFeeAmount));
-
-        }
-
-        feeStatementResponseDto.setFeeComponentsResponseDtoList(feeComponentsResponseDtoList);
-        feeStatementResponseDto.setFeeStatementProcessedSuccessfully(true);
-
-        return feeStatementResponseDto;
-    }
-
-
-    public void updateAStudentFeeComponents(int studentId, int currentYearTotal) {
-
-        JSONArray feeComponentsArray = UtilityClass.getAStudentFeeComponents(studentId);
-
-        for (int i = 0; i < feeComponentsArray.length(); i++) {
-
-            int feeComponentRatio = feeComponentsArray.getJSONObject(i).getInt("FeeComponentRatio");
-            int studentFeeComponentId = feeComponentsArray.getJSONObject(i).getInt("StudentFeeComponentId");
-            int classFeeStructureComponentId = feeComponentsArray.getJSONObject(i).getInt("ClassFeeStructureComponentId");
-
-            double ratio = (double) feeComponentRatio / 100;
-            double componentFeeAmount = currentYearTotal * ratio;
-
-            studentFeeComponentRepository.save(new StudentFeeComponentEntity(studentFeeComponentId, studentId, classFeeStructureComponentId, componentFeeAmount));
-        }
-    }
-
-
-    @GetMapping("/export/pdf")
-    public void exportToPDF(HttpServletResponse response, @RequestParam("studentId") int studentId) throws DocumentException, IOException, URISyntaxException {
-        response.setContentType("application/pdf");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-        String currentDateTime = dateFormatter.format(new Date());
-
-        String fileName = studentRepository.findByStudentId(studentId).get(0).getStudentName() + " " + currentDateTime + " Installment Receipt";
-
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=" + fileName + ".pdf";
-        response.setHeader(headerKey, headerValue);
-
-        installmentReceiptPdfService.export(response, studentId);
+      studentWorth = studentWorth + installmentArray.getJSONObject(i).getInt("InstallmentAmount");
 
     }
 
-    @GetMapping("/excel/fee-installments-made-today")
-    public void exportFeeInstallmentsMadeToday(HttpServletResponse response) throws IOException {
-        try {
-            String fileName = String.format("FEE INSTALLMENTS MADE TODAY (%s)", new SimpleDateFormat("E, MMM dd yyyy").format(new Date()));
-            response.setContentType("application/octet-stream");
-            excelService.exportInstallmentsMadeTodayExcel(response, fileName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    return studentWorth;
+  }
 
 
-    @GetMapping("/excel/fee-installments-made-between-two-dates")
-    public void exportFeeInstallmentsMadeBetweenTwoDates(HttpServletResponse response
-            , @RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) throws IOException {
-        try {
-            String fileName = String.format("FEE INSTALLMENTS MADE BETWEEN %s AND %s", Utils.convertToUserFriendlyDate(
-                            startDate, "yyyy-MM-dd")
-                    , Utils.convertToUserFriendlyDate(endDate, "yyyy-MM-dd"));
-            response.setContentType("application/octet-stream");
-            excelService.exportInstallmentsMadeBetweenTwoDatesExcel(response, fileName, startDate, endDate);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+  public void registerTransaction(int sessionLogId, int userSessionActivityId, int studentId,
+      int installmentId, int previousTermBalance, int previousAnnualBalance, int previousTotal,
+      int nextTermBalance, int nextAnnualBalance, int nextTotal) {
+
+    TransactionsEntity transaction = new TransactionsEntity();
+
+    transaction.setSessionLogId(sessionLogId);
+    transaction.setUserSessionActivityId(userSessionActivityId);
+    transaction.setTransactionDescriptionId(
+        transactionDescriptionsRepository.findByTransactionDescriptionCode(
+                TransactionDescriptionsConfig.REGISTER_FEE_INSTALLMENT_TRANSACTION_DESCRIPTION).get(0)
+            .getTransactionDescriptionId());
+    transaction.setStudentId(studentId);
+    transaction.setInstallmentId(installmentId);
+    transaction.setPreviousTermBalance(previousTermBalance);
+    transaction.setPreviousAnnualBalance(previousAnnualBalance);
+    transaction.setPreviousTotal(previousTotal);
+    transaction.setNextTermBalance(nextTermBalance);
+    transaction.setNextAnnualBalance(nextAnnualBalance);
+    transaction.setNextTotal(nextTotal);
+    transaction.setTransactionDate(UtilityClass.getNow());
+    transaction.setCarryFowardId(
+        carryForwardsRepository.findByIsAdminCarryForward(1).get(0).getCarryFowardId());
+    transaction.setFeeCorrectionId(
+        feeCorrectionsRepository.findByIsAdminFeeCorrection(1).get(0).getFeeCorrectionId());
+
+    transactionsRepository.save(transaction);
+  }
+
+
+  public FeeStatementResponseDto getAStudentFeeStatementForCurrentYear(int studentId) {
+
+    FeeStatementResponseDto feeStatementResponseDto = new FeeStatementResponseDto();
+
+    StudentEntity studentPersonalDetails = studentRepository.findByStudentId(studentId).get(0);
+    JSONObject classDetails = UtilityClass.getAStudentClassDetails(studentId);
+    JSONObject residenceDetails = UtilityClass.getAStudentResidenceDetails(studentId);
+    FeeStatementEntity feeStatementEntity = feeStatementRepository.findFeeStatementByStudentId(
+        studentId).get(0);
+    List<InstallmentsEntity> feeInstallmentsList = installmentRepository.findInstallmentsByStudentId(
+        studentId);
+
+    feeStatementResponseDto.setStudentId(studentId);
+    feeStatementResponseDto.setProfPicName(studentPersonalDetails.getProfPicName());
+    feeStatementResponseDto.setAdmissionNumber(studentPersonalDetails.getAdmissionNo());
+    feeStatementResponseDto.setStudentName(studentPersonalDetails.getStudentName());
+    feeStatementResponseDto.setGender(
+        genderRepository.findByGenderId(studentPersonalDetails.getGenderId()).get(0).getGenderCode()
+            == 1 ? "Male" : "Female");
+    feeStatementResponseDto.setClassDetails(
+        classDetails.getString("AcademicClassLevelName") + " " + classDetails.getString(
+            "ClassStreamName"));
+    feeStatementResponseDto.setResidenceDetails(
+        residenceDetails.getString("StudentResidenceDescription"));
+    feeStatementResponseDto.setTermBalance(feeStatementEntity.getCurrentTermBalance());
+    feeStatementResponseDto.setAnnualBalance(feeStatementEntity.getAnnualBalance());
+    feeStatementResponseDto.setCurrentyearTotal(feeStatementEntity.getCurrentYearTotal());
+
+    List<InstallmentsResponseDto> installmentsResponseDtoArrayList = new ArrayList<>();
+
+    for (int i = 0; i < feeInstallmentsList.size(); i++) {
+      if (feeInstallmentsList.get(i).getInstallmentYear()
+          .matches(".*?\\b" + UtilityClass.getCurrentYear() + "\\b.*?")) {
+
+        String installmentDate = feeInstallmentsList.get(i).getInstallmentDate()
+            .replaceAll(" .+$", "");
+
+        installmentsResponseDtoArrayList.add(
+            new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),
+                feeInstallmentsList.get(i).getInstallmentAmount(), installmentDate,
+                feeInstallmentsList.get(i).getIsCarryForward(),
+                feeInstallmentsList.get(i).getSessionLogId(),
+                feeInstallmentsList.get(i).getUserSessionActivityId(),
+                feeInstallmentsList.get(i).getInstallmentYear(),
+                UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId())
+                    .getString("Name"),
+                getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
+
+      }
     }
 
-    @GetMapping("/excel/fee-installments-made-on-a-specific-date")
-    public void exportFeeInstallmentsMadeOnASpecificDate(HttpServletResponse response
-            , @RequestParam("installmentDate") String installmentDate) throws IOException {
-        try {
-            String fileName = String.format("FEE INSTALLMENTS MADE ON %s", Utils.convertToUserFriendlyDate(
-                    installmentDate, "yyyy-MM-dd"));
-            response.setContentType("application/octet-stream");
-            excelService.exportInstallmentsMadeOnASpecificDateExcel(response, fileName, installmentDate);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);
+
+    JSONArray feeComponentsArray = UtilityClass.getAStudentFeeComponents(studentId);
+    List<FeeComponentsResponseDto> feeComponentsResponseDtoList = new ArrayList<>();
+
+    for (int i = 0; i < feeComponentsArray.length(); i++) {
+
+      String feeComponentDescription = feeComponentsArray.getJSONObject(i)
+          .getString("FeeComponentDescription");
+      double componentFeeAmount = feeComponentsArray.getJSONObject(i)
+          .getDouble("ComponentFeeAmount");
+
+      feeComponentsResponseDtoList.add(
+          new FeeComponentsResponseDto(feeComponentDescription, componentFeeAmount));
+
     }
+
+    feeStatementResponseDto.setFeeComponentsResponseDtoList(feeComponentsResponseDtoList);
+    feeStatementResponseDto.setFeeStatementProcessedSuccessfully(true);
+
+    return feeStatementResponseDto;
+  }
+
+
+  public FeeStatementResponseDto getAStudentFeeStatementSinceJoining(int studentId) {
+
+    FeeStatementResponseDto feeStatementResponseDto = new FeeStatementResponseDto();
+
+    StudentEntity studentPersonalDetails = studentRepository.findByStudentId(studentId).get(0);
+    JSONObject classDetails = UtilityClass.getAStudentClassDetails(studentId);
+    JSONObject residenceDetails = UtilityClass.getAStudentResidenceDetails(studentId);
+    FeeStatementEntity feeStatementEntity = feeStatementRepository.findFeeStatementByStudentId(
+        studentId).get(0);
+    List<InstallmentsEntity> feeInstallmentsList = installmentRepository.findInstallmentsByStudentId(
+        studentId);
+
+    feeStatementResponseDto.setStudentId(studentId);
+    feeStatementResponseDto.setProfPicName(studentPersonalDetails.getProfPicName());
+    feeStatementResponseDto.setAdmissionNumber(studentPersonalDetails.getAdmissionNo());
+    feeStatementResponseDto.setStudentName(studentPersonalDetails.getStudentName());
+    feeStatementResponseDto.setGender(
+        genderRepository.findByGenderId(studentPersonalDetails.getGenderId()).get(0).getGenderCode()
+            == 1 ? "Male" : "Female");
+    feeStatementResponseDto.setClassDetails(
+        classDetails.getString("AcademicClassLevelName") + " " + classDetails.getString(
+            "ClassStreamName"));
+    feeStatementResponseDto.setResidenceDetails(
+        residenceDetails.getString("StudentResidenceDescription"));
+    feeStatementResponseDto.setTermBalance(feeStatementEntity.getCurrentTermBalance());
+    feeStatementResponseDto.setAnnualBalance(feeStatementEntity.getAnnualBalance());
+    feeStatementResponseDto.setCurrentyearTotal(feeStatementEntity.getCurrentYearTotal());
+
+    List<InstallmentsResponseDto> installmentsResponseDtoArrayList = new ArrayList<>();
+
+    for (int i = 0; i < feeInstallmentsList.size(); i++) {
+      String installmentDate = feeInstallmentsList.get(i).getInstallmentDate()
+          .replaceAll(" .+$", "");
+      installmentsResponseDtoArrayList.add(
+          new InstallmentsResponseDto(feeInstallmentsList.get(i).getStudentId(),
+              feeInstallmentsList.get(i).getInstallmentAmount(), installmentDate,
+              feeInstallmentsList.get(i).getIsCarryForward(),
+              feeInstallmentsList.get(i).getSessionLogId(),
+              feeInstallmentsList.get(i).getUserSessionActivityId(),
+              feeInstallmentsList.get(i).getInstallmentYear(),
+              UtilityClass.getAUserByASessionLogId(feeInstallmentsList.get(i).getSessionLogId())
+                  .getString("Name"),
+              getTermDetailsByDate(installmentDate).getString("TermIterationDescription")));
+    }
+
+    feeStatementResponseDto.setInstallmentsResponseArray(installmentsResponseDtoArrayList);
+
+    JSONArray feeComponentsArray = UtilityClass.getAStudentFeeComponents(studentId);
+    List<FeeComponentsResponseDto> feeComponentsResponseDtoList = new ArrayList<>();
+
+    for (int i = 0; i < feeComponentsArray.length(); i++) {
+
+      String feeComponentDescription = feeComponentsArray.getJSONObject(i)
+          .getString("FeeComponentDescription");
+      double componentFeeAmount = feeComponentsArray.getJSONObject(i)
+          .getDouble("ComponentFeeAmount");
+
+      feeComponentsResponseDtoList.add(
+          new FeeComponentsResponseDto(feeComponentDescription, componentFeeAmount));
+
+    }
+
+    feeStatementResponseDto.setFeeComponentsResponseDtoList(feeComponentsResponseDtoList);
+    feeStatementResponseDto.setFeeStatementProcessedSuccessfully(true);
+
+    return feeStatementResponseDto;
+  }
+
+
+  public void updateAStudentFeeComponents(int studentId, int currentYearTotal) {
+
+    JSONArray feeComponentsArray = UtilityClass.getAStudentFeeComponents(studentId);
+
+    for (int i = 0; i < feeComponentsArray.length(); i++) {
+
+      int feeComponentRatio = feeComponentsArray.getJSONObject(i).getInt("FeeComponentRatio");
+      int studentFeeComponentId = feeComponentsArray.getJSONObject(i)
+          .getInt("StudentFeeComponentId");
+      int classFeeStructureComponentId = feeComponentsArray.getJSONObject(i)
+          .getInt("ClassFeeStructureComponentId");
+
+      double ratio = (double) feeComponentRatio / 100;
+      double componentFeeAmount = currentYearTotal * ratio;
+
+      studentFeeComponentRepository.save(
+          new StudentFeeComponentEntity(studentFeeComponentId, studentId,
+              classFeeStructureComponentId, componentFeeAmount));
+    }
+  }
+
+
+  @GetMapping("/export/pdf")
+  public void exportToPDF(HttpServletResponse response, @RequestParam("studentId") int studentId)
+      throws DocumentException, IOException, URISyntaxException {
+    response.setContentType("application/pdf");
+    DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+    String currentDateTime = dateFormatter.format(new Date());
+
+    String fileName =
+        studentRepository.findByStudentId(studentId).get(0).getStudentName() + " " + currentDateTime
+            + " Installment Receipt";
+
+    String headerKey = "Content-Disposition";
+    String headerValue = "attachment; filename=" + fileName + ".pdf";
+    response.setHeader(headerKey, headerValue);
+
+    installmentReceiptPdfService.export(response, studentId);
+
+  }
+
+  @GetMapping("/excel/fee-installments-made-today")
+  public void exportFeeInstallmentsMadeToday(HttpServletResponse response) throws IOException {
+    try {
+      String fileName = String.format("FEE INSTALLMENTS MADE TODAY (%s)",
+          new SimpleDateFormat("E, MMM dd yyyy").format(new Date()));
+      response.setContentType("application/octet-stream");
+      excelService.exportInstallmentsMadeTodayExcel(response, fileName);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+
+  @GetMapping("/excel/fee-installments-made-between-two-dates")
+  public void exportFeeInstallmentsMadeBetweenTwoDates(HttpServletResponse response
+      , @RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate)
+      throws IOException {
+    try {
+      String fileName = String.format("FEE INSTALLMENTS MADE BETWEEN %s AND %s",
+          Utils.convertToUserFriendlyDate(
+              startDate, "yyyy-MM-dd")
+          , Utils.convertToUserFriendlyDate(endDate, "yyyy-MM-dd"));
+      response.setContentType("application/octet-stream");
+      excelService.exportInstallmentsMadeBetweenTwoDatesExcel(response, fileName, startDate,
+          endDate);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @GetMapping("/excel/fee-installments-made-on-a-specific-date")
+  public void exportFeeInstallmentsMadeOnASpecificDate(HttpServletResponse response
+      , @RequestParam("installmentDate") String installmentDate) throws IOException {
+    try {
+      String fileName = String.format("FEE INSTALLMENTS MADE ON %s",
+          Utils.convertToUserFriendlyDate(
+              installmentDate, "yyyy-MM-dd"));
+      response.setContentType("application/octet-stream");
+      excelService.exportInstallmentsMadeOnASpecificDateExcel(response, fileName, installmentDate);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 
 }
