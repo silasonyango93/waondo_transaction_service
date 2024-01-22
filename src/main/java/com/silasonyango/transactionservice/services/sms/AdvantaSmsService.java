@@ -24,7 +24,7 @@ public class AdvantaSmsService {
         System.getenv("ADVANTA_API_KEY"),
         "9427",
         textMessage,
-        "WA",
+        "WAONDO-SEC",
         recipientPhoneNo
     );
 
