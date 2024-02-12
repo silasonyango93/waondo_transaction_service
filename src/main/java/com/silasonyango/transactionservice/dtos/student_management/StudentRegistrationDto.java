@@ -11,8 +11,9 @@ public class StudentRegistrationDto {
     private String admissionDate;
     private String profPicName;
     private int registrationSessionId;
+    private String parentPhoneNumber;
 
-    public StudentRegistrationDto(String admissionNo, String studentName, int genderCode, String studentDob, int studentResidenceCode, int classId, String admissionDate, String profPicName, int registrationSessionId) {
+    public StudentRegistrationDto(String admissionNo, String studentName, int genderCode, String studentDob, int studentResidenceCode, int classId, String admissionDate, String profPicName, int registrationSessionId, String parentPhoneNumber) {
         this.admissionNo = admissionNo;
         this.studentName = studentName;
         this.genderCode = genderCode;
@@ -22,6 +23,7 @@ public class StudentRegistrationDto {
         this.admissionDate = admissionDate;
         this.profPicName = profPicName;
         this.registrationSessionId = registrationSessionId;
+        this.parentPhoneNumber = parentPhoneNumber;
     }
 
     public int getStudentId() {
@@ -102,5 +104,13 @@ public class StudentRegistrationDto {
 
     public void setRegistrationSessionId(int registrationSessionId) {
         this.registrationSessionId = registrationSessionId;
+    }
+
+    public String getParentPhoneNumber() {
+        return parentPhoneNumber;
+    }
+
+    public void setParentPhoneNumber(String parentPhoneNumber) {
+        this.parentPhoneNumber = parentPhoneNumber;
     }
 }

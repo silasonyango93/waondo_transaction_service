@@ -127,6 +127,7 @@ public class StudentController {
       student.setGenderId(
           genderRepository.findByGenderCode(studentRegistrationDto.getGenderCode()).get(0)
               .getGenderId());
+      student.setParentPhoneNumber(studentRegistrationDto.getParentPhoneNumber());
 
       StudentEntity dbSavedStudent = studentRepository.save(student);
 

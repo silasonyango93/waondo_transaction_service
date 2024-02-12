@@ -102,7 +102,8 @@ public class IngestorController {
                     determineClassId(ingestedStudent.getClassId(), ingestedStudent.getCompletedSchool()),
                     "2021-01-01",
                     ingestedStudent.getStudentGender().equals("Male") ? "male_student.png" : "female_student.png",
-                    sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId()
+                    sessionLogsRepository.findByIsAdminSessionLog(1).get(0).getSessionLogId(),
+                null
             ));
 
             StudentEntity savedStudent = studentRepository.findByStudentId(Integer.parseInt(successFailureResponseDto.getReturnValue())).get(0);
